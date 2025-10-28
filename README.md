@@ -1,70 +1,85 @@
-# x10_dev_vue
+# StravaGoals
 
-This template should help get you started developing with Vue 3 in Vite.
+## Description
 
-## Recommended IDE Setup
+StravaGoals is a web application that enables users to define, track, and visualize annual training goals based on simulated Strava activity data. Users can create, edit, and delete goals, review their versioned history, and generate AI-driven suggestions for new or adjusted goals.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Tech Stack
 
-## Recommended Browser Setup
+- **Frontend:** Vue 3, TypeScript 5, Tailwind CSS 4
+- **Backend:** Supabase
+- **AI Module:** Openrouter.ai
+- **CI/CD & Hosting:** GitHub Actions (CI pipelines), mikr.us (Docker hosting)
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Getting Started Locally
 
-## Type Support for `.vue` Imports in TS
+### Prerequisites
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Node.js (v20.19.0 or >=22.12.0)
+- npm
 
-## Customize configuration
+### Installation
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+```bash
+# Clone the repository
+git clone https://github.com/gprawdzik/x10dev_zaliczenie.git
+cd x10dev_zaliczenie
 
-## Project Setup
-
-```sh
+# Install dependencies
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Environment Variables
 
-```sh
+Create a `.env` file in the project root with the following placeholders:
+
+```env
+VITE_SUPABASE_URL=<your-supabase-url>
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+```
+
+### Running the App
+
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+The app will be available at `http://localhost:5173` by default.
 
-```sh
-npm run build
-```
+## Available Scripts
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+- `npm run dev` : Start development server
+- `npm run build` : Build for production
+- `npm run preview` : Preview production build locally
+- `npm run test:unit` : Run unit tests (Vitest)
+- `npm run test:e2e` : Run end-to-end tests (Cypress)
+- `npm run lint` : Run ESLint and auto-fix issues
+- `npm run format` : Run Prettier formatter on source files
 
-```sh
-npm run test:unit
-```
+## Project Scope
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+- **Authentication:** Email/password registration, login, logout, password change, account deletion
+- **Annual Goals Management:** Create, read, update, delete goals with metrics (distance, time, elevation; time-only for Pilates/strength) and scopes (global, consolidation, per-sport)
+- **Goal History:** Append-only versioning of edits without rollback
+- **Activity Generator:** Simulate 100 activities over the last 12 months with realistic time-of-day and sport distributions; include minimal Strava fields (e.g., id, athlete.id, type, distance, moving_time, etc.)
+- **Visualizations:** “My Goals” cumulative progress chart and goal cards; “History” comparative charts of goal vs. actual performance
+- **AI Suggestions:** On-demand analysis of the last 3 months (5% sport threshold), with accept/reject controls to create or update goals
 
-```sh
-npm run test:e2e:dev
-```
+_Boundaries & Exclusions:_
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
+- No real Strava API integration (activities are simulated)
+- Only annual goals supported
+- No advanced activity analysis or logistical planning
+- Minimal security beyond basic password hashing
 
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+## Project Status
 
-```sh
-npm run build
-npm run test:e2e
-```
+- MVP features fully implemented and available for local testing.
+- Environment variable configuration pending (placeholders provided above).
+- CI/CD pipelines (GitHub Actions) and hosting configuration are planned but not yet set up.
 
-### Lint with [ESLint](https://eslint.org/)
+For detailed product requirements, see the [PRD document](.ai/prd.md).
 
-```sh
-npm run lint
-```
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
