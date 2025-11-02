@@ -8,3 +8,7 @@
 - Implement JSONB columns for semi-structured data instead of creating many tables for {{flexible_data}}
 - Use materialized views for complex, frequently accessed read-only data
 
+#### SUPABASE
+
+- Use Supabase for backend services, including authentication and and database integration
+- Follow supabase guidelines for security and performance
