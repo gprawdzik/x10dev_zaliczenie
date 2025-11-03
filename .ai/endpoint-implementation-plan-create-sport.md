@@ -2,14 +2,16 @@
 
 ## 1. Przegląd punktu końcowego
 
-Endpoint `POST /sports` umożliwia administratorowi dodanie nowego sportu do systemu. Sport jest bytem referencyjnym wykorzystywanym w celach (goals) oraz statystykach aktywności, dlatego poprawne i spójne tworzenie rekordów w tabeli `sports` ma krytyczne znaczenie dla integralności danych.
+Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do systemu. Sport jest bytem referencyjnym wykorzystywanym w celach (goals) oraz statystykach aktywności, dlatego poprawne i spójne tworzenie rekordów w tabeli `sports` ma krytyczne znaczenie dla integralności danych.
+
+**Implementacja techniczna:** W praktyce, używamy klienta Supabase (`supabaseClient.from('sports').insert()`), który komunikuje się z PostgREST API pod adresem `/rest/v1/sports`. Endpoint `/api/sports` jest logicznym oznaczeniem w dokumentacji API.
 
 ## 2. Szczegóły żądania
 
 - **Metoda HTTP:** `POST`
-- **URL:** `/sports`
+- **URL:** `/api/sports`
 - **Nagłówki wymagane:**
-  - `Authorization: Bearer <jwt>` – token Supabase z uprawnieniem `role = admin`
+  - `Authorization: Bearer <jwt>` – token Supabase z uprawnieniem `role = admin` (opcjonalne w development)
   - `Content-Type: application/json`
 - **Parametry URL:** brak
 - **Body (JSON):**
@@ -58,8 +60,8 @@ Endpoint `POST /sports` umożliwia administratorowi dodanie nowego sportu do sys
 
 ## 5. Przepływ danych
 
-1. Klient (panel admina) wysyła `POST /sports` z danymi.
-2. Supabase Edge Function (lub bezpośrednie żądanie do Supabase REST) odbiera zapytanie.
+1. Klient (panel admina) wysyła `POST /api/sports` z danymi.
+2. Supabase PostgREST API (poprzez klienta Supabase) odbiera zapytanie.
 3. Funkcja:
    1. Waliduje JSON (Zod / io-ts).
    2. Sprawdza uprawnienia użytkownika (rola `admin`).
