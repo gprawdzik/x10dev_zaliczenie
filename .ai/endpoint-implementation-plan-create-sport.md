@@ -4,7 +4,7 @@
 
 Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do systemu. Sport jest bytem referencyjnym wykorzystywanym w celach (goals) oraz statystykach aktywności, dlatego poprawne i spójne tworzenie rekordów w tabeli `sports` ma krytyczne znaczenie dla integralności danych.
 
-**Implementacja techniczna:** W praktyce, używamy klienta Supabase (`supabaseClient.from('sports').insert()`), który komunikuje się z PostgREST API pod adresem `/rest/v1/sports`. Endpoint `/api/sports` jest logicznym oznaczeniem w dokumentacji API.
+**Implementacja techniczna:** Nie używamy klienta Supabase @src/db/supabase.client.ts bezpośrednio, tylko dopiero w odpowiednim endpoincie, który komunikuje się z PostgREST API pod adresem `/rest/v1/sports` za pomocą @src/db/supabase.client.ts.
 
 ## 2. Szczegóły żądania
 
@@ -19,8 +19,7 @@ Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do
   {
     "code": "run", // wymagane, unikalny kod URL-safe
     "name": "Running", // wymagane, przyjazna nazwa
-    "description": "optional", // opcjonalny opis
-    "consolidated": null // opcjonalny JSONB określający konwersję typów
+    "description": "optional" // opcjonalny opis
   }
   ```
 - **Walidacja pól:**
@@ -29,7 +28,6 @@ Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do
   | `code` | `string` | 1–32 znaków, `[a-z0-9_\-]`, unikalne w tabeli `sports` |
   | `name` | `string` | 1–64 znaków |
   | `description` | `string \| null` | ≤ 256 znaków |
-  | `consolidated`| `object \| null` | dowolny JSON; `null` jeśli brak danych |
 
 ## 3. Wykorzystywane typy
 
@@ -42,7 +40,6 @@ Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do
     code: string
     name: string
     description?: string | null
-    consolidated?: Record<string, unknown> | null
   }
   ```
 - **Command Model:** `CreateSportCommand` (jeśli stosujemy CQRS) z polami identycznymi jak `CreateSportDto`.

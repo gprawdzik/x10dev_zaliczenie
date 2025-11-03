@@ -200,21 +200,18 @@ export type Database = {
       sports: {
         Row: {
           code: string
-          consolidated: Json | null
           description: string | null
           id: string
           name: string
         }
         Insert: {
           code: string
-          consolidated?: Json | null
           description?: string | null
           id?: string
           name: string
         }
         Update: {
           code?: string
-          consolidated?: Json | null
           description?: string | null
           id?: string
           name?: string
