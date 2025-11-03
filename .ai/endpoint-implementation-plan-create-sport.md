@@ -57,14 +57,13 @@ Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do
 
 ## 5. Przepływ danych
 
-1. Klient (panel admina) wysyła `POST /api/sports` z danymi.
-2. Supabase PostgREST API (poprzez klienta Supabase) odbiera zapytanie.
-3. Funkcja:
+1. Endpoint `POST /api/sports` odbiera dane in następnie wysyła do Supabase PostgREST API (poprzez klienta Supabase) odbiera zapytanie.
+2. Funkcja:
    1. Waliduje JSON (Zod / io-ts).
    2. Sprawdza uprawnienia użytkownika (rola `admin`).
    3. Próbuje wstawić rekord do tabeli `sports`.
    4. W przypadku sukcesu zwraca `201` z rekordem.
-4. Baza danych uruchamia constraint UNIQUE na `code`; w razie konfliktu zwraca `409`.
+3. Baza danych uruchamia constraint UNIQUE na `code`; w razie konfliktu zwraca `409`.
 
 > Uwaga: przy Supabase bez custom function można użyć wbudowanego endpointu `POST /rest/v1/sports`; jednak Edge Function daje większą kontrolę nad walidacją i logiką.
 
