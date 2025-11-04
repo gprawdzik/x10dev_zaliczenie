@@ -4,6 +4,7 @@ Frontend
 - Vue 3.5 (komponenty interaktywne jako islands)
 - TypeScript 5
 - Tailwind 4.1
+- shadcn/vue
 
 Backend
 

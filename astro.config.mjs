@@ -1,7 +1,8 @@
 import { defineConfig } from 'astro/config'
 import vue from '@astrojs/vue'
-import tailwind from '@astrojs/tailwind'
+// import tailwind from '@astrojs/tailwind'
 import node from '@astrojs/node'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,13 +17,14 @@ export default defineConfig({
       appEntrypoint: '/src/plugins/vue-app',
     }),
     // Tailwind integration - automatyczna konfiguracja Tailwind CSS
-    tailwind({
-      // Tailwind 4.x używa natywnego CSS
-      applyBaseStyles: false,
-    }),
+    // tailwind({
+    // Tailwind 4.x używa natywnego CSS
+    // applyBaseStyles: false,
+    // }),
   ],
   // Aliasy dla łatwiejszych importów
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: {
         '@': '/src',

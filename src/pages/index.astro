@@ -3,6 +3,7 @@
 // W Astro każdy plik w src/pages/ automatycznie staje się routem
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TheWelcome from '../components/TheWelcome.vue';
+import { Button } from '@/components/ui/button';
 
 // Generuj tę stronę statycznie (prerender)
 export const prerender = true;
@@ -15,6 +16,9 @@ export const prerender = true;
       Pozwala na interaktywność komponentu po stronie klienta
     -->
     <TheWelcome client:load />
+    <div class="mt-4">
+      <Button client:load>Shadcn Button</Button>
+    </div>
   </main>
 </BaseLayout>
 
