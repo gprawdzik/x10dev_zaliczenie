@@ -6,7 +6,7 @@ StravaGoals is a web application that enables users to define, track, and visual
 
 ## Tech Stack
 
-- **Frontend:** Vue 3, TypeScript 5, Tailwind CSS 4
+- **Frontend:** Astro 5.15 with Vue 3.5, TypeScript 5, Tailwind CSS 4.1
 - **Backend:** Supabase
 - **AI Module:** Openrouter.ai
 - **CI/CD & Hosting:** GitHub Actions (CI pipelines), mikr.us (Docker hosting)
@@ -34,9 +34,11 @@ npm install
 Create a `.env` file in the project root with the following placeholders:
 
 ```env
-VITE_SUPABASE_URL=<your-supabase-url>
-VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+PUBLIC_SUPABASE_URL=<your-supabase-url>
+PUBLIC_SUPABASE_KEY=<your-supabase-anon-key>
 ```
+
+> **Note:** In Astro, environment variables prefixed with `PUBLIC_` are accessible on the client-side. Variables without this prefix are only available on the server-side.
 
 ### Running the App
 
@@ -44,7 +46,7 @@ VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173` by default.
+The app will be available at `http://localhost:4321` by default (Astro development server).
 
 ## Available Scripts
 

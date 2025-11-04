@@ -8,11 +8,13 @@ StravaGoals application allows users to define, track, and visualize annual trai
 
 ### Frontend
 
-Vue 3
+Astro 5.15 - Main framework for pages and routing
+
+Vue 3.5 - Interactive components (Islands Architecture)
 
 TypeScript 5
 
-Tailwind 4
+Tailwind 4.1
 
 ### Backend
 
@@ -31,15 +33,29 @@ mikr.us for hosting the application via a Docker image
 ## Project Structure
 
 - `./src` - source code
-- `./src/assets/styles` - Tailwind styles
-- `./src/assets/images` - required images
-- `./src/components` - components
+- `./src/pages` - Astro pages (file-based routing): each .astro file becomes a route
+- `./src/layouts` - Astro layouts for shared page structure
+- `./src/components` - Vue components (interactive islands with client:\* directives)
 - `./src/components/ui` - small reusable UI components, e.g. buttons, cards
 - `./src/components/layout` - larger structures, e.g. navbar, footer
 - `./src/db` - Supabase clients and types
-- `./public` - public assets
+- `./src/plugins` - Vue app configuration (Pinia, Supabase)
+- `./src/stores` - Pinia stores for state management
+- `./src/assets` - static assets (styles, images, fonts)
+- `./public` - public static files served as-is
 
 Always update this section after modifying the directory structure.
+
+## Architecture Notes
+
+The project uses Astro's Islands Architecture:
+
+- **Pages (.astro)**: Static or server-rendered pages with file-based routing
+- **Components (.vue)**: Interactive UI components that are hydrated as "islands"
+- **Hydration**: Use client:load, client:idle, or client:visible directives on Vue components
+- **Routing**: No Vue Router - use standard <a> tags and Astro's file-based routing
+- **State Management**: Pinia works in Vue components with client:\* directives
+- **Data Fetching**: Can be done server-side in .astro pages or client-side in .vue components
 
 ## Coding practices
 

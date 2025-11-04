@@ -7,11 +7,11 @@ Zanim zaczniemy, zapoznaj się z poniższymi informacjami:
    Create sport (admin-only; optional for MVP)
 
 - Method: POST
-- Path: `/sports`
+- Path: `/api/sports`
 - Body JSON:
 
 ```json
-{ "code": "run", "name": "Running", "description": "optional", "consolidated": null }
+{ "code": "run", "name": "Running", "description": "optional" }
 ```
 
 - Response: 201 with created row
@@ -35,7 +35,7 @@ Zanim zaczniemy, zapoznaj się z poniższymi informacjami:
 
 5. Implementation rules:
    <implementation_rules>
-   @shared.mdc, @frondend.mdc, @database.mdc
+   @shared.mdc, @frondend.mdc, @backend.mdc
    </implementation_rules>
 
 Twoim zadaniem jest stworzenie kompleksowego planu wdrożenia endpointu interfejsu API REST. Przed dostarczeniem ostatecznego planu użyj znaczników <analysis>, aby przeanalizować informacje i nakreślić swoje podejście. W tej analizie upewnij się, że:

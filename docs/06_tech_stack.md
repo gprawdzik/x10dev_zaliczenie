@@ -6,6 +6,7 @@ Frontend
 
 Backend
 
+- Astro
 - Supabase
 
 AI

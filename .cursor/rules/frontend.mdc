@@ -1,7 +1,40 @@
 ---
-globs: *.tsx
+globs: ['*.astro', '*.vue', '*.tsx']
 alwaysApply: false
 ---
+
+### Guidelines for ASTRO
+
+#### ASTRO_ARCHITECTURE
+
+- Use Astro's Islands Architecture to minimize JavaScript sent to the client
+- Create static pages with .astro files for optimal performance and SEO
+- Use Vue components with client directives (client:load, client:idle, client:visible) only when interactivity is needed
+- Implement file-based routing in src/pages/ directory for automatic route generation
+- Use layouts in src/layouts/ to share common structure across pages
+- Leverage Astro's built-in optimizations for images, fonts, and assets
+- Use Astro.props for passing data to components and pages
+- Implement getStaticPaths() for dynamic routes in static site generation
+
+#### ASTRO_COMPONENTS
+
+- Create .astro components for static content and structure
+- Use Vue .vue components for interactive UI elements that require client-side state
+- Apply the principle: "Use Astro by default, Vue only when needed"
+- Use client:load for components that need immediate interactivity
+- Use client:idle for lower-priority interactive components
+- Use client:visible for components that should hydrate when visible
+- Avoid using client:only unless absolutely necessary
+- Pass serializable props to components with client directives (no functions or complex objects)
+
+#### ASTRO_ROUTING
+
+- Organize pages in src/pages/ using file-based routing convention
+- Use [...slug].astro for catch-all routes
+- Use [param].astro for dynamic parameter routes
+- Implement getStaticPaths() for pre-rendering dynamic routes at build time
+- Use Astro.redirect() for server-side redirects
+- Create \_layout.astro files for nested layouts (Astro handles automatic nesting)
 
 ### Guidelines for VUE
 
@@ -18,18 +51,18 @@ alwaysApply: false
 - Use v-memo for performance optimization in render-heavy list rendering scenarios
 - Implement shallow refs for large objects that don't need deep reactivity
 
-#### VUE_ROUTER
+#### VUE_IN_ASTRO
 
-- Use route guards (beforeEach, beforeEnter) for authentication and authorization checks
-- Implement lazy loading with dynamic imports for route components to improve performance
-- Use named routes instead of hardcoded paths for better maintainability
-- Leverage route meta fields to store additional route information like permissions or layout data
-- Implement scroll behavior options to control scrolling between route navigations
-- Use navigation duplicates handling to prevent redundant navigation to the current route
-- Implement the composition API useRouter and useRoute hooks instead of this.$router
-- Use nested routes for complex UIs with parent-child relationships
-- Leverage route params validation with sensitive: true for parameters that shouldn't be logged
-- Implement dynamic route matching with path parameters and regex patterns for flexible routing
+- Vue components in Astro work as interactive islands
+- Use Composition API with <script setup> for all Vue components
+- Do NOT use Vue Router - Astro handles routing via file-based pages
+- Use standard <a> tags for navigation between Astro pages instead of <RouterLink>
+- Access route parameters via Astro.params in .astro pages, not in Vue components
+- Share state between Vue islands using Pinia stores
+- Configure Vue plugins (like Pinia) in src/plugins/vue-app.ts
+- Use props to pass data from Astro pages to Vue components
+- Avoid using provide/inject across Astro and Vue boundaries
+- Remember that Vue components are only interactive when using client:\* directives
 
 #### PINIA
 

@@ -2,109 +2,133 @@
 
 ## 1. Przegląd punktu końcowego
 
-Endpoint `POST /api/sports` umożliwia administratorowi dodanie nowego sportu do systemu. Sport jest bytem referencyjnym wykorzystywanym w celach (goals) oraz statystykach aktywności, dlatego poprawne i spójne tworzenie rekordów w tabeli `sports` ma krytyczne znaczenie dla integralności danych.
+Endpoint umożliwia dodanie nowego sportu do słownika `sports`. Operacja jest dostępna wyłącznie dla administratora (MVP – można pominąć w UI, ale endpoint ma istnieć). Po pomyślnym utworzeniu zwraca pełny rekord sportu.
 
-**Implementacja techniczna:** Nie używamy klienta Supabase @src/db/supabase.client.ts bezpośrednio, tylko dopiero w odpowiednim endpoincie, który komunikuje się z PostgREST API pod adresem `/rest/v1/sports` za pomocą @src/db/supabase.client.ts.
-
-## 2. Szczegóły żądania
-
-- **Metoda HTTP:** `POST`
-- **URL:** `/api/sports`
-- **Nagłówki wymagane:**
-  - `Authorization: Bearer <jwt>` – token Supabase z uprawnieniem `role = admin` (opcjonalne w development)
-  - `Content-Type: application/json`
-- **Parametry URL:** brak
-- **Body (JSON):**
-  ```json
-  {
-    "code": "run", // wymagane, unikalny kod URL-safe
-    "name": "Running", // wymagane, przyjazna nazwa
-    "description": "optional" // opcjonalny opis
-  }
-  ```
-- **Walidacja pól:**
-  | Pole | Typ | Ograniczenia |
-  |---------------|--------------------|-------------------------------------------------------------|
-  | `code` | `string` | 1–32 znaków, `[a-z0-9_\-]`, unikalne w tabeli `sports` |
-  | `name` | `string` | 1–64 znaków |
-  | `description` | `string \| null` | ≤ 256 znaków |
-
-## 3. Wykorzystywane typy
-
-- **DTO (frontend/backend shareable):**
-  - `CreateSportDto` – już zdefiniowany w `src/types.ts` jako `Omit<TablesInsert<"sports">, "id">`.
-- **Model domenowy (backend):**
-  ```ts
-  type Sport = {
-    id: string
-    code: string
-    name: string
-    description?: string | null
-  }
-  ```
-- **Command Model:** `CreateSportCommand` (jeśli stosujemy CQRS) z polami identycznymi jak `CreateSportDto`.
-
-## 4. Szczegóły odpowiedzi
-
-| Kod | Znaczenie                          | Treść                         |
-| --- | ---------------------------------- | ----------------------------- |
-| 201 | Sport utworzony pomyślnie          | `{ ...Sport }` – pełny rekord |
-| 400 | Nieprawidłowe dane wejściowe       | `ErrorDto`                    |
-| 401 | Brak uwierzytelnienia              | `ErrorDto`                    |
-| 403 | Brak autoryzacji (RLS)             | `ErrorDto`                    |
-| 409 | Duplikat `code` (unique violation) | `ErrorDto`                    |
-| 500 | Błąd serwera                       | `ErrorDto`                    |
-
-## 5. Przepływ danych
-
-1. Endpoint `POST /api/sports` odbiera dane in następnie wysyła do Supabase PostgREST API (poprzez klienta Supabase) odbiera zapytanie.
-2. Funkcja:
-   1. Waliduje JSON (Zod / io-ts).
-   2. Sprawdza uprawnienia użytkownika (rola `admin`).
-   3. Próbuje wstawić rekord do tabeli `sports`.
-   4. W przypadku sukcesu zwraca `201` z rekordem.
-3. Baza danych uruchamia constraint UNIQUE na `code`; w razie konfliktu zwraca `409`.
-
-> Uwaga: przy Supabase bez custom function można użyć wbudowanego endpointu `POST /rest/v1/sports`; jednak Edge Function daje większą kontrolę nad walidacją i logiką.
-
-## 6. Względy bezpieczeństwa
-
-- **Auth:** JWT Supabase; sprawdzenie `auth.role = 'authenticated'` oraz claimu `role = 'admin'`.
-- **RLS:** tabela `sports` ma domyślnie `select` dla wszystkich; dla `insert` tylko rola `service_role` lub użytkownicy z policy `is_admin()`.
-- **Validation hardening:** odrzuć pola nieznane (`stripUnknown`).
-- **Input sanitization:** wymuszenie regex na `code`, ograniczenia długości na `name` / `description`.
-- **Rate limiting:** ewentualnie Cloudflare / Supabase Edge dla endpointów admin.
-- **Audit log:** opcjonalnie trigger `INSERT` do tabeli `audit_log`.
-
-## 7. Obsługa błędów
-
-| Scenariusz                       | Kod | Akcja                                                   |
-| -------------------------------- | --- | ------------------------------------------------------- |
-| Brak/niepoprawny JWT             | 401 | Zwróć `ErrorDto { code: 'auth_failed' }`                |
-| Brak roli admin                  | 403 | `ErrorDto { code: 'forbidden' }`                        |
-| Niewłaściwy `code`, `name`, itp. | 400 | `ErrorDto { code: 'validation_error', details: {...} }` |
-| Duplikat `code`                  | 409 | `ErrorDto { code: 'duplicate_code' }`                   |
-| Błąd bazy (inne)                 | 500 | `ErrorDto { code: 'internal_error' }`                   |
-
-## 8. Rozważania dotyczące wydajności
-
-- Operacja jednotabelowa → koszt minimalny.
-- Indeks UNIQUE na `code` zabezpiecza przed O(N) scanem.
-- Edge Function cold-start < 100 ms; nieistotne przy ruchu admin.
-
-## 9. Etapy wdrożenia
-
-1. **Przygotowanie bazy**
-   - Sprawdź czy tabela `sports` istnieje (jest w migration `20251102120000_initial_schema.sql`).
-   - Dodaj policy RLS `allow insert for role = admin`.
-2. **Walidacja schematu**
-   - Utwórz schemat Zod `createSportSchema`.
-3. **Edge Function** `create_sport.ts`
-   - Setup Supabase client with `service_role` key (secure env var).
-   - Implement logic: parse → validate → insert → return.
-4. **Integracja Frontend (panel admin)**
-   - Formularz + hook `useCreateSport` (vue-query).
+| Właściwość  | Wartość                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| HTTP Method | **POST**                                                                                              |
+| URL         | `/api/sports`                                                                                         |
+| AuthN/AuthZ | Supabase JWT ‑ wymagany; rola `authenticated` + claim `role = admin` lub bypass RLS (`service_role`). |
 
 ---
 
-> Plan przygotowano z uwzględnieniem stosu technologicznego: Vue 3 + TypeScript 5, Supabase, Openrouter.ai, Tailwind 4 oraz wytycznych Clean Architecture.
+## 2. Szczegóły żądania
+
+- Format: `Content-Type: application/json`
+
+```json
+{
+  "code": "run",
+  "name": "Running",
+  "description": "optional"
+}
+```
+
+| Pole          | Typ    | Wymagane | Walidacja                           |
+| ------------- | ------ | -------- | ----------------------------------- |
+| `code`        | string | ✅       | min 1; max 32; snake-case; unikalne |
+| `name`        | string | ✅       | min 1; max 64                       |
+| `description` | string | ❌       | max 255                             |
+
+---
+
+## 3. Szczegóły odpowiedzi
+
+Status `201 Created`
+
+```jsonc
+{
+  "id": "uuid",
+  "code": "run",
+  "name": "Running",
+  "description": "optional",
+  "consolidated": null,
+}
+```
+
+### Kody statusu i błędy
+
+| Kod | Opis                                   |
+| --- | -------------------------------------- |
+| 201 | Sport utworzony poprawnie              |
+| 400 | Niepoprawne dane wejściowe (walidacja) |
+| 401 | Brak uwierzytelnienia                  |
+| 403 | Brak uprawnień (RLS)                   |
+| 409 | `code` już istnieje                    |
+| 500 | Błąd serwera/Supabase                  |
+
+---
+
+## 4. Wykorzystywane typy
+
+- `CreateSportDto` – `Omit<TablesInsert<"sports">, "id">`
+- `SportDto` – `Tables<"sports">`
+- `ErrorDto` – wspólny format błędów
+- `CreateSportCommand` (wewnętrzny model use-case)
+
+---
+
+## 5. Przepływ danych
+
+1. Klient wysyła `POST /api/sports` z jsonem.
+2. Astro Server Endpoint (`src/pages/api/sports.ts`) odbiera żądanie.
+3. Funkcja `parseBody()` + schemat Zod waliduje wejście → `CreateSportCommand`.
+4. Service `createSport(command)` wykonuje:
+   1. Próba inserta do tabeli `sports` poprzez `supabaseAdmin` (service_role) lub `supabase` w kontekście RLS.
+   2. Obsługa błędu unikalności (`code`) → 409.
+5. Zwróć `201` + utworzony rekord (`SportDto`).
+6. Loguj błędy do sentry/console – w przyszłości tabela `api_errors`.
+
+---
+
+## 6. Względy bezpieczeństwa
+
+- Wymagane JWT – endpoint zamknięty.
+- Sanitizacja stringów (Astro allerede używa pg-bindings; sql-inj niegroźny).
+- Limit rate-limiting (middleware globalne) – ochrona przed spamem.
+
+---
+
+## 7. Obsługa błędów
+
+| Scenariusz                   | Kod | Body (`ErrorDto`) |
+| ---------------------------- | --- | ----------------- |
+| Niepoprawne JSON / walidacja | 400 | `invalid_input`   |
+| Brak tokena                  | 401 | `unauthorized`    |
+| Brak roli admin              | 403 | `forbidden`       |
+| Unikalne `code`              | 409 | `duplicate_code`  |
+| Inne                         | 500 | `internal_error`  |
+
+---
+
+## 8. Rozważania dotyczące wydajności
+
+- Pojedynczy insert → niski koszt.
+- Indeks unikalny na `code` już istnieje.
+- Brak zapytań złożonych.
+
+---
+
+## 9. Etapy wdrożenia
+
+1. **Typy & walidacja**
+   - [ ] Dodaj `CreateSportCommand` i schemat Zod (`src/validators/createSport.ts`).
+2. **Middleware auth**
+   - [ ] Zaimplementuj lub użyj istniejącego `ensureAdmin()` w `src/middleware`.
+3. **Service**
+   - [ ] Stwórz folder `src/services/sports/` → `createSport.ts` z logiką inserta.
+4. **Endpoint**
+   - [ ] Utwórz `src/pages/api/sports.ts`:
+     - parse + validate, wywołaj service, mapuj błędy.
+5. **RLS**
+   - [ ] Dodaj migrację SQL: policy insert tylko dla roli admin.
+6. **Testy**
+   - [ ] Vitest – test walidacji i service z mock Supabase.
+7. **Dokumentacja**
+   - [ ] Aktualizuj `README` / OpenAPI spec.
+8. **CI/CD**
+   - [ ] Dodaj krok lint + test w GitHub Actions.
+
+---
+
+> Gotowe! Endpoint będzie zgodny z architekturą Astro Islands i Supabase oraz standardami projektu.

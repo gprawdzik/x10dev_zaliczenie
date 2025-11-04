@@ -1,4 +1,4 @@
-import type { Tables, TablesInsert, TablesUpdate, Enums } from "./db/database.types";
+import type { Tables, TablesInsert, TablesUpdate, Enums } from "./db/database.types.js";
 
 // Sport DTOs
 export type SportDto = Tables<"sports">;

@@ -1,0 +1,25 @@
+---
+// Strona About
+// Prosta strona statyczna bez komponentów Vue
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Generuj tę stronę statycznie (prerender)
+export const prerender = true;
+---
+
+<BaseLayout title="StravaGoals - About">
+  <div class="about">
+    <h1>This is an about page</h1>
+  </div>
+</BaseLayout>
+
+<style>
+  @media (min-width: 1024px) {
+    .about {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+  }
+</style>
+

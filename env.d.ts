@@ -1,15 +1,21 @@
-/// <reference types="vite/client" />
+/// <reference types="astro/client" />
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from './src/db/database.types';
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from './src/db/database.types.js'
 
 declare global {
-  interface ImportMetaEnv {
-    readonly VITE_SUPABASE_URL: string;
-    readonly VITE_SUPABASE_KEY: string;
+  namespace App {
+    interface Locals {
+      supabase: SupabaseClient<Database>
+    }
   }
+}
 
-  interface ImportMeta {
-    readonly env: ImportMetaEnv;
-  }
+interface ImportMetaEnv {
+  readonly SUPABASE_URL: string
+  readonly SUPABASE_KEY: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }
