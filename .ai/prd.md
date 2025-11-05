@@ -1,10 +1,13 @@
 # Dokument wymagań produktu (PRD) - StravaGoals
 
 ## 1. Przegląd produktu
+
 Aplikacja StravaGoals umożliwia użytkownikom definiowanie, śledzenie oraz wizualizację rocznych celów treningowych opartych na wygenerowanych danych aktywności. Użytkownik może tworzyć, edytować i usuwać cele, przeglądać historię zmian oraz generować sugestie nowych lub zmodyfikowanych celów przy użyciu prostego modułu AI.
 
 ## 2. Problem użytkownika
+
 Użytkownicy Strava nie mają możliwości:
+
 - przeglądania i przechowywania historycznych celów treningowych
 - wizualizacji postępu względem założonych celów
 - otrzymywania inteligentnych sugestii dotyczących nowych lub modyfikowanych celów na podstawie wcześniejszych aktywności
@@ -12,42 +15,45 @@ Użytkownicy Strava nie mają możliwości:
 Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie przyszłych celów.
 
 ## 3. Wymagania funkcjonalne
+
 - Konta i autoryzacja
-   - rejestracja za pomocą email i hasła 
-   - logowanie i wylogowanie
-   - zmiana hasła
-   - usunięcie konta
+  - rejestracja za pomocą email i hasła
+  - logowanie i wylogowanie
+  - zmiana hasła
+  - usunięcie konta
 - Zarządzanie celami rocznymi
-   - tworzenie, edycja, odczyt, przegląd i usunięcie celów
-   - trzy metryki: dystans, czas, przewyższenie (Pilates i trening siłowy: tylko czas)
-   - zakres: globalny, konsolidacja, per-sport
-   - walidacja jednostek metrycznych i ograniczeń metryk per sport
+  - tworzenie, edycja, odczyt, przegląd i usunięcie celów
+  - trzy metryki: dystans, czas, przewyższenie (Pilates i trening siłowy: tylko czas)
+  - zakres: globalny, konsolidacja, per-sport
+  - walidacja jednostek metrycznych i ograniczeń metryk per sport
 - Historia celów
-   - każda edycja tworzy nowy wpis append-only
-   - brak rollbacku, brak zapisu powodu zmiany
-   - widok listy wersji i wykres cel vs wykonanie
+  - każda edycja tworzy nowy wpis append-only
+  - brak rollbacku, brak zapisu powodu zmiany
+  - widok listy wersji i wykres cel vs wykonanie
 - Generator aktywności
-   - symulacja 100 aktywności przypadających na ostatnie 12 miesięcy
-   - rozkład pór dnia (tydzień popołudnia, weekend cały dzień)
-   - dystrybucja sportów: 50% główny, 30% druga, 15% trzecia, 5% czwarta
-   - minimalny zestaw pól zgodny ze Strava (id, athlete.id, name, type, sport_type, start_date, start_date_local, timezone, utc_offset, distance, moving_time, elapsed_time, total_elevation_gain, average_speed)
+  - symulacja 100 aktywności przypadających na ostatnie 12 miesięcy
+  - rozkład pór dnia (tydzień popołudnia, weekend cały dzień)
+  - dystrybucja sportów: 50% główny, 30% druga, 15% trzecia, 5% czwarta
+  - minimalny zestaw pól zgodny ze Strava (id, athlete.id, name, type, sport_type, start_date, start_date_local, timezone, utc_offset, distance, moving_time, elapsed_time, total_elevation_gain, average_speed)
 - Wizualizacje
-   - strona "Moje cele": wykres kumulatywny postępu w bieżącym roku i lista kart celów
-   - strona "Historia": wykres porównawczy cel vs wykonanie dla wszystkich lat obowiązywania celu.
+  - strona "Moje cele": wykres kumulatywny postępu w bieżącym roku i lista kart celów
+  - strona "Historia": wykres porównawczy cel vs wykonanie dla wszystkich lat obowiązywania celu.
 - Sugestie AI (na żądanie)
-   - analiza ostatnich 3 miesięcy aktywności
-   - próg 5% udziału sportu do propozycji nowych lub korekt
-   - przycisk "Pokaż sugestie" uruchamia proces
-   - wyświetlanie listy sugestii i przycisków "Akceptuj" lub "Odrzuć"
-   - akceptacja tworzy lub aktualizuje cel
+  - analiza ostatnich 3 miesięcy aktywności
+  - próg 5% udziału sportu do propozycji nowych lub korekt
+  - przycisk "Pokaż sugestie" uruchamia proces
+  - wyświetlanie listy sugestii i przycisków "Akceptuj" lub "Odrzuć"
+  - akceptacja tworzy lub aktualizuje cel
 
 ## 4. Granice produktu
+
 - brak integracji z rzeczywistym API Strava (dane aktywności generowane)
 - obsługa wyłącznie celów rocznych
 - brak zaawansowanej analizy aktywności i planowania logistycznego
 - ograniczone bezpieczeństwo poza minimalnym hashowaniem haseł
 
 ## 5. Historyjki użytkowników
+
 - ID: US-001
   Tytuł: Rejestracja nowego użytkownika
   Opis: Użytkownik zakłada konto podając email i hasło.
@@ -113,7 +119,7 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   Opis: Użytkownik przegląda listę swoich celów i wykres kumulatywny.
   Kryteria akceptacji:
   - wykres kumulatywny aktualizuje się zgodnie z aktualnymi danymi
-  - lista celów wyświetla kluczowe informacje (metoda*, postęp%, custom)
+  - lista celów wyświetla kluczowe informacje (metoda\*, postęp%, custom)
   - wykres porównawczy cel vs wykonanie
 
 - ID: US-010
@@ -135,6 +141,13 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   Kryteria akceptacji:
   - sugestia zostaje oznaczona jako odrzucona i nie pojawia się ponownie
 
+- ID: US-013
+  Tytuł: Dodanie sportu przez administratora
+  Opis: Użytkownik z tolą administrator ma możliwość dodania nowego sportu w zakladce Ustawienia.
+  Kryteria akceptacji:
+  - Administrator ma możliwość dodania nowego rodzaju sportu.
+
 ## 6. Metryki sukcesu
+
 - 90% aktywnych użytkowników posiada przynajmniej jeden cel w ciągu 7 dni od rejestracji
 - 50% użytkowników akceptuje sugestie proponowane przez moduł AI

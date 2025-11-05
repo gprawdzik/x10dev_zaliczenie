@@ -3,11 +3,15 @@ Jesteś doświadczonym menedżerem produktu, którego zadaniem jest pomoc w stwo
 Prosimy o uważne zapoznanie się z poniższymi informacjami:
 
 <project_description>
+
 # Aplikacja - StravaGoals (MVP)
 
 ### Główny problem
+
 Strava umoliwia dodawanie celów treningowych. Niestety nie ma możliwości zobaczenia historycznych wyników oraz celów treningowych. Aplikacja ta ma to umożliwiać.
+
 ### Najmniejszy zestaw funkcjonalności
+
 - Zapisywanie, edycja, odczytywanie, przeglądanie i usuwanie celów treningowych.
 - Zapis historii celów.
 - Skupmy się na celach rocznych.
@@ -15,26 +19,30 @@ Strava umoliwia dodawanie celów treningowych. Niestety nie ma możliwości zoba
 - Prosty system kont użytkowników do powiązania użytkownika z celami oraz aktywnościami
 - Przedstawienie graficzne celów - cel vs wykanie
 - Integracja z AI umożliwiająca na podstawie aktywności z ostatnich 3 miesięcy zasugerować nowe cele lub zmienić aktualne.
+- Administrator ma możliwość zapisania nowego rodzaju sportu
 
 ### Co NIE wchodzi w zakres MVP
+
 - Integracja ze strava api. Aktywności użytkownika zostaną wygenerowane.
 - Cele inne niż roczne.
 - Zaawansowana analiza aktywności.
 - Zaawansowane planowanie czasu i logistyki
 
 ### Kryteria sukcesu
+
 - 90% użytkowników posiada dodany minimum jeden cel w swoim profilu.
 - 50% użytkowników akcetuje cele zaproponowane przez AI
-</project_description>
+  </project_description>
 
 Przeanalizuj dostarczone informacje, koncentrując się na aspektach istotnych dla tworzenia PRD. Rozważ następujące kwestie:
 <prd_analysis>
+
 1. Zidentyfikuj główny problem, który produkt ma rozwiązać.
 2. Określ kluczowe funkcjonalności MVP.
 3. Rozważ potencjalne historie użytkownika i ścieżki korzystania z produktu.
 4. Pomyśl o kryteriach sukcesu i sposobach ich mierzenia.
 5. Oceń ograniczenia projektowe i ich wpływ na rozwój produktu.
-</prd_analysis>
+   </prd_analysis>
 
 Na podstawie analizy wygeneruj listę 10 pytań i zaleceń w formie łączonej (pytanie + zalecenie). Powinny one dotyczyć wszelkich niejasności, potencjalnych problemów lub obszarów, w których potrzeba więcej informacji, aby stworzyć skuteczny PRD. Rozważ pytania dotyczące:
 
@@ -49,6 +57,7 @@ Na podstawie analizy wygeneruj listę 10 pytań i zaleceń w formie łączonej (
 Wymień tutaj swoje pytania i zalecenia, ponumerowane dla jasności:
 
 Przykładowo:
+
 1. Czy już od startu projektu planujesz wprowadzenie płatnych subskrypcji?
 
 Rekomendacja: Pierwszy etap projektu może skupić się na funkcjonalnościach darmowych, aby przyciągnąć użytkowników, a płatne funkcje można wprowadzić w późniejszym etapie.
