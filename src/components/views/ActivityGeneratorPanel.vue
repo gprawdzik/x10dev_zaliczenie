@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue'
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogClose,
@@ -11,124 +11,128 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { useToastStore } from '@/stores/toast';
+} from '@/components/ui/dialog'
+import { useToastStore } from '@/stores/toast'
 import type {
   ErrorDto,
   GenerateActivitiesRequest,
   GenerateActivitiesResponse,
   SportDto,
-} from '@/types';
+} from '@/types'
 
-const API_ENDPOINT = '/api/activities-generate';
-const SPORTS_ENDPOINT = '/api/sports';
-const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
-const DEFAULT_TIMEZONE = 'Europe/Warsaw';
+const API_ENDPOINT = '/api/activities-generate'
+const SPORTS_ENDPOINT = '/api/sports'
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_KEY
+const DEFAULT_TIMEZONE = 'Europe/Warsaw'
 const FIXED_DISTRIBUTION = {
   primary: 0.5,
   secondary: 0.3,
   tertiary: 0.15,
   quaternary: 0.05,
-} as const;
-const SPORTS_TO_PICK = 4;
+} as const
+const SPORTS_TO_PICK = 4
 
 type SportsState = {
-  items: SportDto[];
-  isLoading: boolean;
-  error: string | null;
-};
+  items: SportDto[]
+  isLoading: boolean
+  error: string | null
+}
 
 const sportsState = reactive<SportsState>({
   items: [],
   isLoading: false,
   error: null,
-});
+})
 
-const selectedSports = ref<string[]>([]);
-const isDialogOpen = ref(false);
-const isGenerating = ref(false);
-const toast = useToastStore();
+const selectedSports = ref<string[]>([])
+const isDialogOpen = ref(false)
+const isGenerating = ref(false)
+const toast = useToastStore()
 
-const distributionSummary = 'Stały rozkład: 50% / 30% / 15% / 5%';
+const distributionSummary = 'Stały rozkład: 50% / 30% / 15% / 5%'
 const selectedSportsDisplay = computed(() =>
   selectedSports.value.map((code) => {
-    const sport = sportsState.items.find((item) => item.code === code);
-    return { code, name: sport?.name ?? formatCodeAsName(code) };
-  })
-);
+    const sport = sportsState.items.find((item) => item.code === code)
+    return { code, name: sport?.name ?? formatCodeAsName(code) }
+  }),
+)
 const sportsSummary = computed(() =>
   selectedSportsDisplay.value.length
     ? selectedSportsDisplay.value.map((sport) => sport.name).join(', ')
-    : 'Brak wybranych sportów'
-);
-const confirmButtonLabel = computed(() => (isGenerating.value ? 'Generuję...' : 'Generuj'));
+    : 'Brak wybranych sportów',
+)
+const confirmButtonLabel = computed(() => (isGenerating.value ? 'Generuję...' : 'Generuj'))
 
 onMounted(() => {
-  void fetchSports();
-});
+  void fetchSports()
+})
 
 async function fetchSports(): Promise<void> {
-  sportsState.isLoading = true;
-  sportsState.error = null;
+  sportsState.isLoading = true
+  sportsState.error = null
 
   try {
-    const response = await fetch(SPORTS_ENDPOINT);
+    const response = await fetch(SPORTS_ENDPOINT)
     if (!response.ok) {
-      throw new Error('Nie udało się pobrać listy sportów.');
+      throw new Error('Nie udało się pobrać listy sportów.')
     }
 
-    const data = (await response.json()) as SportDto[];
-    sportsState.items = data;
-    selectedSports.value = selectSportsCodes(data);
+    const data = (await response.json()) as SportDto[]
+    sportsState.items = data
+    selectedSports.value = selectSportsCodes(data)
   } catch (error) {
-    console.error('Błąd pobierania sportów:', error);
-    sportsState.items = [];
-    sportsState.error = 'Nie udało się pobrać listy sportów. Dodaj sporty w systemie lub spróbuj ponownie.';
-    selectedSports.value = [];
+    console.error('Błąd pobierania sportów:', error)
+    sportsState.items = []
+    sportsState.error =
+      'Nie udało się pobrać listy sportów. Dodaj sporty w systemie lub spróbuj ponownie.'
+    selectedSports.value = []
   } finally {
-    sportsState.isLoading = false;
+    sportsState.isLoading = false
   }
 }
 
 function selectSportsCodes(sports: SportDto[]): string[] {
-  const codes = sports.map((sport) => sport.code).filter(Boolean);
+  const codes = sports.map((sport) => sport.code).filter(Boolean)
   if (!codes.length) {
-    return [];
+    return []
   }
-  return pickRandomSports(codes, SPORTS_TO_PICK);
+  return pickRandomSports(codes, SPORTS_TO_PICK)
 }
 
 function pickRandomSports(pool: string[], count: number): string[] {
   if (!pool.length) {
-    return [];
+    return []
   }
 
-  const uniquePool = Array.from(new Set(pool));
-  const selections: string[] = [];
-  const mutablePool = [...uniquePool];
+  const uniquePool = Array.from(new Set(pool))
+  const selections: string[] = []
+  const mutablePool = [...uniquePool]
 
   while (mutablePool.length && selections.length < count) {
-    const index = Math.floor(Math.random() * mutablePool.length);
-    const [code] = mutablePool.splice(index, 1);
-    selections.push(code);
+    const index = Math.floor(Math.random() * mutablePool.length)
+    const [code] = mutablePool.splice(index, 1)
+    selections.push(code)
   }
 
-  return selections;
+  return selections
 }
 
 function rerollSports(): void {
   if (sportsState.isLoading) {
-    return;
+    return
   }
 
   if (sportsState.items.length) {
-    selectedSports.value = selectSportsCodes(sportsState.items);
-    return;
+    selectedSports.value = selectSportsCodes(sportsState.items)
+    return
   }
 
   // If no sports available, set empty array
-  selectedSports.value = [];
-  toast.warning('Brak sportów', 'Nie można wylosować sportów. Pobierz listę sportów lub dodaj je w systemie.');
+  selectedSports.value = []
+  toast.warning(
+    'Brak sportów',
+    'Nie można wylosować sportów. Pobierz listę sportów lub dodaj je w systemie.',
+  )
 }
 
 function formatCodeAsName(code: string): string {
@@ -136,97 +140,97 @@ function formatCodeAsName(code: string): string {
     .split(/[-_]/)
     .filter(Boolean)
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(' ');
+    .join(' ')
 }
 
 function buildRequestPayload(): GenerateActivitiesRequest {
   const payload: GenerateActivitiesRequest = {
     timezone: DEFAULT_TIMEZONE,
     distribution: { ...FIXED_DISTRIBUTION },
-  };
-
-  if (selectedSports.value.length) {
-    payload.primary_sports = selectedSports.value;
   }
 
-  return payload;
+  if (selectedSports.value.length) {
+    payload.primary_sports = selectedSports.value
+  }
+
+  return payload
 }
 
 function validateBeforeGenerate(): boolean {
   if (!selectedSports.value.length) {
-    toast.error('Brak sportów', 'Nie udało się wybrać dyscyplin do generowania.');
-    return false;
+    toast.error('Brak sportów', 'Nie udało się wybrać dyscyplin do generowania.')
+    return false
   }
 
   if (sportsState.isLoading) {
-    toast.info('Pobieranie danych', 'Poczekaj na zakończenie pobierania listy sportów.');
-    return false;
+    toast.info('Pobieranie danych', 'Poczekaj na zakończenie pobierania listy sportów.')
+    return false
   }
 
-  return true;
+  return true
 }
 
 async function handleGenerateActivities(): Promise<void> {
   if (!validateBeforeGenerate()) {
-    return;
+    return
   }
 
-  isGenerating.value = true;
+  isGenerating.value = true
 
   try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-    };
+    }
 
     if (SUPABASE_ANON_KEY) {
-      headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
-      headers.apikey = SUPABASE_ANON_KEY;
+      headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`
+      headers.apikey = SUPABASE_ANON_KEY
     }
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers,
       body: JSON.stringify(buildRequestPayload()),
-    });
+    })
 
     const responseBody = (await response.json().catch(() => null)) as
       | GenerateActivitiesResponse
       | ErrorDto
-      | null;
-    
+      | null
+
     if (!response.ok) {
       const errorMessage =
         (responseBody as ErrorDto | null)?.error?.message ??
-        'Wystąpił błąd podczas generowania aktywności.';
-      toast.error('Błąd generowania', errorMessage);
-      return;
+        'Wystąpił błąd podczas generowania aktywności.'
+      toast.error('Błąd generowania', errorMessage)
+      return
     }
-    
-    const createdCount = (responseBody as GenerateActivitiesResponse)?.created_count ?? 0;
+
+    const createdCount = (responseBody as GenerateActivitiesResponse)?.created_count ?? 0
     toast.success(
-      'Dane wygenerowane', 
-      `Utworzono ${createdCount} ${pluralizeActivities(createdCount)}`
-    );
-    isDialogOpen.value = false;
+      'Dane wygenerowane',
+      `Utworzono ${createdCount} ${pluralizeActivities(createdCount)}`,
+    )
+    isDialogOpen.value = false
   } catch (error) {
-    console.error('Błąd podczas generowania aktywności:', error);
-    toast.error('Błąd generowania', 'Nie udało się połączyć z serwerem. Spróbuj ponownie później.');
+    console.error('Błąd podczas generowania aktywności:', error)
+    toast.error('Błąd generowania', 'Nie udało się połączyć z serwerem. Spróbuj ponownie później.')
   } finally {
-    isGenerating.value = false;
+    isGenerating.value = false
   }
 }
 
 function pluralizeActivities(count: number): string {
-  if (count === 1) return 'aktywność';
-  if (count >= 2 && count <= 4) return 'aktywności';
-  return 'aktywności';
+  if (count === 1) return 'aktywność'
+  if (count >= 2 && count <= 4) return 'aktywności'
+  return 'aktywności'
 }
 
 function openConfirmationDialog(): void {
   if (!validateBeforeGenerate()) {
-    return;
+    return
   }
-  isDialogOpen.value = true;
+  isDialogOpen.value = true
 }
 </script>
 
@@ -241,85 +245,91 @@ function openConfirmationDialog(): void {
       </CardHeader>
       <CardContent>
         <div class="space-y-6">
-          <section class="space-y-3 rounded-lg border border-border/60 p-4">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p class="text-sm font-medium">Dyscypliny wykorzystane podczas generowania</p>
-                <p class="text-xs text-muted-foreground">
-                  Lista pobierana jest z API i losowo wybierane są {{ SPORTS_TO_PICK }} sporty.
+          <div class="flex flex-col divide-y divide-border/60 rounded-lg border border-border/60">
+            <section class="space-y-3 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-sm font-medium">Dyscypliny wykorzystane podczas generowania</p>
+                  <p class="text-xs text-muted-foreground">
+                    Lista pobierana jest z API i losowo wybierane są {{ SPORTS_TO_PICK }} sporty.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  :disabled="sportsState.isLoading || isGenerating"
+                  @click="rerollSports"
+                >
+                  Wylosuj ponownie
+                </Button>
+              </div>
+
+              <div v-if="sportsState.isLoading" class="text-sm text-muted-foreground">
+                Trwa pobieranie listy sportów...
+              </div>
+              <div v-else class="flex flex-wrap gap-2">
+                <span
+                  v-for="sport in selectedSportsDisplay"
+                  :key="sport.code"
+                  class="rounded-full border border-border px-3 py-1 text-sm"
+                >
+                  {{ sport.name }}
+                  <span class="text-xs text-muted-foreground">({{ sport.code }})</span>
+                </span>
+                <p v-if="!selectedSportsDisplay.length" class="text-sm text-muted-foreground">
+                  Brak wybranych sportów. Spróbuj ponownie.
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                :disabled="sportsState.isLoading || isGenerating"
-                @click="rerollSports"
-              >
-                Wylosuj ponownie
-              </Button>
-            </div>
 
-            <div v-if="sportsState.isLoading" class="text-sm text-muted-foreground">
-              Trwa pobieranie listy sportów...
-            </div>
-            <div v-else class="flex flex-wrap gap-2">
-              <span
-                v-for="sport in selectedSportsDisplay"
-                :key="sport.code"
-                class="rounded-full border border-border px-3 py-1 text-sm"
-              >
-                {{ sport.name }}
-                <span class="text-xs text-muted-foreground">({{ sport.code }})</span>
-              </span>
-              <p v-if="!selectedSportsDisplay.length" class="text-sm text-muted-foreground">
-                Brak wybranych sportów. Spróbuj ponownie.
+              <p v-if="sportsState.error" class="text-xs text-destructive">
+                {{ sportsState.error }}
               </p>
-            </div>
+            </section>
 
-            <p v-if="sportsState.error" class="text-xs text-destructive">
-              {{ sportsState.error }}
-            </p>
-          </section>
+            <section class="space-y-1 p-4">
+              <p class="text-sm font-medium">Rozkład prawdopodobieństwa</p>
+              <p class="text-sm text-muted-foreground">
+                {{ distributionSummary }}
+              </p>
+            </section>
+          </div>
 
-          <section class="space-y-1 rounded-lg border border-border/60 p-4">
-            <p class="text-sm font-medium">Rozkład prawdopodobieństwa</p>
-          <p class="text-sm text-muted-foreground">
-              {{ distributionSummary }}
-          </p>
-          </section>
+          <div class="flex justify-end border-t border-border/60 pt-4">
+            <Dialog v-model:open="isDialogOpen">
+              <Button type="button" :disabled="isGenerating" @click="openConfirmationDialog">
+                Generuj dane
+              </Button>
 
-          <div class="flex flex-wrap items-center justify-end gap-3">
-          <Dialog v-model:open="isDialogOpen">
-              <div class="flex justify-end">
-                <Button type="button" :disabled="isGenerating" @click="openConfirmationDialog">
-                  Generuj dane
-                </Button>
-            </div>
-
-            <DialogContent>
-              <DialogHeader>
+              <DialogContent>
+                <DialogHeader>
                   <DialogTitle>Potwierdź generowanie danych</DialogTitle>
                   <DialogDescription class="space-y-1 text-sm">
-                    <p>Strefa czasowa: <strong>{{ DEFAULT_TIMEZONE }}</strong></p>
-                    <p>Sporty: <strong>{{ sportsSummary }}</strong></p>
-                    <p>Rozkład: <strong>{{ distributionSummary }}</strong></p>
-                </DialogDescription>
-              </DialogHeader>
+                    <p>
+                      Strefa czasowa: <strong>{{ DEFAULT_TIMEZONE }}</strong>
+                    </p>
+                    <p>
+                      Sporty: <strong>{{ sportsSummary }}</strong>
+                    </p>
+                    <p>
+                      Rozkład: <strong>{{ distributionSummary }}</strong>
+                    </p>
+                  </DialogDescription>
+                </DialogHeader>
 
-              <DialogFooter>
-                <DialogClose as-child>
+                <DialogFooter>
+                  <DialogClose as-child>
                     <Button variant="outline" type="button" :disabled="isGenerating">
-                    Anuluj
-                  </Button>
-                </DialogClose>
+                      Anuluj
+                    </Button>
+                  </DialogClose>
 
                   <Button type="button" :disabled="isGenerating" @click="handleGenerateActivities">
                     {{ confirmButtonLabel }}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <p v-if="isGenerating" class="text-sm text-muted-foreground">
@@ -336,4 +346,3 @@ function openConfirmationDialog(): void {
   max-width: 880px;
 }
 </style>
-
