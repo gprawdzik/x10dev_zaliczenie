@@ -1,0 +1,24 @@
+---
+// Strona ustawień - dostępna tylko dla zalogowanych użytkowników
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SettingsView from '../components/views/SettingsView.vue';
+---
+
+<BaseLayout title="Ustawienia - StravaGoals">
+  <main>
+    <!-- 
+      SettingsView to główny komponent Vue z zakładkami.
+      Używamy client:load, aby zapewnić natychmiastową interaktywność.
+    -->
+    <SettingsView client:load />
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+</style>
+

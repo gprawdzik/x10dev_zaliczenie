@@ -2,6 +2,7 @@
 // Base Layout - główny layout dla wszystkich stron
 // W Astro layouts definiują wspólną strukturę HTML dla różnych stron
 import HelloWorld from '../components/HelloWorld.vue';
+import { Toaster } from '../components/ui/sonner';
 import '../assets/main.css';
 
 interface Props {
@@ -45,6 +46,9 @@ const { title = 'StravaGoals' } = Astro.props;
 
     <!-- Slot dla zawartości strony -->
     <slot />
+
+    <!-- Globalny komponent Toast - używa client:load dla interaktywności -->
+    <Toaster client:load richColors position="top-right" />
   </body>
 </html>
 

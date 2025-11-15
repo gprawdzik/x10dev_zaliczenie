@@ -22,13 +22,13 @@ import { createClient } from '@supabase/supabase-js'
 
 import type { Database } from '../db/database.types.ts'
 
-const supabaseUrl = import.meta.env.SUPABASE_URL
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY
 
 export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey)
 ```
 
-This file initializes the Supabase client using the environment variables `SUPABASE_URL` and `SUPABASE_KEY`.
+This file initializes the Supabase client using the publicly exposed environment variables `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_KEY`. Astro only exposes variables prefixed with `PUBLIC_` to browser code, which is required for islands that hydrate on the client.
 
 ### 2. Middleware Setup
 
@@ -66,8 +66,8 @@ declare global {
 }
 
 interface ImportMetaEnv {
-  readonly SUPABASE_URL: string
-  readonly SUPABASE_KEY: string
+  readonly PUBLIC_SUPABASE_URL: string
+  readonly PUBLIC_SUPABASE_KEY: string
 }
 
 interface ImportMeta {

@@ -30,6 +30,8 @@ coverage
 
 .env
 
+allfileshas.txt
+
 # Cypress
 /cypress/videos/
 /cypress/screenshots/

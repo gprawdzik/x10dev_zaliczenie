@@ -1,0 +1,131 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { useToastStore } from '@/stores/toast';
+
+// Stan ładowania i modala
+const isGenerating = ref(false);
+const isDialogOpen = ref(false);
+
+// Toast store do wyświetlania powiadomień
+const toast = useToastStore();
+
+/**
+ * Obsługa generowania aktywności
+ * Wysyła żądanie do API endpoint /api/activities/generate
+ */
+const handleGenerateActivities = async () => {
+  isGenerating.value = true;
+
+  try {
+    // TODO: Implementacja prawdziwego API call
+    // const response = await fetch('/api/activities/generate', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    // });
+    
+    // if (!response.ok) {
+    //   throw new Error('Failed to generate activities');
+    // }
+    
+    // const data = await response.json();
+
+    // Symulacja API call na potrzeby dewelopmentu
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Wyświetl powiadomienie sukcesu
+    toast.success('Dane wygenerowane', 'Aktywności zostały pomyślnie wygenerowane');
+    
+    isDialogOpen.value = false;
+
+  } catch (error) {
+    console.error('Błąd podczas generowania aktywności:', error);
+    toast.error('Błąd generowania', 'Wystąpił błąd podczas generowania danych. Spróbuj ponownie.');
+  } finally {
+    isGenerating.value = false;
+  }
+};
+</script>
+
+<template>
+  <div class="activity-generator-panel">
+    <Card>
+      <CardHeader>
+        <CardTitle>Generator danych aktywności</CardTitle>
+        <CardDescription>
+          Wygeneruj symulowane dane aktywności do celów testowych i wizualizacji.
+          Generator utworzy realistyczne dane treningowe dla bieżącego roku.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="space-y-4">
+          <p class="text-sm text-muted-foreground">
+            Po uruchomieniu generatora zostaną utworzone przykładowe aktywności sportowe
+            z różnymi parametrami (dystans, czas, wzniesienie). Proces może potrwać kilka sekund.
+          </p>
+
+          <!-- Dialog (modal) z potwierdzeniem -->
+          <Dialog v-model:open="isDialogOpen">
+            <!-- Przycisk otwierający modal -->
+            <DialogTrigger as-child>
+              <Button :disabled="isGenerating">
+                Generuj dane
+              </Button>
+            </DialogTrigger>
+
+            <!-- Zawartość modala -->
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Potwierdzenie generowania danych</DialogTitle>
+                <DialogDescription>
+                  Czy na pewno chcesz wygenerować nowe dane aktywności?
+                  Proces może zająć kilka sekund.
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter>
+                <!-- Przycisk anuluj -->
+                <DialogClose as-child>
+                  <Button variant="outline" :disabled="isGenerating">
+                    Anuluj
+                  </Button>
+                </DialogClose>
+
+                <!-- Przycisk potwierdź -->
+                <Button
+                  :disabled="isGenerating"
+                  @click="handleGenerateActivities"
+                >
+                  {{ isGenerating ? 'Generuję...' : 'Generuj' }}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <!-- Wskaźnik ładowania -->
+          <div v-if="isGenerating" class="text-sm text-muted-foreground">
+            Trwa generowanie danych aktywności...
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+</template>
+
+<style scoped>
+.activity-generator-panel {
+  max-width: 800px;
+}
+</style>
+

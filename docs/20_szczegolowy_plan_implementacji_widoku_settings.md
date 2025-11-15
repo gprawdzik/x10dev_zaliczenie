@@ -9,32 +9,88 @@ Najpierw przejrzyj następujące informacje:
 
 2. Opis widoku:
    <view_description>
-   {{view-description}} <- wklej opis implementowanego widoku z ui-plan.md
+   **Ustawienia** (`/settings`)
+   • Cel: Konfiguracja profilu, generowanie danych i zarządzanie sportami  
+   • Kluczowe informacje: Zakładki: **Profil**, **Generator danych**, **Sporty** (admin)  
+   • Kluczowe komponenty: `Tabs`, `ProfileForm`, `ActivityGeneratorPanel`, `SportManagerPanel`, `Loader`, `Toast`  
+   • UX / dostępność / bezpieczeństwo: Ochrona przed przypadkowym uruchomieniem generatora (modal potwierdzenia);
    </view_description>
 
 3. User Stories:
    <user_stories>
-   {{user-stories}} <- wklej historyjki użytkownika z @prd.md, które będą adresowane przez widok
-   </user_stories>
+   ID: US-013
+   Tytuł: Dodanie sportu przez administratora
+   Opis: Użytkownik z tolą administrator ma możliwość dodania nowego sportu w zakladce Ustawienia.
+   Kryteria akceptacji:
+
+- Administrator ma możliwość dodania nowego rodzaju sportu.
+
+- ID: US-003
+  Tytuł: Zmiana hasła
+  Opis: Zalogowany użytkownik zmienia swoje hasło.
+  Kryteria akceptacji:
+- wymagana autoryzacja obecnym hasłem
+- nowe hasło spełnia wymagania długości
+- po zmianie użytkownik może się zalogować przy użyciu nowego hasła
+
+- ID: US-004
+  Tytuł: Usunięcie konta
+  Opis: Zalogowany użytkownik usuwa swoje konto.
+  Kryteria akceptacji:
+  - potwierdzenie decyzji (modal)
+  - usunięcie wszystkich danych użytkownika
+  - przekierowanie na stronę rejestracji/logowania
+    </user_stories>
 
 4. Endpoint Description:
    <endpoint_description>
-   {{endpoint-description}} <- wklej opisy endpointów z api-plan.md, z których będzie korzystał widok
-   </endpoint_description>
+   List sports
+
+- Method: GET
+- Path: `/sports`
+- Query params: `code` (eq), `name` (ilike), `page`, `limit`, `sort_by`, `sort_dir`
+- Response 200 JSON: array of sports
+
+```json
+[{ "id": "uuid", "code": "run", "name": "Running", "description": "", "consolidated": null }]
+```
+
+- Errors: 401
+
+Get sport by id
+
+- Method: GET
+- Path: `/sports?id=eq.{id}`
+- Response 200 JSON: single-element array with sport or empty array
+- Errors: 401, 404 if empty and handled by wrapper
+
+Create sport (admin-only; optional for MVP)
+
+- Method: POST
+- Path: `/sports`
+- Body JSON:
+
+```json
+{ "code": "run", "name": "Running", "description": "optional", "consolidated": null }
+```
+
+- Response: 201 with created row
+- Errors: 401, 403 (RLS), 409 (unique violation)
+  </endpoint_description>
 
 5. Endpoint Implementation:
    <endpoint_implementation>
-   {{endpoint-implementation}} <- zamień na referencję do implementacji endpointów, z których będzie korzystał widok (np. @generations.ts, @flashcards.ts)
+   @createSport.ts
    </endpoint_implementation>
 
 6. Type Definitions:
    <type_definitions>
-   {{types}} <- zamień na referencję do pliku z definicjami DTOsów (np. @types.ts)
+   @types.ts
    </type_definitions>
 
 7. Tech Stack:
    <tech_stack>
-   {{tech-stack}} <- zamień na referencję do pliku @tech-stack.md
+   @tech-stack.ts
    </tech_stack>
 
 Przed utworzeniem ostatecznego planu wdrożenia przeprowadź analizę i planowanie wewnątrz tagów <implementation_breakdown> w swoim bloku myślenia. Ta sekcja może być dość długa, ponieważ ważne jest, aby być dokładnym.
