@@ -65,6 +65,7 @@ The app will be available at `http://localhost:4321` by default (Astro developme
 - **Goal History:** Append-only versioning of edits without rollback
 - **Activity Generator:** Simulate 100 activities over the last 12 months with realistic time-of-day and sport distributions; include minimal Strava fields (e.g., id, athlete.id, type, distance, moving_time, etc.)
 - **Visualizations:** “My Goals” cumulative progress chart and goal cards; “History” comparative charts of goal vs. actual performance
+- **UI Preferences:** Manual light/dark mode toggle persisted in the browser
 - **AI Suggestions:** On-demand analysis of the last 3 months (5% sport threshold), with accept/reject controls to create or update goals
 
 _Boundaries & Exclusions:_

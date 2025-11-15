@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Button } from '@/components/ui/button';
+import ThemeToggle from '@/components/ui/ThemeToggle.vue';
 
 // Stan mobilnego menu
 const isMobileMenuOpen = ref(false);
@@ -65,6 +66,7 @@ const toggleMobileMenu = () => {
 
       <!-- Przycisk user menu (placeholder na przyszłość) -->
       <div class="navbar-actions">
+        <ThemeToggle />
         <Button variant="ghost" size="sm" class="hidden md:flex">
           <span class="text-sm">👤 Użytkownik</span>
         </Button>
@@ -217,6 +219,12 @@ const toggleMobileMenu = () => {
   background-color: hsl(var(--accent));
 }
 
+@media (min-width: 768px) {
+  .mobile-menu-button {
+    display: none;
+  }
+}
+
 /* Mobile menu */
 .mobile-menu {
   display: flex;
@@ -258,6 +266,12 @@ const toggleMobileMenu = () => {
 .mobile-nav-link.active {
   background-color: hsl(var(--accent));
   font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu {
+    display: none;
+  }
 }
 </style>
 

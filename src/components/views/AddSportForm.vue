@@ -116,9 +116,9 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-4">
+  <form @submit.prevent="handleSubmit" class="flex flex-col gap-6">
     <!-- Pole: Kod -->
-    <div class="space-y-2">
+    <div class="flex flex-col gap-3">
       <Label for="sport-code">Kod sportu *</Label>
       <Input
         id="sport-code"
@@ -134,7 +134,7 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Pole: Nazwa -->
-    <div class="space-y-2">
+    <div class="flex flex-col gap-3">
       <Label for="sport-name">Nazwa sportu *</Label>
       <Input
         id="sport-name"
@@ -150,7 +150,7 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Pole: Opis (opcjonalne) -->
-    <div class="space-y-2">
+    <div class="flex flex-col gap-3">
       <Label for="sport-description">Opis (opcjonalnie)</Label>
       <Input
         id="sport-description"
@@ -167,7 +167,7 @@ const handleSubmit = async () => {
     </p>
 
     <!-- Przycisk submit -->
-    <div class="flex justify-end">
+    <div class="flex justify-end pt-2">
       <Button type="submit" :disabled="isLoading">
         {{ isLoading ? 'Dodaję...' : 'Dodaj sport' }}
       </Button>

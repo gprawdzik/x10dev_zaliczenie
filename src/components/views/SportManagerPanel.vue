@@ -58,7 +58,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="sport-manager-panel space-y-6">
+  <div class="sport-manager-panel grid w-full gap-6 lg:grid-cols-2 lg:items-start">
     <!-- Karta dodawania sportu -->
     <Card>
       <CardHeader>
@@ -100,7 +100,7 @@ onMounted(() => {
 
 <style scoped>
 .sport-manager-panel {
-  max-width: 1000px;
+  width: 100%;
 }
 </style>
 

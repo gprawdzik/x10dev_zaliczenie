@@ -82,11 +82,13 @@ const handleGenerateActivities = async () => {
           <!-- Dialog (modal) z potwierdzeniem -->
           <Dialog v-model:open="isDialogOpen">
             <!-- Przycisk otwierający modal -->
-            <DialogTrigger as-child>
-              <Button :disabled="isGenerating">
-                Generuj dane
-              </Button>
-            </DialogTrigger>
+            <div class="flex justify-end pt-2">
+              <DialogTrigger as-child>
+                <Button :disabled="isGenerating">
+                  Generuj dane
+                </Button>
+              </DialogTrigger>
+            </div>
 
             <!-- Zawartość modala -->
             <DialogContent>

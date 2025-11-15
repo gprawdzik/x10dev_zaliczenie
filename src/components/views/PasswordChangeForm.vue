@@ -107,9 +107,9 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-4">
+  <form @submit.prevent="handleSubmit" class="flex flex-col gap-6">
     <!-- Pole: Obecne hasło -->
-    <div class="space-y-2">
+    <div class="flex flex-col gap-3">
       <Label for="current-password">Obecne hasło</Label>
       <Input
         id="current-password"
@@ -125,7 +125,7 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Pole: Nowe hasło -->
-    <div class="space-y-2">
+    <div class="flex flex-col gap-3">
       <Label for="new-password">Nowe hasło</Label>
       <Input
         id="new-password"
@@ -141,7 +141,7 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Pole: Potwierdź nowe hasło -->
-    <div class="space-y-2">
+    <div class="flex flex-col gap-3">
       <Label for="confirm-password">Potwierdź nowe hasło</Label>
       <Input
         id="confirm-password"
@@ -162,7 +162,7 @@ const handleSubmit = async () => {
     </p>
 
     <!-- Przycisk submit -->
-    <div class="flex justify-end">
+    <div class="flex justify-end pt-2">
       <Button type="submit" :disabled="isLoading">
         {{ isLoading ? 'Zmieniam hasło...' : 'Zmień hasło' }}
       </Button>

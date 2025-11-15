@@ -26,6 +26,25 @@ const {
     <meta name="description" content={description} />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{title}</title>
+    <script is:inline>
+      (function () {
+        try {
+          const storageKey = 'stravagoals-theme';
+          const root = document.documentElement;
+          const stored = window.localStorage.getItem(storageKey);
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : prefersDark
+                ? 'dark'
+                : 'light';
+          root.classList.toggle('dark', theme === 'dark');
+        } catch (error) {
+          console.warn('Theme init failed', error);
+        }
+      })();
+    </script>
   </head>
   <body>
     <!-- Nawigacja górna -->

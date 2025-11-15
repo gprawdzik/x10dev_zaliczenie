@@ -5,7 +5,7 @@ import AccountDeleteSection from './AccountDeleteSection.vue';
 </script>
 
 <template>
-  <div class="profile-panel space-y-6">
+  <div class="profile-panel grid w-full gap-6 lg:grid-cols-2 lg:items-start">
     <!-- Karta zmiany hasła -->
     <Card>
       <CardHeader>
@@ -36,7 +36,7 @@ import AccountDeleteSection from './AccountDeleteSection.vue';
 
 <style scoped>
 .profile-panel {
-  max-width: 800px;
+  width: 100%;
 }
 </style>
 

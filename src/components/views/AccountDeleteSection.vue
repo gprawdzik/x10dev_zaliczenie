@@ -59,19 +59,23 @@ const handleDeleteAccount = async () => {
 
 <template>
   <div class="account-delete-section">
-    <p class="text-sm text-muted-foreground mb-4">
-      Po usunięciu konta wszystkie Twoje dane, w tym cele, aktywności i historia zmian,
-      zostaną trwale usunięte. Ta operacja jest nieodwracalna.
-    </p>
+    <div class="account-delete-section__text">
+      <p class="text-sm text-muted-foreground">
+        Po usunięciu konta wszystkie Twoje dane, w tym cele, aktywności i historia zmian,
+        zostaną trwale usunięte. Ta operacja jest nieodwracalna.
+      </p>
+    </div>
 
     <!-- Dialog (modal) z potwierdzeniem -->
     <Dialog v-model:open="isDialogOpen">
       <!-- Przycisk otwierający modal -->
-      <DialogTrigger as-child>
-        <Button variant="destructive">
-          Usuń konto
-        </Button>
-      </DialogTrigger>
+      <div class="account-delete-section__actions">
+        <DialogTrigger as-child>
+          <Button variant="destructive">
+            <span>Usuń konto</span>
+          </Button>
+        </DialogTrigger>
+      </div>
 
       <!-- Zawartość modala -->
       <DialogContent>
@@ -104,4 +108,23 @@ const handleDeleteAccount = async () => {
     </Dialog>
   </div>
 </template>
+
+<style scoped>
+.account-delete-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.account-delete-section__text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.account-delete-section__actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+</style>
 
