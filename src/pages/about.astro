@@ -1,25 +1,157 @@
 ---
-// Strona About
-// Prosta strona statyczna bez komponentów Vue
-import BaseLayout from '../layouts/BaseLayout.astro';
+// Strona About - O aplikacji
+import AppLayout from '../layouts/AppLayout.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Generuj tę stronę statycznie (prerender)
 export const prerender = true;
 ---
 
-<BaseLayout title="StravaGoals - About">
-  <div class="about">
-    <h1>This is an about page</h1>
+<AppLayout 
+  title="O aplikacji - StravaGoals"
+  description="Dowiedz się więcej o aplikacji StravaGoals"
+>
+  <div class="about-page">
+    <!-- Nagłówek -->
+    <div class="page-header">
+      <h1 class="page-title">O aplikacji</h1>
+      <p class="page-subtitle">
+        StravaGoals to aplikacja do zarządzania i śledzenia Twoich celów treningowych
+      </p>
+    </div>
+
+    <!-- Główna sekcja -->
+    <div class="about-content">
+      <Card>
+        <CardHeader>
+          <CardTitle>🎯 Czym jest StravaGoals?</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <p>
+            StravaGoals to narzędzie stworzone dla pasjonatów sportu i aktywności fizycznej,
+            którzy chcą systematycznie śledzić swoje postępy i osiągać ambitne cele treningowe.
+          </p>
+          <p>
+            Aplikacja pozwala na definiowanie rocznych celów dla różnych dyscyplin sportowych,
+            automatyczne śledzenie postępów oraz otrzymywanie inteligentnych sugestii
+            dotyczących Twoich treningów.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>✨ Główne funkcje</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul class="space-y-3">
+            <li class="flex gap-3">
+              <span class="text-xl">📊</span>
+              <div>
+                <strong>Dashboard z postępami</strong>
+                <p class="text-sm text-muted-foreground">
+                  Zobacz swoje postępy w jednym miejscu z przejrzystymi wizualizacjami
+                </p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-xl">🎯</span>
+              <div>
+                <strong>Zarządzanie celami</strong>
+                <p class="text-sm text-muted-foreground">
+                  Definiuj cele roczne dla różnych sportów (dystans, czas, wzniesienie)
+                </p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-xl">🏃</span>
+              <div>
+                <strong>Śledzenie aktywności</strong>
+                <p class="text-sm text-muted-foreground">
+                  Monitoruj wszystkie swoje treningi i aktywności sportowe
+                </p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-xl">📈</span>
+              <div>
+                <strong>Wizualizacje postępów</strong>
+                <p class="text-sm text-muted-foreground">
+                  Analizuj swoje wyniki z wykresami i statystykami
+                </p>
+              </div>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-xl">🤖</span>
+              <div>
+                <strong>Sugestie AI</strong>
+                <p class="text-sm text-muted-foreground">
+                  Otrzymuj inteligentne rekomendacje dotyczące swoich celów
+                </p>
+              </div>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>🛠️ Technologia</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="mb-4">Aplikacja została stworzona z wykorzystaniem nowoczesnych technologii:</p>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <strong>Frontend:</strong>
+              <ul class="mt-2 space-y-1 text-muted-foreground">
+                <li>• Astro 5.15</li>
+                <li>• Vue 3.5</li>
+                <li>• TypeScript</li>
+                <li>• Tailwind CSS</li>
+              </ul>
+            </div>
+            <div>
+              <strong>Backend:</strong>
+              <ul class="mt-2 space-y-1 text-muted-foreground">
+                <li>• Supabase</li>
+                <li>• OpenRouter AI</li>
+                <li>• PostgreSQL</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   </div>
-</BaseLayout>
+</AppLayout>
 
 <style>
-  @media (min-width: 1024px) {
-    .about {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
+  .about-page {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 1.125rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 </style>
 

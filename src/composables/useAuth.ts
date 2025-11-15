@@ -1,0 +1,114 @@
+import { supabaseClient } from '../db/supabase.client.js';
+
+/**
+ * Composable do zarządzania autentykacją użytkownika
+ * Wykorzystuje Supabase Auth
+ */
+export function useAuth() {
+  /**
+   * Zmienia hasło użytkownika
+   * @param currentPassword - Obecne hasło (nie jest używane przez Supabase, ale pozostawiamy dla walidacji)
+   * @param newPassword - Nowe hasło
+   * @returns Promise z wynikiem operacji
+   */
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      // Supabase Auth nie wymaga obecnego hasła dla zalogowanego użytkownika
+      // Możemy zaimplementować dodatkową walidację obecnego hasła przez re-authentication
+      const { error } = await supabaseClient.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error changing password:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Usuwa konto użytkownika
+   * UWAGA: Ta operacja wymaga uprawnień admin lub odpowiedniej funkcji RPC w Supabase
+   * W prostej implementacji można użyć soft delete lub funkcji edge
+   */
+  const deleteAccount = async () => {
+    try {
+      // Pobierz aktualnego użytkownika
+      const { data: { user } } = await supabaseClient.auth.getUser();
+
+      if (!user) {
+        throw new Error('No user logged in');
+      }
+
+      // UWAGA: Usuwanie konta w Supabase wymaga specjalnej implementacji
+      // Opcja 1: Wywołać RPC function która obsługuje usuwanie
+      // Opcja 2: Wywołać dedykowany endpoint API
+      // Opcja 3: Użyć admin API (tylko po stronie serwera)
+      
+      // Na potrzeby MVP używamy endpoint API
+      const response = await fetch('/api/user/account', {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete account');
+      }
+
+      // Wyloguj użytkownika po usunięciu konta
+      await supabaseClient.auth.signOut();
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Wylogowuje użytkownika
+   */
+  const signOut = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Pobiera aktualnie zalogowanego użytkownika
+   */
+  const getCurrentUser = async () => {
+    try {
+      const { data: { user }, error } = await supabaseClient.auth.getUser();
+      
+      if (error) {
+        throw error;
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+  };
+
+  return {
+    changePassword,
+    deleteAccount,
+    signOut,
+    getCurrentUser,
+  };
+}
+

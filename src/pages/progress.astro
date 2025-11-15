@@ -1,0 +1,67 @@
+---
+// Strona Postępy (Progress)
+import AppLayout from '../layouts/AppLayout.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+// Generuj tę stronę statycznie (prerender)
+export const prerender = true;
+---
+
+<AppLayout 
+  title="Postępy - StravaGoals"
+  description="Analizuj swoje postępy i statystyki treningowe"
+>
+  <div class="progress-page">
+    <div class="page-header">
+      <h1 class="page-title">Postępy</h1>
+      <p class="page-subtitle">
+        Wizualizacje i analiza Twoich postępów treningowych
+      </p>
+    </div>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>🚧 W budowie</CardTitle>
+        <CardDescription>Ta funkcjonalność będzie wkrótce dostępna</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p class="text-muted-foreground">
+          Tutaj będziesz mógł przeglądać szczegółowe analizy swoich postępów.
+          Funkcje do zaimplementowania:
+        </p>
+        <ul class="mt-4 space-y-2 text-sm text-muted-foreground">
+          <li>✓ Wykresy postępów dla celów rocznych</li>
+          <li>✓ Porównanie między latami</li>
+          <li>✓ Statystyki per sport</li>
+          <li>✓ Trendy i prognozy</li>
+          <li>✓ Eksport raportów</li>
+        </ul>
+      </CardContent>
+    </Card>
+  </div>
+</AppLayout>
+
+<style>
+  .progress-page {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: hsl(var(--muted-foreground));
+  }
+</style>
+

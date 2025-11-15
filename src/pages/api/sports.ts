@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { ZodError } from 'zod';
 import { createSportSchema, type CreateSportCommand } from '../../validators/createSport.js';
 import { createSport, SportCreationError, SportCreationErrors } from '../../services/sports/createSport.js';
+import { getSports, GetSportsError } from '../../services/sports/getSports.js';
 import type { ErrorDto, SportDto } from '../../types.js';
 
 // Mark this endpoint as server-rendered to enable request body access
@@ -123,6 +124,40 @@ export const POST: APIRoute = async ({ request }) => {
   } catch (error) {
     // Catch-all error handler
     console.error('Unhandled error in POST /api/sports:', error);
+    return errorResponse(500, 'internal_error', 'An unexpected error occurred');
+  }
+};
+
+/**
+ * GET /api/sports
+ *
+ * Retrieves all sports from the database.
+ *
+ * Responses:
+ * - 200: Array of sports
+ * - 500: Internal server error
+ */
+export const GET: APIRoute = async () => {
+  try {
+    // Fetch all sports
+    const sports = await getSports();
+
+    // Return success response
+    return new Response(JSON.stringify(sports), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    // Handle service errors
+    if (error instanceof GetSportsError) {
+      console.error('Error fetching sports:', error);
+      return errorResponse(500, error.code, error.message);
+    }
+
+    // Catch-all error handler
+    console.error('Unhandled error in GET /api/sports:', error);
     return errorResponse(500, 'internal_error', 'An unexpected error occurred');
   }
 };

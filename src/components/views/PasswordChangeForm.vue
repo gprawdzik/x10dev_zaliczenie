@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToastStore } from '@/stores/toast';
+import { useAuth } from '@/composables/useAuth';
 
 // Typ ViewModel dla formularza
 interface PasswordChangeViewModel {
@@ -25,6 +26,9 @@ const errors = reactive<Partial<Record<keyof PasswordChangeViewModel | 'general'
 
 // Toast store do wyświetlania powiadomień
 const toast = useToastStore();
+
+// Auth composable do operacji na użytkowniku
+const { changePassword } = useAuth();
 
 /**
  * Walidacja formularza po stronie klienta
@@ -77,18 +81,8 @@ const handleSubmit = async () => {
   errors.general = '';
 
   try {
-    // TODO: Implementacja prawdziwego API call
-    // const response = await fetch('/api/user/password', {
-    //   method: 'PATCH',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     currentPassword: form.currentPassword,
-    //     newPassword: form.newPassword,
-    //   }),
-    // });
-
-    // Symulacja API call na potrzeby dewelopmentu
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Wywołaj Supabase Auth do zmiany hasła
+    await changePassword(form.currentPassword, form.newPassword);
 
     // Sukces - wyczyść formularz
     form.currentPassword = '';
@@ -98,10 +92,14 @@ const handleSubmit = async () => {
     // Wyświetl powiadomienie sukcesu
     toast.success('Hasło zostało zmienione', 'Twoje hasło zostało pomyślnie zaktualizowane');
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Błąd podczas zmiany hasła:', error);
-    toast.error('Błąd zmiany hasła', 'Wystąpił błąd podczas zmiany hasła. Spróbuj ponownie.');
-    errors.general = 'Wystąpił błąd podczas zmiany hasła. Spróbuj ponownie.';
+    
+    // Obsłuż różne typy błędów
+    const errorMessage = error?.message || 'Wystąpił błąd podczas zmiany hasła. Spróbuj ponownie.';
+    
+    toast.error('Błąd zmiany hasła', errorMessage);
+    errors.general = errorMessage;
   } finally {
     isLoading.value = false;
   }

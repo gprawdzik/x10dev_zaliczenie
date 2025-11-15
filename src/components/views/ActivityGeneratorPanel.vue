@@ -29,29 +29,33 @@ const handleGenerateActivities = async () => {
   isGenerating.value = true;
 
   try {
-    // TODO: Implementacja prawdziwego API call
-    // const response = await fetch('/api/activities/generate', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    // });
+    // Wywołaj API do generowania aktywności
+    const response = await fetch('/api/activities/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
     
-    // if (!response.ok) {
-    //   throw new Error('Failed to generate activities');
-    // }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || 'Failed to generate activities');
+    }
     
-    // const data = await response.json();
-
-    // Symulacja API call na potrzeby dewelopmentu
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Wyświetl powiadomienie sukcesu
-    toast.success('Dane wygenerowane', 'Aktywności zostały pomyślnie wygenerowane');
+    const data = await response.json();
+    
+    // Wyświetl powiadomienie sukcesu z liczbą wygenerowanych aktywności
+    const count = data.created_count || 0;
+    toast.success(
+      'Dane wygenerowane', 
+      `Wygenerowano ${count} ${count === 1 ? 'aktywność' : 'aktywności'}`
+    );
     
     isDialogOpen.value = false;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Błąd podczas generowania aktywności:', error);
-    toast.error('Błąd generowania', 'Wystąpił błąd podczas generowania danych. Spróbuj ponownie.');
+    
+    const errorMessage = error?.message || 'Wystąpił błąd podczas generowania danych. Spróbuj ponownie.';
+    toast.error('Błąd generowania', errorMessage);
   } finally {
     isGenerating.value = false;
   }

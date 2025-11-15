@@ -1,0 +1,138 @@
+---
+/**
+ * AppLayout - główny layout dla aplikacji StravaGoals
+ * Zawiera nawigację, footer i globalny Toaster do powiadomień
+ */
+import Navbar from '../components/layout/Navbar.vue';
+import { Toaster } from '../components/ui/sonner';
+import '../assets/base.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = 'StravaGoals - Zarządzaj swoimi celami treningowymi',
+  description = 'Aplikacja do zarządzania i śledzenia celów treningowych'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <!-- Nawigacja górna -->
+    <Navbar client:load />
+
+    <!-- Główna zawartość strony -->
+    <main class="main-content">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <p class="footer-text">
+          © {new Date().getFullYear()} StravaGoals. Aplikacja do zarządzania celami treningowymi.
+        </p>
+        <div class="footer-links">
+          <a href="/about" class="footer-link">O aplikacji</a>
+          <span class="footer-divider">•</span>
+          <a href="/settings" class="footer-link">Ustawienia</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Globalny komponent Toast dla powiadomień -->
+    <Toaster client:load richColors position="top-right" />
+  </body>
+</html>
+
+<style>
+  /* Reset dla body - używamy Tailwind i zmiennych CSS z base.css */
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Główna zawartość */
+  .main-content {
+    flex: 1;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Zwiększ padding na większych ekranach */
+  @media (min-width: 768px) {
+    .main-content {
+      padding: 3rem 2rem;
+    }
+  }
+
+  /* Footer */
+  .app-footer {
+    width: 100%;
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted) / 0.3);
+    margin-top: auto;
+  }
+
+  .footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .footer-container {
+      flex-direction: row;
+    }
+  }
+
+  .footer-text {
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+    margin: 0;
+    text-align: center;
+  }
+
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .footer-link {
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-link:hover {
+    color: hsl(var(--foreground));
+  }
+
+  .footer-divider {
+    color: hsl(var(--border));
+    user-select: none;
+  }
+</style>
+

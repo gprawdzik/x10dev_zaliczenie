@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useToastStore } from '@/stores/toast';
+import { useAuth } from '@/composables/useAuth';
 
 // Stan ładowania podczas usuwania konta
 const isDeleting = ref(false);
@@ -21,6 +22,9 @@ const isDialogOpen = ref(false);
 // Toast store do wyświetlania powiadomień
 const toast = useToastStore();
 
+// Auth composable do operacji na użytkowniku
+const { deleteAccount } = useAuth();
+
 /**
  * Obsługa potwierdzenia usunięcia konta
  * Wysyła żądanie do API i przekierowuje użytkownika po sukcesie
@@ -29,30 +33,24 @@ const handleDeleteAccount = async () => {
   isDeleting.value = true;
 
   try {
-    // TODO: Implementacja prawdziwego API call
-    // const response = await fetch('/api/user/account', {
-    //   method: 'DELETE',
-    // });
-    
-    // if (!response.ok) {
-    //   throw new Error('Failed to delete account');
-    // }
-
-    // Symulacja API call na potrzeby dewelopmentu
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Wywołaj funkcję usuwania konta (wyloguje automatycznie)
+    await deleteAccount();
 
     // Wyświetl powiadomienie sukcesu
     toast.success('Konto zostało usunięte', 'Zostaniesz wylogowany');
     
     isDialogOpen.value = false;
 
-    // TODO: Wylogowanie użytkownika i przekierowanie na stronę główną
-    // await logout();
-    // window.location.href = '/';
+    // Przekieruj na stronę główną po krótkiej chwili
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Błąd podczas usuwania konta:', error);
-    toast.error('Błąd usuwania konta', 'Wystąpił błąd podczas usuwania konta. Spróbuj ponownie.');
+    
+    const errorMessage = error?.message || 'Wystąpił błąd podczas usuwania konta. Spróbuj ponownie.';
+    toast.error('Błąd usuwania konta', errorMessage);
   } finally {
     isDeleting.value = false;
   }

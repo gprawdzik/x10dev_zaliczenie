@@ -34,14 +34,19 @@ mikr.us for hosting the application via a Docker image
 
 - `./src` - source code
 - `./src/pages` - Astro pages (file-based routing): each .astro file becomes a route
-- `./src/layouts` - Astro layouts for shared page structure
+- `./src/layouts` - Astro layouts for shared page structure (AppLayout.astro)
 - `./src/components` - Vue components (interactive islands with client:\* directives)
-- `./src/components/ui` - small reusable UI components, e.g. buttons, cards
-- `./src/components/layout` - larger structures, e.g. navbar, footer
-- `./src/db` - Supabase clients and types
+- `./src/components/ui` - small reusable UI components from shadcn/vue (buttons, cards, dialogs, etc.)
+- `./src/components/layout` - larger structural components (Navbar, Footer)
+- `./src/components/views` - main view components for pages (SettingsView, etc.)
+- `./src/composables` - Vue composables (useAuth, etc.)
+- `./src/db` - Supabase clients and database types
+- `./src/services` - business logic services (sports, activities, etc.)
+- `./src/validators` - Zod validation schemas
 - `./src/plugins` - Vue app configuration (Pinia, Supabase)
-- `./src/stores` - Pinia stores for state management
-- `./src/assets` - static assets (styles, images, fonts)
+- `./src/stores` - Pinia stores for state management (toast, counter)
+- `./src/assets` - static assets (styles with Tailwind)
+- `./src/lib` - utility functions (cn for class merging)
 - `./public` - public static files served as-is
 
 Always update this section after modifying the directory structure.
