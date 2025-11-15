@@ -118,6 +118,76 @@ All API routes live under `src/pages/api`. Each endpoint expects a valid Supabas
 - **Response:** `201 Created` with `{ "created_count": 100 }`
 - **Errors:** `401` (auth), `422` (invalid overrides), `500` (database/unknown)
 
+### `GET /api/goals`
+
+- **Auth:** Required
+- **Description:** Lists the authenticated user’s annual goals with filtering, sorting, and pagination. Pass `id=eq.<goal_id>` to retrieve a single goal.
+- **Query params:**
+  - `year`: integer (optional)
+  - `sport_id`: UUID (optional)
+  - `scope_type`: `global` or `per_sport`
+  - `metric_type`: `distance`, `time`, or `elevation_gain`
+  - `page` (default 1, ≥1), `limit` (default 20, max 100)
+  - `sort_by`: `created_at` (default), `year`, `target_value`
+  - `sort_dir`: `asc` or `desc` (default)
+- **Response:** `200 OK` with `Paginated<GoalDto>` for list requests or `GoalDto` for single-goal lookups.
+- **Errors:** `400` (invalid filters), `401` (auth), `404` (goal not found), `500` (unexpected failure)
+
+### `POST /api/goals`
+
+- **Auth:** Required
+- **Description:** Creates a new annual goal for the authenticated user. Body must be JSON (`Content-Type: application/json`).
+- **Body:**
+
+  ```json
+  {
+    "scope_type": "global",
+    "year": 2025,
+    "metric_type": "distance",
+    "target_value": 2000000,
+    "sport_id": null
+  }
+  ```
+
+  - `scope_type`: `global` (requires `sport_id: null`) or `per_sport` (requires valid `sport_id`)
+  - `year`: 2000–2100
+  - `metric_type`: `distance`, `time`, `elevation_gain`
+  - `target_value`: positive number (stored in the minimal unit for the metric)
+
+- **Response:** `201 Created` with the persisted `GoalDto`.
+- **Errors:** `400` (validation), `401` (auth), `403` (RLS violation), `409` (duplicate combination), `500`
+
+### `PATCH /api/goals?id=eq.<goal_id>`
+
+- **Auth:** Required
+- **Description:** Updates metric metadata for an existing goal; at least one field is required.
+- **Body:**
+
+  ```json
+  {
+    "metric_type": "distance",
+    "target_value": 2200000
+  }
+  ```
+
+- **Response:** `200 OK` with the updated `GoalDto`.
+- **Errors:** `400` (missing id/body), `401`, `403`, `404`, `500`
+
+### `DELETE /api/goals?id=eq.<goal_id>`
+
+- **Auth:** Required
+- **Description:** Deletes a goal owned by the current user.
+- **Response:** `204 No Content`
+- **Errors:** `400` (missing id), `401`, `403`, `404`, `500`
+
+### `GET /api/goal_history?goal_id=eq.<goal_id>`
+
+- **Auth:** Required
+- **Description:** Returns an append-only audit trail of changes for a goal, ordered by `changed_at`.
+- **Query params:** `page`, `limit`, `sort_by` (`changed_at`), `sort_dir`
+- **Response:** `200 OK` with `Paginated<GoalHistoryDto>`
+- **Errors:** `400`, `401`, `403`, `404`, `500`
+
 ## Project Status
 
 - MVP features fully implemented and available for local testing.
