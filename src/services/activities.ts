@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Database, TablesInsert } from '../db/database.types.js';
 import { supabaseClient } from '../db/supabase.client.js';
-import type { ActivityDto, GenerateActivitiesResponse, Paginated } from '../types.js';
+import type { ActivityDto, GenerateActivitiesResponse, Paginated, SportDto } from '../types.js';
 import type { GenerateActivitiesOverrides, ListActivitiesQuery } from '../validators/activity.js';
 
 export const ActivitiesServiceErrors = {
@@ -32,19 +32,20 @@ type DistributionConfig = {
   quaternary: number;
 };
 
-type GeneratorConfig = {
-  timezone: string;
-  sports: string[];
-  distribution: DistributionConfig;
-  total: number;
-};
-
 type SportProfile = {
+  code: string;
   type: string;
   displayName: string;
   distanceKmRange: [number, number];
   speedKphRange: [number, number];
   elevationRange: [number, number];
+};
+
+type GeneratorConfig = {
+  timezone: string;
+  profiles: SportProfile[];
+  distribution: DistributionConfig;
+  total: number;
 };
 
 type LocalDateParts = {
@@ -66,7 +67,6 @@ type LocalizedTimestamp = {
 };
 
 const DEFAULT_TIMEZONE = 'Europe/Warsaw';
-const DEFAULT_SPORTS = ['running', 'cycling', 'swimming', 'hiking'] as const;
 const DEFAULT_DISTRIBUTION: DistributionConfig = {
   primary: 0.5,
   secondary: 0.3,
@@ -77,66 +77,8 @@ const TOTAL_SYNTHETIC_ACTIVITIES = 100;
 const WEEKDAY_ACTIVE_HOURS: [number, number] = [16, 21];
 const WEEKEND_ACTIVE_HOURS: [number, number] = [7, 19];
 
-const SPORT_PROFILES: Record<string, SportProfile> = {
-  running: {
-    type: 'Run',
-    displayName: 'Run',
-    distanceKmRange: [3, 24],
-    speedKphRange: [8.5, 15.5],
-    elevationRange: [20, 450],
-  },
-  cycling: {
-    type: 'Ride',
-    displayName: 'Ride',
-    distanceKmRange: [15, 120],
-    speedKphRange: [22, 36],
-    elevationRange: [50, 1200],
-  },
-  swimming: {
-    type: 'Swim',
-    displayName: 'Swim',
-    distanceKmRange: [0.6, 4],
-    speedKphRange: [2, 5],
-    elevationRange: [0, 25],
-  },
-  hiking: {
-    type: 'Hike',
-    displayName: 'Hike',
-    distanceKmRange: [4, 25],
-    speedKphRange: [3, 6],
-    elevationRange: [120, 1500],
-  },
-  walking: {
-    type: 'Walk',
-    displayName: 'Walk',
-    distanceKmRange: [2, 12],
-    speedKphRange: [3, 6],
-    elevationRange: [0, 200],
-  },
-  sup: {
-    type: 'StandUpPaddle',
-    displayName: 'SUP',
-    distanceKmRange: [2, 10],
-    speedKphRange: [4, 8],
-    elevationRange: [0, 50],
-  },
-  pilates: {
-    type: 'Workout',
-    displayName: 'Pilates',
-    distanceKmRange: [1, 3],
-    speedKphRange: [3, 5],
-    elevationRange: [0, 20],
-  },
-  'strength_training': {
-    type: 'Workout',
-    displayName: 'Strength',
-    distanceKmRange: [1, 4],
-    speedKphRange: [1, 4],
-    elevationRange: [0, 40],
-  },
-};
-
-const FALLBACK_PROFILE: SportProfile = {
+const DEFAULT_SPORT_PROFILE: SportProfile = {
+  code: 'workout',
   type: 'Workout',
   displayName: 'Workout',
   distanceKmRange: [3, 10],
@@ -213,6 +155,7 @@ export async function listActivities(
 
 export async function generateActivities(
   userId: string,
+  sports: SportDto[],
   overrides: GenerateActivitiesOverrides = {},
   options?: { supabase?: ActivitiesSupabaseClient }
 ): Promise<GenerateActivitiesResponse> {
@@ -220,6 +163,13 @@ export async function generateActivities(
     throw new ActivitiesServiceError(
       ActivitiesServiceErrors.VALIDATION_ERROR,
       'userId is required to generate activities'
+    );
+  }
+
+  if (!sports || sports.length === 0) {
+    throw new ActivitiesServiceError(
+      ActivitiesServiceErrors.VALIDATION_ERROR,
+      'At least one sport is required to generate activities'
     );
   }
 
@@ -231,7 +181,7 @@ export async function generateActivities(
     );
   }
 
-  const config = resolveGeneratorConfig(overrides);
+  const config = resolveGeneratorConfig(sports, overrides);
   const activities = buildSyntheticActivities(userId, config);
 
   const { error } = await client.from('activities').insert(activities);
@@ -248,43 +198,68 @@ export async function generateActivities(
   return { created_count: activities.length };
 }
 
-function resolveGeneratorConfig(overrides: GenerateActivitiesOverrides = {}): GeneratorConfig {
-  const sanitizedSports = deduplicateSports(
-    (overrides.primary_sports ?? Array.from(DEFAULT_SPORTS)).map((sport) => sport.trim().toLowerCase())
-  );
-  const sports = ensureSportSlots(sanitizedSports, Array.from(DEFAULT_SPORTS));
+function resolveGeneratorConfig(sports: SportDto[], overrides: GenerateActivitiesOverrides = {}): GeneratorConfig {
   const timezone = (overrides.timezone ?? DEFAULT_TIMEZONE).trim() || DEFAULT_TIMEZONE;
   const distribution = normalizeDistribution(overrides.distribution ?? DEFAULT_DISTRIBUTION);
+  
+  // Build profiles from SportDto array
+  const profiles = sports.map(sport => buildSportProfile(sport));
+  
+  // Ensure we have exactly 4 profiles for distribution
+  const finalProfiles = ensureFourProfiles(profiles);
 
   return {
     timezone,
-    sports,
+    profiles: finalProfiles,
     distribution,
     total: TOTAL_SYNTHETIC_ACTIVITIES,
   };
 }
 
-function deduplicateSports(sports: string[]): string[] {
-  return Array.from(new Set(sports.filter(Boolean)));
+function buildSportProfile(sport: SportDto): SportProfile {
+  // Extract profile data from consolidated field if available
+  const consolidated = sport.consolidated as Record<string, unknown> | null;
+  
+  const distanceKmRange = extractRange(consolidated?.distanceKmRange, [3, 10]);
+  const speedKphRange = extractRange(consolidated?.speedKphRange, [4, 8]);
+  const elevationRange = extractRange(consolidated?.elevationRange, [0, 200]);
+  const type = (consolidated?.type as string) ?? 'Workout';
+
+  return {
+    code: sport.code,
+    type,
+    displayName: sport.name,
+    distanceKmRange,
+    speedKphRange,
+    elevationRange,
+  };
 }
 
-function ensureSportSlots(sports: string[], fallbacks: string[]): string[] {
-  const result = [...sports];
-  let fallbackIndex = 0;
+function extractRange(value: unknown, defaultRange: [number, number]): [number, number] {
+  if (Array.isArray(value) && value.length === 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+    return [value[0], value[1]];
+  }
+  return defaultRange;
+}
+
+function ensureFourProfiles(profiles: SportProfile[]): SportProfile[] {
+  if (profiles.length === 0) {
+    return [DEFAULT_SPORT_PROFILE, DEFAULT_SPORT_PROFILE, DEFAULT_SPORT_PROFILE, DEFAULT_SPORT_PROFILE];
+  }
+  
+  if (profiles.length >= 4) {
+    return profiles.slice(0, 4);
+  }
+  
+  // If we have less than 4, repeat existing profiles to fill slots
+  const result = [...profiles];
   while (result.length < 4) {
-    const fallback = fallbacks[fallbackIndex % fallbacks.length];
-    if (!result.includes(fallback)) {
-      result.push(fallback);
-    }
-    fallbackIndex += 1;
+    result.push(profiles[result.length % profiles.length]);
   }
-
-  if (result.length > 4) {
-    return result.slice(0, 4);
-  }
-
+  
   return result;
 }
+
 
 function normalizeDistribution(dist: DistributionConfig): DistributionConfig {
   const sum = dist.primary + dist.secondary + dist.tertiary + dist.quaternary;
@@ -307,15 +282,14 @@ function buildSyntheticActivities(userId: string, config: GeneratorConfig): Acti
 function createSyntheticActivity(userId: string, config: GeneratorConfig): ActivityInsert {
   const baseDate = pickRandomDateWithinYear();
   const localized = buildLocalizedTimestamp(baseDate, config.timezone);
-  const sportType = pickSportType(config);
-  const profile = SPORT_PROFILES[sportType] ?? buildFallbackProfile(sportType);
+  const profile = pickSportProfile(config);
   const metrics = buildMetrics(profile, getSeasonalityMultiplier(localized.month));
 
   return {
     user_id: userId,
     name: buildActivityName(profile.displayName, localized.localHour),
     type: profile.type,
-    sport_type: sportType,
+    sport_type: profile.code,
     start_date: localized.utcDate.toISOString(),
     start_date_local: localized.startDateLocal,
     timezone: config.timezone,
@@ -466,12 +440,12 @@ function formatOffset(minutes: number): string {
   return `${sign}${hours}:${mins}`;
 }
 
-function pickSportType(config: GeneratorConfig): string {
-  const weights: Array<{ sport: string; weight: number }> = [
-    { sport: config.sports[0], weight: config.distribution.primary },
-    { sport: config.sports[1], weight: config.distribution.secondary },
-    { sport: config.sports[2], weight: config.distribution.tertiary },
-    { sport: config.sports[3], weight: config.distribution.quaternary },
+function pickSportProfile(config: GeneratorConfig): SportProfile {
+  const weights: Array<{ profile: SportProfile; weight: number }> = [
+    { profile: config.profiles[0], weight: config.distribution.primary },
+    { profile: config.profiles[1], weight: config.distribution.secondary },
+    { profile: config.profiles[2], weight: config.distribution.tertiary },
+    { profile: config.profiles[3], weight: config.distribution.quaternary },
   ];
 
   const totalWeight = weights.reduce((sum, item) => sum + item.weight, 0) || 1;
@@ -481,26 +455,13 @@ function pickSportType(config: GeneratorConfig): string {
   for (const bucket of weights) {
     accumulator += bucket.weight;
     if (threshold <= accumulator) {
-      return bucket.sport;
+      return bucket.profile;
     }
   }
 
-  return weights[weights.length - 1].sport;
+  return weights[weights.length - 1].profile;
 }
 
-function buildFallbackProfile(code: string): SportProfile {
-  const normalized = code.replace(/[_-]/g, ' ');
-  const title = normalized
-    .split(' ')
-    .filter(Boolean)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(' ');
-
-  return {
-    ...FALLBACK_PROFILE,
-    displayName: title || FALLBACK_PROFILE.displayName,
-  };
-}
 
 function buildMetrics(profile: SportProfile, seasonality: number) {
   const distanceKm = clamp(

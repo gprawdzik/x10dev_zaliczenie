@@ -1,23 +1,51 @@
 import type { APIRoute } from 'astro';
 import { ZodError } from 'zod';
 
-import { AuthError } from '../../middleware/requireAuth.js';
-import { requireAuth } from '../../middleware/requireAuth.js';
 import {
   ActivitiesServiceError,
   ActivitiesServiceErrors,
   generateActivities,
 } from '../../services/activities.js';
+import { getSports, GetSportsError } from '../../services/sports/getSports.js';
 import type { ErrorDto, GenerateActivitiesResponse } from '../../types.js';
 import { generateActivitiesBodySchema, type GenerateActivitiesOverrides } from '../../validators/activity.js';
 
 export const prerender = false;
+const GENERATOR_USER_ID = import.meta.env.PUBLIC_SUPABASE_GENERATOR_USER_ID;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { userId } = await requireAuth(request);
+    const userId = resolveGeneratorUserId();
     const overrides = await parseGenerateActivitiesBody(request);
-    const result = await generateActivities(userId, overrides);
+    
+    // Fetch sports from database
+    const allSports = await getSports();
+    
+    // Filter sports based on primary_sports if provided
+    let selectedSports = allSports;
+    if (overrides.primary_sports && overrides.primary_sports.length > 0) {
+      const requestedCodes = overrides.primary_sports.map(code => code.trim().toLowerCase());
+      selectedSports = allSports.filter(sport => requestedCodes.includes(sport.code.toLowerCase()));
+      
+      // If no matching sports found, throw validation error
+      if (selectedSports.length === 0) {
+        throw new ActivitiesServiceError(
+          ActivitiesServiceErrors.VALIDATION_ERROR,
+          'None of the requested sports exist in the database',
+          { requested_sports: overrides.primary_sports }
+        );
+      }
+    }
+    
+    // If no sports available, throw error
+    if (selectedSports.length === 0) {
+      throw new ActivitiesServiceError(
+        ActivitiesServiceErrors.VALIDATION_ERROR,
+        'No sports available in the database. Please add sports first.'
+      );
+    }
+    
+    const result = await generateActivities(userId, selectedSports, overrides);
     return jsonResponse(result satisfies GenerateActivitiesResponse, 201);
   } catch (error) {
     return handleGenerateActivitiesError(error);
@@ -50,10 +78,6 @@ async function parseGenerateActivitiesBody(request: Request): Promise<GenerateAc
 }
 
 function handleGenerateActivitiesError(error: unknown): Response {
-  if (error instanceof AuthError) {
-    return errorResponse(401, error.code, error.message, error.details);
-  }
-
   if (error instanceof ZodError) {
     const validationErrors = error.issues.map((issue) => ({
       field: issue.path.join('.') || undefined,
@@ -77,6 +101,15 @@ function handleGenerateActivitiesError(error: unknown): Response {
         console.error('Unknown activities service error:', error);
         return errorResponse(500, 'INTERNAL_ERROR', 'Unexpected activities service error');
     }
+  }
+
+  if (error instanceof GetSportsError) {
+    console.error('Failed to fetch sports:', error);
+    return errorResponse(500, error.code, error.message, error.details);
+  }
+
+  if (error instanceof GeneratorUserError) {
+    return errorResponse(500, 'GENERATOR_USER_UNCONFIGURED', error.message);
   }
 
   console.error('Unhandled error in POST /api/activities-generate:', error);
@@ -105,5 +138,20 @@ function errorResponse(
   };
 
   return jsonResponse(body, status);
+}
+
+class GeneratorUserError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'GeneratorUserError';
+  }
+}
+
+function resolveGeneratorUserId(): string {
+  const userId = GENERATOR_USER_ID?.trim();
+  if (!userId) {
+    throw new GeneratorUserError('PUBLIC_SUPABASE_GENERATOR_USER_ID is not configured');
+  }
+  return userId;
 }
 
