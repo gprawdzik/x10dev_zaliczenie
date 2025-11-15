@@ -75,6 +75,49 @@ _Boundaries & Exclusions:_
 - No advanced activity analysis or logistical planning
 - Minimal security beyond basic password hashing
 
+## REST API
+
+All API routes live under `src/pages/api`. Each endpoint expects a valid Supabase JWT (send `Authorization: Bearer <access_token>` or the standard `sb-access-token` cookie). Responses follow the shared `ErrorDto` shape on failure.
+
+### `GET /api/activities`
+
+- **Auth:** Required (user tied to Supabase session)
+- **Description:** Lists the authenticated user’s activities with filtering, sorting, and pagination.
+- **Query params:**
+  - `from`, `to`: ISO 8601 timestamps (`from ≤ to`)
+  - `sport_type`, `type`: exact matches on corresponding columns
+  - `page` (default 1, ≥1), `limit` (default 20, max 100)
+  - `sort_by`: `start_date` (default), `distance`, `moving_time`
+  - `sort_dir`: `asc` or `desc` (default)
+- **Response:** `200 OK` with `Paginated<ActivityDto>` (data, page, limit, total)
+- **Errors:** `400` (validation issues), `401` (missing/invalid token), `500` (unexpected failure)
+
+### `POST /api/activities-generate`
+
+- **Auth:** Required
+- **Description:** Generates and stores 100 simulated activities for the authenticated user (last 12 months).
+- **Body (optional JSON overrides):**
+
+  ```json
+  {
+    "primary_sports": ["running", "cycling", "swimming", "hiking"],
+    "distribution": {
+      "primary": 0.5,
+      "secondary": 0.3,
+      "tertiary": 0.15,
+      "quaternary": 0.05
+    },
+    "timezone": "Europe/Warsaw"
+  }
+  ```
+
+  - `primary_sports`: 1–25 entries; missing slots fall back to defaults
+  - `distribution`: values must sum to ~1.0 (±0.01)
+  - `timezone`: valid IANA identifier
+
+- **Response:** `201 Created` with `{ "created_count": 100 }`
+- **Errors:** `401` (auth), `422` (invalid overrides), `500` (database/unknown)
+
 ## Project Status
 
 - MVP features fully implemented and available for local testing.

@@ -20,6 +20,12 @@ export type GenerateActivitiesRequest = Partial<{
   timezone: string;
 }>;
 export type GenerateActivitiesResponse = { created_count: number };
+export type Paginated<T> = {
+  data: T[];
+  page: number;
+  limit: number;
+  total: number;
+};
 
 // Progress/Stats DTOs
 export type ProgressAnnualRequest = {

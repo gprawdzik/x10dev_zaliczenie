@@ -193,7 +193,7 @@ List activities
 Generate 100 activities for last 12 months (per PRD)
 
 - Method: POST
-- Path: `/functions/v1/activities-generate`
+- Path: `/api/activities-generate`
 - Description: Simulates 100 activities using defined distributions; inserts into `activities` for the authenticated user.
 - Body JSON (optional overrides):
 
