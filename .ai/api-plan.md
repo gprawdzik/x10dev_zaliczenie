@@ -163,7 +163,7 @@ List goal history for a goal
 List activities
 
 - Method: GET
-- Path: `/activities`
+- Path: `/api/activities`
 - Query params: `from` (gte start_date), `to` (lte start_date), `sport_type` (eq), `type` (eq), `page`, `limit`, `sort_by`, `sort_dir`
 - Response 200 JSON: array of activities
 

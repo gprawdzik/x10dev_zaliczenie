@@ -9,78 +9,62 @@ Najpierw przejrzyj następujące informacje:
 
 2. Opis widoku:
    <view_description>
-   **Ustawienia** (`/settings`)
-   • Cel: Konfiguracja profilu, generowanie danych i zarządzanie sportami  
-   • Kluczowe informacje: Zakładki: **Profil**, **Generator danych**, **Sporty** (admin)  
-   • Kluczowe komponenty: `Tabs`, `ProfileForm`, `ActivityGeneratorPanel`, `SportManagerPanel`, `Loader`, `Toast`  
-   • UX / dostępność / bezpieczeństwo: Ochrona przed przypadkowym uruchomieniem generatora (modal potwierdzenia);
-   </view_description>
+
+- **Moje aktywności** (`/activities`)
+  • Cel: Umożliwia przeglądanie wygenerowanych aktywności treningowych
+  • Kluczowe informacje: Tabela z aktywnościami (nazwa, typ, data, dystans, czas trwania), paginacja, opcje sortowania
+  • Kluczowe komponenty: `ActivitiesTable`, `PaginationControl`, `SortDropdown`
+  • UX / dostępność / bezpieczeństwo: Lazy loading danych, skeleton state dla tabeli, ARIA atrybuty dla sortowania i paginacji
+  </view_description>
 
 3. User Stories:
    <user_stories>
-   ID: US-013
-   Tytuł: Dodanie sportu przez administratora
-   Opis: Użytkownik z tolą administrator ma możliwość dodania nowego sportu w zakladce Ustawienia.
-   Kryteria akceptacji:
 
-- Administrator ma możliwość dodania nowego rodzaju sportu.
-
-- ID: US-003
-  Tytuł: Zmiana hasła
-  Opis: Zalogowany użytkownik zmienia swoje hasło.
+- ID: US-014
+  Tytuł: Wyświetlanie aktywności
+  Opis: Użytkownik może wyświetlić wygenerowane aktywności.
   Kryteria akceptacji:
-- wymagana autoryzacja obecnym hasłem
-- nowe hasło spełnia wymagania długości
-- po zmianie użytkownik może się zalogować przy użyciu nowego hasła
-
-- ID: US-004
-  Tytuł: Usunięcie konta
-  Opis: Zalogowany użytkownik usuwa swoje konto.
-  Kryteria akceptacji:
-  - potwierdzenie decyzji (modal)
-  - usunięcie wszystkich danych użytkownika
-  - przekierowanie na stronę rejestracji/logowania
+  - Użytkownik widzi swoje aktywności.
+  - paginacja
+  - sortowanie
     </user_stories>
 
 4. Endpoint Description:
    <endpoint_description>
-   List sports
+   List activities
 
 - Method: GET
-- Path: `/sports`
-- Query params: `code` (eq), `name` (ilike), `page`, `limit`, `sort_by`, `sort_dir`
-- Response 200 JSON: array of sports
+- Path: `/api/activities`
+- Query params: `from` (gte start_date), `to` (lte start_date), `sport_type` (eq), `type` (eq), `page`, `limit`, `sort_by`, `sort_dir`
+- Response 200 JSON: array of activities
 
 ```json
-[{ "id": "uuid", "code": "run", "name": "Running", "description": "", "consolidated": null }]
+[
+  {
+    "id": "uuid",
+    "user_id": "uuid",
+    "name": "Lunch Run",
+    "type": "Run",
+    "sport_type": "running",
+    "start_date": "2025-09-01T12:00:00Z",
+    "start_date_local": "2025-09-01T14:00:00+02:00",
+    "timezone": "Europe/Warsaw",
+    "utc_offset": 7200,
+    "distance": 10000,
+    "moving_time": "3600s",
+    "elapsed_time": "3700s",
+    "total_elevation_gain": 120,
+    "average_speed": 2.7
+  }
+]
 ```
 
 - Errors: 401
-
-Get sport by id
-
-- Method: GET
-- Path: `/sports?id=eq.{id}`
-- Response 200 JSON: single-element array with sport or empty array
-- Errors: 401, 404 if empty and handled by wrapper
-
-Create sport (admin-only; optional for MVP)
-
-- Method: POST
-- Path: `/sports`
-- Body JSON:
-
-```json
-{ "code": "run", "name": "Running", "description": "optional", "consolidated": null }
-```
-
-- Response: 201 with created row
-- Errors: 401, 403 (RLS), 409 (unique violation)
   </endpoint_description>
 
 5. Endpoint Implementation:
    <endpoint_implementation>
-   @createSport.ts
+   @activities.ts
    </endpoint_implementation>
 
 6. Type Definitions:

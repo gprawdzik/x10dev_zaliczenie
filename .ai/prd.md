@@ -35,6 +35,10 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   - rozkład pór dnia (tydzień popołudnia, weekend cały dzień)
   - dystrybucja sportów: 50% główny, 30% druga, 15% trzecia, 5% czwarta
   - minimalny zestaw pól zgodny ze Strava (id, athlete.id, name, type, sport_type, start_date, start_date_local, timezone, utc_offset, distance, moving_time, elapsed_time, total_elevation_gain, average_speed)
+- Moje aktywności
+  - Wyświetlanie aktywności
+  - paginacja
+  - możliwość sortowania
 - Wizualizacje
   - strona "Moje cele": wykres kumulatywny postępu w bieżącym roku i lista kart celów
   - strona "Historia": wykres porównawczy cel vs wykonanie dla wszystkich lat obowiązywania celu.
@@ -146,6 +150,14 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   Opis: Użytkownik z tolą administrator ma możliwość dodania nowego sportu w zakladce Ustawienia.
   Kryteria akceptacji:
   - Administrator ma możliwość dodania nowego rodzaju sportu.
+
+- ID: US-014
+  Tytuł: Wyświetlanie aktywności
+  Opis: Użytkownik może wyświetlić wygenerowane aktywności.
+  Kryteria akceptacji:
+    - Użytkownik widzi swoje aktywności. 
+    - paginacja
+    - sortowanie
 
 ## 6. Metryki sukcesu
 

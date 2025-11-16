@@ -2,7 +2,7 @@
 
 ## 1. Przegląd struktury UI
 
-Aplikacja StravaGoals składa się z sześciu głównych widoków i dwóch modalnych rozszerzeń, połączonych prostą nawigacją bottom-navbar (mobile) lub top-navbar (desktop). Kluczowe zasady projektowe to:
+Aplikacja StravaGoals składa się z siedmiu głównych widoków i dwóch modalnych rozszerzeń, połączonych prostą nawigacją bottom-navbar (mobile) lub top-navbar (desktop). Kluczowe zasady projektowe to:
 
 - prostota i spójność dzięki bibliotece shadcn/vue oraz Tailwind 4
 - responsywność: układ 1 × N (mobile) i ≥ 2 kolumn (desktop)
@@ -34,6 +34,12 @@ Aplikacja StravaGoals składa się z sześciu głównych widoków i dwóch modal
   • Kluczowe informacje: Wybór lat, zbiorczy wykres porównawczy, tabela roczna  
   • Kluczowe komponenty: `HistoryChart`, `YearSelector`, `PaginationButton`  
   • UX / dostępność / bezpieczeństwo: ARIA dla selektora, czytelny kontrast wykresów
+
+- **Moje aktywności** (`/activities`)
+  • Cel: Umożliwia przeglądanie wygenerowanych aktywności treningowych
+  • Kluczowe informacje: Tabela z aktywnościami (nazwa, typ, data, dystans, czas trwania), paginacja, opcje sortowania
+  • Kluczowe komponenty: `ActivitiesTable`, `PaginationControl`, `SortDropdown`
+  • UX / dostępność / bezpieczeństwo: Lazy loading danych, skeleton state dla tabeli, ARIA atrybuty dla sortowania i paginacji
 
 - **Ustawienia** (`/settings`)
   • Cel: Konfiguracja profilu, generowanie danych i zarządzanie sportami  
@@ -69,14 +75,15 @@ Aplikacja StravaGoals składa się z sześciu głównych widoków i dwóch modal
    • Akceptacja sugestii → `POST /functions/ai-suggestions-accept` → reload `GET /goals`.
 3. Użytkownik przechodzi do **Historia** (`/history`) z bottom/top-navbar.  
    • Wybiera lata i sortowanie → `POST /functions/progress-history`.
-4. W **Ustawieniach** (`/settings`) użytkownik w zakładce **Generator danych** uruchamia symulację (`POST /functions/activities-generate`) z loaderem pełnoekranowym + toast.
-5. Użytkownik może się wylogować z menu → `supabase.auth.signOut()` → redirect `/login`.
+4. Użytkownik przechodzi na stronę **Moje aktywności** (`/activities`). Dane ładowane są z paginacją (`GET /api/activities`).
+5. W **Ustawieniach** (`/settings`) użytkownik w zakładce **Generator danych** uruchamia symulację (`POST /functions/activities-generate`) z loaderem pełnoekranowym + toast.
+6. Użytkownik może się wylogować z menu → `supabase.auth.signOut()` → redirect `/login`.
 
 ## 4. Układ i struktura nawigacji
 
-- **Mobile**: `BottomNavBar` (ikony **Cele**, **Historia**, **Ustawienia**).  
+- **Mobile**: `BottomNavBar` (ikony **Cele**, **Aktywności**, **Historia**, **Ustawienia**).  
   – Ukrywa się, gdy wciśnięta jest klawiatura lub modal na wierzchu.
-- **Desktop**: `TopNavBar` (logo + linki tekstowe).
+- **Desktop**: `TopNavBar` (logo + linki tekstowe **Cele**, **Aktywności**, **Historia**, **Ustawienia**).
 - **Router**: Astro file-based; każdy widok to plik `.astro`.  
   – Vue components używają `client:visible`/`client:idle` do hydratacji.
 
@@ -92,6 +99,9 @@ Aplikacja StravaGoals składa się z sześciu głównych widoków i dwóch modal
 - `AISuggestionCard` – panel propozycji z przyciskami akcji
 - `Tabs` – zakładki w ustawieniach
 - `Loader` – pełnoekranowy i inline spinner
+- `ActivitiesTable` – Tabela do wyświetlania aktywności z sortowaniem
+- `PaginationControl` - Komponent do nawigacji między stronami listy
+- `SortDropdown` - Dropdown do wyboru kolumny sortowania
 - `SportManagerPanel` – panel zarządzania sportami (lista istniejących sportów, formularz dodawania, usuwania)
 - `Toast` – globalny system powiadomień (sukces / błąd)
 - `SkeletonRow` – placeholder listy podczas ładowania
