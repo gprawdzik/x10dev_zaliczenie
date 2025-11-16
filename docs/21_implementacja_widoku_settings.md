@@ -3,7 +3,7 @@ Twoim zadaniem jest zaimplementowanie widoku frontendu w oparciu o podany plan i
 Najpierw przejrzyj plan implementacji:
 
 <implementation_plan>
-@settings-view-implementation-plan.md
+@view-settings-implementation-plan.md
 </implementation_plan>
 
 Teraz przejrzyj zasady implementacji:

@@ -22,7 +22,6 @@ import type {
 
 const API_ENDPOINT = '/api/activities-generate'
 const SPORTS_ENDPOINT = '/api/sports'
-const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_KEY
 const DEFAULT_TIMEZONE = 'Europe/Warsaw'
 const FIXED_DISTRIBUTION = {
   primary: 0.5,
@@ -33,9 +32,19 @@ const FIXED_DISTRIBUTION = {
 const SPORTS_TO_PICK = 4
 
 type SportsState = {
-  items: SportDto[]
+  items: SportListItem[]
   isLoading: boolean
   error: string | null
+}
+
+type SportListItem = {
+  code: string
+  name: string
+}
+
+type SportSelection = {
+  code: string
+  name: string
 }
 
 const sportsState = reactive<SportsState>({
@@ -51,16 +60,23 @@ const toast = useToastStore()
 
 const distributionSummary = 'Stały rozkład: 50% / 30% / 15% / 5%'
 const selectedSportsDisplay = computed(() =>
-  selectedSports.value.map((code) => {
+  selectedSports.value.map((code): SportSelection => {
     const sport = sportsState.items.find((item) => item.code === code)
     return { code, name: sport?.name ?? formatCodeAsName(code) }
   }),
 )
-const sportsSummary = computed(() =>
-  selectedSportsDisplay.value.length
-    ? selectedSportsDisplay.value.map((sport) => sport.name).join(', ')
-    : 'Brak wybranych sportów',
-)
+const sportsSummary = computed<string>(() => {
+  if (!selectedSports.value.length) {
+    return 'Brak wybranych sportów'
+  }
+
+  const sportNames = selectedSports.value.map((code): string => {
+    const sport = sportsState.items.find((item) => item.code === code)
+    return sport?.name ?? formatCodeAsName(code)
+  })
+
+  return sportNames.join(', ')
+})
 const confirmButtonLabel = computed(() => (isGenerating.value ? 'Generuję...' : 'Generuj'))
 
 onMounted(() => {
@@ -78,8 +94,12 @@ async function fetchSports(): Promise<void> {
     }
 
     const data = (await response.json()) as SportDto[]
-    sportsState.items = data
-    selectedSports.value = selectSportsCodes(data)
+    const simplified = data.map((sport) => ({
+      code: sport.code,
+      name: sport.name,
+    }))
+    sportsState.items = simplified
+    selectedSports.value = selectSportsCodes(simplified)
   } catch (error) {
     console.error('Błąd pobierania sportów:', error)
     sportsState.items = []
@@ -91,7 +111,7 @@ async function fetchSports(): Promise<void> {
   }
 }
 
-function selectSportsCodes(sports: SportDto[]): string[] {
+function selectSportsCodes(sports: SportListItem[]): string[] {
   const codes = sports.map((sport) => sport.code).filter(Boolean)
   if (!codes.length) {
     return []
@@ -180,11 +200,6 @@ async function handleGenerateActivities(): Promise<void> {
   try {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-    }
-
-    if (SUPABASE_ANON_KEY) {
-      headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`
-      headers.apikey = SUPABASE_ANON_KEY
     }
 
     const response = await fetch(API_ENDPOINT, {
