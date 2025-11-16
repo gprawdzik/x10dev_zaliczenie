@@ -1,10 +1,65 @@
-import { supabaseClient } from '../db/supabase.client.js';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
+
+import { supabaseClient } from '../db/supabase.client.js'
+
+const getEmailRedirectUrl = () => {
+  if (typeof window === 'undefined') {
+    return undefined
+  }
+
+  return `${window.location.origin}/auth/callback`
+}
 
 /**
  * Composable do zarządzania autentykacją użytkownika
  * Wykorzystuje Supabase Auth
  */
 export function useAuth() {
+  /**
+   * Rejestruje nowego użytkownika i zwraca informacje o sesji
+   */
+  const signUp = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: getEmailRedirectUrl(),
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return { user: data.user, session: data.session }
+    } catch (error) {
+      console.error('Error signing up:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Loguje użytkownika przy użyciu emaila i hasła
+   */
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return { user: data.user, session: data.session }
+    } catch (error) {
+      console.error('Error signing in:', error)
+      throw error
+    }
+  }
+
   /**
    * Zmienia hasło użytkownika
    * @param currentPassword - Obecne hasło (nie jest używane przez Supabase, ale pozostawiamy dla walidacji)
@@ -73,42 +128,74 @@ export function useAuth() {
    */
   const signOut = async () => {
     try {
-      const { error } = await supabaseClient.auth.signOut();
+      const { error } = await supabaseClient.auth.signOut()
       
       if (error) {
-        throw error;
+        throw error
       }
 
-      return { success: true };
+      return { success: true }
     } catch (error) {
-      console.error('Error signing out:', error);
-      throw error;
+      console.error('Error signing out:', error)
+      throw error
     }
-  };
+  }
 
   /**
    * Pobiera aktualnie zalogowanego użytkownika
    */
   const getCurrentUser = async () => {
     try {
-      const { data: { user }, error } = await supabaseClient.auth.getUser();
+      const {
+        data: { user },
+        error,
+      } = await supabaseClient.auth.getUser()
       
       if (error) {
-        throw error;
+        throw error
       }
 
-      return user;
+      return user
     } catch (error) {
-      console.error('Error getting current user:', error);
-      return null;
+      console.error('Error getting current user:', error)
+      return null
     }
-  };
+  }
+
+  /**
+   * Sprawdza, czy użytkownik posiada aktywną sesję
+   */
+  const isAuthenticated = async (): Promise<boolean> => {
+    try {
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession()
+
+      return Boolean(session)
+    } catch (error) {
+      console.error('Error checking authentication:', error)
+      return false
+    }
+  }
+
+  /**
+   * Subskrybuje zmiany stanu autentykacji
+   */
+  const onAuthStateChange = (
+    callback: (event: AuthChangeEvent, session: Session | null) => void
+  ) => {
+    return supabaseClient.auth.onAuthStateChange(callback)
+  }
 
   return {
+    signUp,
+    signIn,
+    isAuthenticated,
+    onAuthStateChange,
     changePassword,
     deleteAccount,
     signOut,
     getCurrentUser,
-  };
+  }
 }
 

@@ -1,7 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import type { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ui/ThemeToggle.vue';
+import { supabaseClient } from '@/db/supabase.client.js';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // Stan mobilnego menu
 const isMobileMenuOpen = ref(false);
@@ -10,9 +20,52 @@ const isMobileMenuOpen = ref(false);
 // Używamy pustego stringa jako wartość początkową dla SSR
 const currentPath = ref('');
 
-// Po montowaniu komponentu pobierz aktualną ścieżkę
-onMounted(() => {
+// Informacje o zalogowanym użytkowniku
+const user = ref<User | null>(null);
+const isLoadingUser = ref(true);
+const authError = ref<string | null>(null);
+
+let authSubscription: ReturnType<typeof supabaseClient.auth.onAuthStateChange> | null = null;
+
+const userDisplayLabel = computed(() => user.value?.email ?? 'Zaloguj');
+
+async function loadCurrentUser() {
+  try {
+    const {
+      data: { user: currentUser },
+      error,
+    } = await supabaseClient.auth.getUser();
+
+    if (error) {
+      throw error;
+    }
+
+    user.value = currentUser ?? null;
+    authError.value = null;
+  } catch (error) {
+    console.error('Navbar: unable to load current user', error);
+    user.value = null;
+    authError.value = 'Nie udało się pobrać informacji o profilu.';
+  } finally {
+    isLoadingUser.value = false;
+  }
+}
+
+// Po montowaniu komponentu pobierz aktualną ścieżkę i status sesji
+onMounted(async () => {
   currentPath.value = window.location.pathname;
+  await loadCurrentUser();
+
+  authSubscription = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    user.value = session?.user ?? null;
+    authError.value = null;
+    isLoadingUser.value = false;
+  });
+});
+
+onBeforeUnmount(() => {
+  authSubscription?.data.subscription.unsubscribe();
+  authSubscription = null;
 });
 
 // Nawigacja - linki
@@ -64,11 +117,51 @@ const toggleMobileMenu = () => {
         </a>
       </div>
 
-      <!-- Przycisk user menu (placeholder na przyszłość) -->
+      <!-- Przycisk user menu -->
       <div class="navbar-actions">
         <ThemeToggle />
-        <Button variant="ghost" size="sm" class="hidden md:flex">
-          <span class="text-sm">👤 Użytkownik</span>
+
+        <DropdownMenu v-if="user && !isLoadingUser">
+          <DropdownMenuTrigger as-child>
+            <Button variant="ghost" size="sm" class="hidden md:flex items-center gap-2">
+              <span class="text-base">👤</span>
+              <span class="text-sm">{{ userDisplayLabel }}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" class="w-60">
+            <DropdownMenuLabel class="flex flex-col gap-1">
+              <span class="text-xs uppercase tracking-wide text-muted-foreground">Zalogowano jako</span>
+              <span class="text-sm text-foreground">{{ user.email }}</span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem as-child>
+              <a href="/settings" class="flex w-full items-center gap-2">
+                <span>⚙️</span>
+                <span>Ustawienia</span>
+              </a>
+            </DropdownMenuItem>
+            <DropdownMenuItem as-child>
+              <a href="/auth/logout" class="flex w-full items-center gap-2 text-destructive">
+                <span>🚪</span>
+                <span>Wyloguj</span>
+              </a>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Button
+          v-else-if="!user && !isLoadingUser"
+          as="a"
+          href="/auth/login"
+          variant="outline"
+          size="sm"
+          class="hidden md:flex"
+        >
+          Zaloguj
+        </Button>
+
+        <Button v-else variant="ghost" size="sm" class="hidden md:flex" disabled>
+          Ładowanie...
         </Button>
 
         <!-- Przycisk mobile menu -->
@@ -84,7 +177,7 @@ const toggleMobileMenu = () => {
     </div>
 
     <!-- Mobilne menu -->
-    <div v-if="isMobileMenuOpen" class="mobile-menu md:hidden">
+    <div v-if="isMobileMenuOpen" class="mobile-menu md:hidden" role="menu">
       <a
         v-for="link in navLinks"
         :key="link.href"
@@ -95,6 +188,43 @@ const toggleMobileMenu = () => {
         <span class="nav-icon">{{ link.icon }}</span>
         <span>{{ link.label }}</span>
       </a>
+
+      <div class="mobile-auth-panel">
+        <p v-if="user" class="mobile-auth-text">
+          Zalogowano jako
+          <span class="font-semibold">{{ user.email }}</span>
+        </p>
+        <p v-else class="mobile-auth-text text-muted-foreground">
+          Nie jesteś zalogowany.
+        </p>
+
+        <div class="mobile-auth-actions">
+          <Button
+            v-if="user"
+            as="a"
+            href="/auth/logout"
+            variant="outline"
+            size="sm"
+            class="w-full justify-center text-destructive"
+          >
+            🚪 Wyloguj
+          </Button>
+          <Button
+            v-else
+            as="a"
+            href="/auth/login"
+            variant="outline"
+            size="sm"
+            class="w-full justify-center"
+          >
+            Zaloguj
+          </Button>
+        </div>
+
+        <p v-if="authError" class="mobile-auth-error">
+          {{ authError }}
+        </p>
+      </div>
     </div>
   </nav>
 </template>
@@ -229,8 +359,8 @@ const toggleMobileMenu = () => {
 .mobile-menu {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem 1rem 1rem;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem 1.25rem;
   border-top: 1px solid hsl(var(--border));
   animation: slideDown 0.2s ease-out;
 }
@@ -272,6 +402,30 @@ const toggleMobileMenu = () => {
   .mobile-menu {
     display: none;
   }
+}
+
+.mobile-auth-panel {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed hsl(var(--border));
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-auth-text {
+  font-size: 0.9rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.mobile-auth-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mobile-auth-error {
+  font-size: 0.8rem;
+  color: hsl(var(--destructive));
 }
 </style>
 

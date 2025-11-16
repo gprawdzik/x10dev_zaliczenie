@@ -14,7 +14,6 @@ declare global {
 interface ImportMetaEnv {
   readonly PUBLIC_SUPABASE_URL: string
   readonly PUBLIC_SUPABASE_KEY: string
-  readonly PUBLIC_SUPABASE_GENERATOR_USER_ID: string
 }
 
 interface ImportMeta {

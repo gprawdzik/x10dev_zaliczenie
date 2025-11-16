@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { ZodError } from 'zod';
 
+import type { Database } from '../../db/database.types.js';
 import { AuthError } from '../../middleware/requireAuth.js';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import {
@@ -13,9 +15,9 @@ import { goalHistoryQuerySchema, type GoalHistoryQuery } from '../../validators/
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   try {
-    const { userId } = await requireAuth(request);
+    const { userId } = await requireAuth(request, { supabase: locals.supabase });
     const params = parseGoalHistoryQuery(request.url);
     const history = await listGoalHistory(userId, params);
     return jsonResponse(history);

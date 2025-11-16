@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { ZodError } from 'zod';
 
+import type { Database } from '../../db/database.types.js';
 import {
   ActivitiesServiceError,
   ActivitiesServiceErrors,
@@ -9,13 +11,14 @@ import {
 import { getSports, GetSportsError } from '../../services/sports/getSports.js';
 import type { ErrorDto, GenerateActivitiesResponse } from '../../types.js';
 import { generateActivitiesBodySchema, type GenerateActivitiesOverrides } from '../../validators/activity.js';
+import { AuthError } from '../../middleware/requireAuth.js';
+import { requireAuth } from '../../middleware/requireAuth.js';
 
 export const prerender = false;
-const GENERATOR_USER_ID = import.meta.env.PUBLIC_SUPABASE_GENERATOR_USER_ID;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const userId = resolveGeneratorUserId();
+    const { userId } = await requireAuth(request, { supabase: locals.supabase });
     const overrides = await parseGenerateActivitiesBody(request);
     
     // Fetch sports from database
@@ -78,6 +81,10 @@ async function parseGenerateActivitiesBody(request: Request): Promise<GenerateAc
 }
 
 function handleGenerateActivitiesError(error: unknown): Response {
+  if (error instanceof AuthError) {
+    return errorResponse(401, error.code, error.message, error.details);
+  }
+
   if (error instanceof ZodError) {
     const validationErrors = error.issues.map((issue) => ({
       field: issue.path.join('.') || undefined,
@@ -108,10 +115,6 @@ function handleGenerateActivitiesError(error: unknown): Response {
     return errorResponse(500, error.code, error.message, error.details);
   }
 
-  if (error instanceof GeneratorUserError) {
-    return errorResponse(500, 'GENERATOR_USER_UNCONFIGURED', error.message);
-  }
-
   console.error('Unhandled error in POST /api/activities-generate:', error);
   return errorResponse(500, 'INTERNAL_ERROR', 'An unexpected error occurred');
 }
@@ -138,20 +141,5 @@ function errorResponse(
   };
 
   return jsonResponse(body, status);
-}
-
-class GeneratorUserError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'GeneratorUserError';
-  }
-}
-
-function resolveGeneratorUserId(): string {
-  const userId = GENERATOR_USER_ID?.trim();
-  if (!userId) {
-    throw new GeneratorUserError('PUBLIC_SUPABASE_GENERATOR_USER_ID is not configured');
-  }
-  return userId;
 }
 

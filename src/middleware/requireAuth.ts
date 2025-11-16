@@ -38,12 +38,28 @@ export async function requireAuth(request: Request, options?: RequireAuthOptions
     throw new AuthError(AuthErrorCodes.CLIENT_UNAVAILABLE, 'Supabase client is not initialized');
   }
 
-  const token = extractToken(request);
-  if (!token) {
-    throw new AuthError(AuthErrorCodes.MISSING_TOKEN, 'Access token is required for this operation');
-  }
+  // When using server client from locals (created with @supabase/ssr),
+  // the client handles cookies automatically, so we call getUser() without token.
+  // For other cases (e.g., API calls with Bearer token), we extract token manually.
+  let data;
+  let error;
 
-  const { data, error } = await client.auth.getUser(token);
+  if (options?.supabase) {
+    // Server client with SSR - let it handle cookies automatically
+    const result = await client.auth.getUser();
+    data = result.data;
+    error = result.error;
+  } else {
+    // Fallback for clients without SSR - extract token manually
+    const token = extractToken(request);
+    if (!token) {
+      throw new AuthError(AuthErrorCodes.MISSING_TOKEN, 'Access token is required for this operation');
+    }
+
+    const result = await client.auth.getUser(token);
+    data = result.data;
+    error = result.error;
+  }
 
   if (error || !data?.user) {
     throw new AuthError(AuthErrorCodes.INVALID_TOKEN, 'Invalid or expired access token', {
@@ -51,10 +67,14 @@ export async function requireAuth(request: Request, options?: RequireAuthOptions
     });
   }
 
+  // Get access token from session for response
+  const { data: { session } } = await client.auth.getSession();
+  const accessToken = session?.access_token ?? '';
+
   return {
     userId: data.user.id,
     user: data.user,
-    accessToken: token,
+    accessToken,
   };
 }
 

@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { ZodError, type ZodSchema } from 'zod';
 
+import type { Database } from '../../db/database.types.js';
 import { AuthError } from '../../middleware/requireAuth.js';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import {
@@ -33,9 +35,9 @@ class UnsupportedMediaTypeError extends Error {
   }
 }
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   try {
-    const { userId } = await requireAuth(request);
+    const { userId } = await requireAuth(request, { supabase: locals.supabase });
     const searchParams = new URL(request.url).searchParams;
     const goalId = extractResourceId(searchParams.get('id'));
 
@@ -52,9 +54,9 @@ export const GET: APIRoute = async ({ request }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const { userId } = await requireAuth(request);
+    const { userId } = await requireAuth(request, { supabase: locals.supabase });
     ensureJsonRequest(request);
     const payload = await parseJsonBody<CreateGoalInput>(request, createGoalSchema);
     const goal = await createGoal(userId, payload);
@@ -64,9 +66,9 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const PATCH: APIRoute = async ({ request }) => {
+export const PATCH: APIRoute = async ({ request, locals }) => {
   try {
-    const { userId } = await requireAuth(request);
+    const { userId } = await requireAuth(request, { supabase: locals.supabase });
     ensureJsonRequest(request);
 
     const searchParams = new URL(request.url).searchParams;
@@ -86,9 +88,9 @@ export const PATCH: APIRoute = async ({ request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ request }) => {
+export const DELETE: APIRoute = async ({ request, locals }) => {
   try {
-    const { userId } = await requireAuth(request);
+    const { userId } = await requireAuth(request, { supabase: locals.supabase });
     const searchParams = new URL(request.url).searchParams;
     const goalId = extractResourceId(searchParams.get('id'));
 

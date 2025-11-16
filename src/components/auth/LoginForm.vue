@@ -5,14 +5,20 @@ import { loginSchema } from '@/validators/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/composables/useAuth';
+import { getAuthErrorMessage } from '@/lib/authErrors';
 
 interface Props {
   redirectTarget?: string | null;
+  flashMessage?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   redirectTarget: null,
+  flashMessage: null,
 });
+
+const { signIn } = useAuth();
 
 const formValues = reactive<LoginInput>({
   email: '',
@@ -22,6 +28,10 @@ const formValues = reactive<LoginInput>({
 const fieldErrors = reactive<Partial<Record<keyof LoginInput, string>>>({});
 const submissionState = ref<'idle' | 'processing' | 'success' | 'error'>('idle');
 const statusMessage = ref('');
+
+const isProcessing = computed(() => submissionState.value === 'processing');
+const redirectDestination = computed(() => props.redirectTarget ?? '/');
+const flashMessage = computed(() => props.flashMessage?.trim() ?? '');
 
 /**
  * Przyjazny tekst o przekierowaniu po logowaniu.
@@ -39,11 +49,6 @@ const resetErrors = () => {
     delete fieldErrors[key as keyof LoginInput];
   });
 };
-
-const simulateSubmissionDelay = () =>
-  new Promise(resolve => {
-    setTimeout(resolve, 600);
-  });
 
 const validateForm = (): boolean => {
   resetErrors();
@@ -63,21 +68,44 @@ const validateForm = (): boolean => {
 };
 
 const handleSubmit = async () => {
+  if (isProcessing.value) {
+    return;
+  }
+
   submissionState.value = 'processing';
-  statusMessage.value = 'Przygotowujemy dane do wysłania...';
+  statusMessage.value = 'Logujemy Cię...';
 
   if (!validateForm()) {
     return;
   }
 
-  await simulateSubmissionDelay();
-  submissionState.value = 'success';
-  statusMessage.value = 'Dane wyglądają poprawnie. Integracja z backendem nastąpi później.';
+  try {
+    await signIn(formValues.email, formValues.password);
+
+    submissionState.value = 'success';
+    statusMessage.value = 'Zalogowano pomyślnie! Przekierowujemy do panelu...';
+
+    if (typeof window !== 'undefined') {
+      window.location.href = redirectDestination.value;
+    }
+  } catch (error) {
+    submissionState.value = 'error';
+    statusMessage.value = getAuthErrorMessage(error);
+  }
 };
 </script>
 
 <template>
   <form class="flex flex-col gap-6" @submit.prevent="handleSubmit" novalidate>
+    <div
+      v-if="flashMessage"
+      class="rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground"
+      role="status"
+      aria-live="polite"
+    >
+      {{ flashMessage }}
+    </div>
+
     <div v-if="redirectInfo" class="rounded-md border border-dashed border-border bg-muted/40 p-3 text-sm">
       {{ redirectInfo }}
     </div>
@@ -92,6 +120,7 @@ const handleSubmit = async () => {
         autocomplete="email"
         placeholder="jan.kowalski@example.com"
         :aria-invalid="!!fieldErrors.email"
+        :disabled="isProcessing"
       />
       <p v-if="fieldErrors.email" class="text-sm text-destructive" aria-live="polite">
         {{ fieldErrors.email }}
@@ -108,6 +137,7 @@ const handleSubmit = async () => {
         autocomplete="current-password"
         placeholder="••••••••••"
         :aria-invalid="!!fieldErrors.password"
+        :disabled="isProcessing"
       />
       <p v-if="fieldErrors.password" class="text-sm text-destructive" aria-live="polite">
         {{ fieldErrors.password }}
@@ -128,8 +158,8 @@ const handleSubmit = async () => {
       {{ statusMessage }}
     </div>
 
-    <Button type="submit" :disabled="submissionState === 'processing'">
-      <span v-if="submissionState === 'processing'">Trwa logowanie...</span>
+    <Button type="submit" :disabled="isProcessing">
+      <span v-if="isProcessing">Trwa logowanie...</span>
       <span v-else>Zaloguj się</span>
     </Button>
   </form>

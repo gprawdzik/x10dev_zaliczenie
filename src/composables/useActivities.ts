@@ -26,6 +26,7 @@ type UseActivitiesOptions = Partial<{
 }>;
 
 export function useActivities(options: UseActivitiesOptions = {}) {
+  const isServer = typeof window === 'undefined';
   const activities = ref<ActivityViewModel[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -84,6 +85,10 @@ export function useActivities(options: UseActivitiesOptions = {}) {
   };
 
   const fetchActivities = async () => {
+    if (isServer) {
+      return;
+    }
+
     if (activeController) {
       activeController.abort();
     }
@@ -131,21 +136,23 @@ export function useActivities(options: UseActivitiesOptions = {}) {
     }
   };
 
-  watch(
-    () => [
-      pagination.page,
-      pagination.limit,
-      sorting.sortBy,
-      sorting.sortDir,
-      filters.sportType,
-      filters.from,
-      filters.to,
-    ],
-    () => {
-      void fetchActivities();
-    },
-    { immediate: true }
-  );
+  if (!isServer) {
+    watch(
+      () => [
+        pagination.page,
+        pagination.limit,
+        sorting.sortBy,
+        sorting.sortDir,
+        filters.sportType,
+        filters.from,
+        filters.to,
+      ],
+      () => {
+        void fetchActivities();
+      },
+      { immediate: true }
+    );
+  }
 
   const changePage = (nextPage: number) => {
     if (!Number.isFinite(nextPage)) {

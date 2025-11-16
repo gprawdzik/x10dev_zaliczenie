@@ -1,0 +1,20 @@
+---
+const supabase = Astro.locals.supabase
+
+export const prerender = false
+
+if (!supabase) {
+  throw new Error('Supabase client is unavailable in Astro.locals')
+}
+
+try {
+  await supabase.auth.signOut()
+} catch (error) {
+  console.error('Logout failed:', error)
+  return Astro.redirect('/auth/login?flash=session-expired')
+}
+
+return Astro.redirect('/auth/login?flash=logout-success')
+---
+
+

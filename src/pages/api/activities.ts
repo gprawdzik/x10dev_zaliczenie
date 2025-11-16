@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { ZodError } from 'zod';
 
+import type { Database } from '../../db/database.types.js';
 import { AuthError } from '../../middleware/requireAuth.js';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import {
@@ -12,11 +14,10 @@ import type { ErrorDto } from '../../types.js';
 import { listActivitiesQuerySchema, type ListActivitiesQuery } from '../../validators/activity.js';
 
 export const prerender = false;
-const GENERATOR_USER_ID = import.meta.env.PUBLIC_SUPABASE_GENERATOR_USER_ID;
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   try {
-    const userId = await resolveUserId(request);
+    const userId = await resolveUserId(request, locals.supabase);
     const params = parseListActivitiesQuery(request.url);
     const paginatedActivities = await listActivities(userId, params);
     return jsonResponse(paginatedActivities, 200);
@@ -44,10 +45,6 @@ function parseListActivitiesQuery(url: string): ListActivitiesQuery {
 function handleListActivitiesError(error: unknown): Response {
   if (error instanceof AuthError) {
     return errorResponse(401, error.code, error.message, error.details);
-  }
-
-  if (error instanceof GeneratorUserError) {
-    return errorResponse(500, 'GENERATOR_USER_UNCONFIGURED', error.message);
   }
 
   if (error instanceof ZodError) {
@@ -103,27 +100,8 @@ function errorResponse(
   return jsonResponse(body, status);
 }
 
-class GeneratorUserError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'GeneratorUserError';
-  }
-}
-
-async function resolveUserId(request: Request): Promise<string> {
-  try {
-    const { userId } = await requireAuth(request);
-    return userId;
-  } catch (error) {
-    if (error instanceof AuthError) {
-      const fallbackUserId = GENERATOR_USER_ID?.trim();
-      if (fallbackUserId) {
-        return fallbackUserId;
-      }
-      throw new GeneratorUserError('PUBLIC_SUPABASE_GENERATOR_USER_ID is not configured');
-    }
-
-    throw error;
-  }
+async function resolveUserId(request: Request, supabase: SupabaseClient<Database>): Promise<string> {
+  const { userId } = await requireAuth(request, { supabase });
+  return userId;
 }
 

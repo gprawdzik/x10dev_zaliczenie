@@ -36,7 +36,6 @@ Create a `.env` file in the project root with the following placeholders:
 ```env
 PUBLIC_SUPABASE_URL=<your-supabase-url>
 PUBLIC_SUPABASE_KEY=<your-supabase-anon-key>
-PUBLIC_SUPABASE_GENERATOR_USER_ID=<uuid-of-demo-user-for-activity-generator>
 ```
 
 > **Note:** In Astro, environment variables prefixed with `PUBLIC_` are accessible on the client-side. Variables without this prefix are only available on the server-side.
@@ -78,7 +77,7 @@ _Boundaries & Exclusions:_
 
 ## REST API
 
-All API routes live under `src/pages/api`. Each endpoint expects a valid Supabase JWT (send `Authorization: Bearer <access_token>` or the standard `sb-access-token` cookie), **except** `POST /api/activities-generate`, which uses the configured generator user and does not require authentication. Responses follow the shared `ErrorDto` shape on failure.
+All API routes live under `src/pages/api`. Each endpoint expects a valid Supabase JWT (send `Authorization: Bearer <access_token>` or the standard `sb-access-token` cookie). Responses follow the shared `ErrorDto` shape on failure.
 
 ### `GET /api/activities`
 
@@ -95,8 +94,8 @@ All API routes live under `src/pages/api`. Each endpoint expects a valid Supabas
 
 ### `POST /api/activities-generate`
 
-- **Auth:** Not required (uses `PUBLIC_SUPABASE_GENERATOR_USER_ID` as the target user)
-- **Description:** Generates and stores 100 simulated activities for the configured demo user (last 12 months). Sports are retrieved from the database via `/api/sports` endpoint.
+- **Auth:** Required (uses the authenticated Supabase user as the target)
+- **Description:** Generates and stores 100 simulated activities for the authenticated user (last 12 months). Sports are retrieved from the database via `/api/sports` endpoint.
 - **Body (optional JSON overrides):**
 
   ```json

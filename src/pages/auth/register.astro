@@ -1,6 +1,20 @@
 ---
-import AuthLayout from '@/layouts/AuthLayout.astro';
-import RegisterForm from '@/components/auth/RegisterForm.vue';
+import AuthLayout from '@/layouts/AuthLayout.astro'
+import RegisterForm from '@/components/auth/RegisterForm.vue'
+
+const supabase = Astro.locals.supabase
+
+if (!supabase) {
+  throw new Error('Supabase client is unavailable in Astro.locals')
+}
+
+const {
+  data: { session },
+} = await supabase.auth.getSession()
+
+if (session) {
+  return Astro.redirect('/')
+}
 ---
 
 <AuthLayout

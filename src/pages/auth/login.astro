@@ -2,8 +2,30 @@
 import AuthLayout from '@/layouts/AuthLayout.astro';
 import LoginForm from '@/components/auth/LoginForm.vue';
 
+const supabase = Astro.locals.supabase;
+
+if (!supabase) {
+  throw new Error('Supabase client is unavailable in Astro.locals');
+}
+
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+if (session) {
+  return Astro.redirect('/');
+}
+
 const redirectParam = Astro.url.searchParams.get('redirect') ?? '';
 const redirectTarget = redirectParam.startsWith('/') ? redirectParam : null;
+
+const flashMessages = {
+  'logout-success': 'Wylogowano pomyślnie. Do zobaczenia!',
+  'session-expired': 'Twoja sesja wygasła. Zaloguj się ponownie.',
+} as const;
+
+const flashKey = Astro.url.searchParams.get('flash') ?? '';
+const flashMessage = flashKey in flashMessages ? flashMessages[flashKey as keyof typeof flashMessages] : null;
 ---
 
 <AuthLayout
@@ -12,7 +34,11 @@ const redirectTarget = redirectParam.startsWith('/') ? redirectParam : null;
   heading="Zaloguj się"
   subheading="Uzyskaj dostęp do swojego panelu i kontynuuj realizację planu"
 >
-  <LoginForm client:load redirect-target={redirectTarget ?? undefined} />
+  <LoginForm
+    client:load
+    redirect-target={redirectTarget ?? undefined}
+    flash-message={flashMessage ?? undefined}
+  />
 
   <div slot="links" class="space-y-2">
     <p class="text-sm text-muted-foreground">
