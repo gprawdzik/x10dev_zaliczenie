@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
-const SORTABLE_FIELDS = ['start_date', 'distance', 'moving_time'] as const;
-const SORT_DIRECTIONS = ['asc', 'desc'] as const;
+import {
+  ACTIVITY_SORTABLE_FIELDS,
+  ACTIVITY_SORT_DIRECTIONS,
+} from '../types.js';
 
 const isoDateSchema = z
   .string()
@@ -37,8 +39,8 @@ export const listActivitiesQuerySchema = z
       .optional(),
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(100).default(20),
-    sort_by: z.enum(SORTABLE_FIELDS).default('start_date'),
-    sort_dir: z.enum(SORT_DIRECTIONS).default('desc'),
+    sort_by: z.enum(ACTIVITY_SORTABLE_FIELDS).default('start_date'),
+    sort_dir: z.enum(ACTIVITY_SORT_DIRECTIONS).default('desc'),
   })
   .refine(
     (data) => {
@@ -95,9 +97,6 @@ export const generateActivitiesBodySchema = z.object({
 
 export type ListActivitiesQuery = z.output<typeof listActivitiesQuerySchema>;
 export type GenerateActivitiesOverrides = z.output<typeof generateActivitiesBodySchema>;
-export type ActivitySortField = (typeof SORTABLE_FIELDS)[number];
-export type ActivitySortDirection = (typeof SORT_DIRECTIONS)[number];
-
-export const ACTIVITY_SORTABLE_FIELDS = SORTABLE_FIELDS;
-export const ACTIVITY_SORT_DIRECTIONS = SORT_DIRECTIONS;
+export type { ActivitySortField, ActivitySortDirection } from '../types.js';
+export { ACTIVITY_SORTABLE_FIELDS, ACTIVITY_SORT_DIRECTIONS } from '../types.js';
 

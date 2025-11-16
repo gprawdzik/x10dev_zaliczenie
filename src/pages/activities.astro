@@ -1,72 +1,16 @@
 ---
 // Strona Aktywności (Activities)
 import AppLayout from '../layouts/AppLayout.astro';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import ActivitiesView from '../components/views/ActivitiesView.vue';
 
-// Generuj tę stronę statycznie (prerender)
-export const prerender = true;
+// Widok korzysta z danych demo (PUBLIC_SUPABASE_GENERATOR_USER_ID), dlatego SSR nie ma sensu
+export const prerender = false;
 ---
 
 <AppLayout 
   title="Aktywności - StravaGoals"
-  description="Przeglądaj i zarządzaj swoimi aktywnościami sportowymi"
+  description="Przeglądaj i analizuj historię wygenerowanych aktywności treningowych"
 >
-  <div class="activities-page">
-    <div class="page-header">
-      <h1 class="page-title">Aktywności</h1>
-      <p class="page-subtitle">
-        Historia Twoich treningów i aktywności sportowych
-      </p>
-    </div>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>🚧 W budowie</CardTitle>
-        <CardDescription>Ta funkcjonalność będzie wkrótce dostępna</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p class="text-muted-foreground">
-          Tutaj będziesz mógł przeglądać wszystkie swoje aktywności sportowe.
-          Funkcje do zaimplementowania:
-        </p>
-        <ul class="mt-4 space-y-2 text-sm text-muted-foreground">
-          <li>✓ Lista wszystkich aktywności</li>
-          <li>✓ Filtrowanie po sporcie i dacie</li>
-          <li>✓ Szczegóły każdej aktywności</li>
-          <li>✓ Statystyki podsumowujące</li>
-          <li>✓ Eksport danych</li>
-        </ul>
-        <div class="mt-6">
-          <a href="/settings" class="text-sm font-medium text-primary hover:underline">
-            → Wygeneruj przykładowe aktywności w ustawieniach
-          </a>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
+  <ActivitiesView client:load />
 </AppLayout>
-
-<style>
-  .activities-page {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .page-header {
-    margin-bottom: 2rem;
-  }
-
-  .page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: hsl(var(--foreground));
-    margin-bottom: 0.5rem;
-  }
-
-  .page-subtitle {
-    font-size: 1rem;
-    color: hsl(var(--muted-foreground));
-  }
-</style>
 

@@ -27,6 +27,33 @@ export type Paginated<T> = {
   total: number;
 };
 
+export const ACTIVITY_SORTABLE_FIELDS = ['start_date', 'distance', 'moving_time'] as const;
+export type ActivitySortField = (typeof ACTIVITY_SORTABLE_FIELDS)[number];
+
+export const ACTIVITY_SORT_DIRECTIONS = ['asc', 'desc'] as const;
+export type ActivitySortDirection = (typeof ACTIVITY_SORT_DIRECTIONS)[number];
+
+export type SortOption = {
+  value: ActivitySortField;
+  label: string;
+};
+
+export type ActivitiesSortState = {
+  sortBy: ActivitySortField;
+  sortDir: ActivitySortDirection;
+};
+
+export type ActivityViewModel = {
+  id: string;
+  name: string;
+  type: string;
+  startDate: string;
+  distance: string;
+  duration: string;
+  elevation: string;
+  pace: string;
+};
+
 // Progress/Stats DTOs
 export type ProgressAnnualRequest = {
   year: number;
