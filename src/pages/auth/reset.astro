@@ -1,0 +1,25 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro'
+import PasswordResetForm from '@/components/auth/PasswordResetForm.vue'
+---
+
+<AuthLayout
+  title="StravaGoals — Ustaw nowe hasło"
+  description="Zaktualizuj swoje hasło, aby odzyskać dostęp do StravaGoals"
+  heading="Ustaw nowe hasło"
+  subheading="Zadbamy o bezpieczeństwo Twojego konta po potwierdzeniu linku resetującego"
+>
+  <PasswordResetForm client:load />
+
+  <div slot="links" class="space-y-2">
+    <p class="text-sm text-muted-foreground">
+      Pamiętasz hasło?
+      <a href="/auth/login" class="font-semibold text-primary">Wróć do logowania</a>
+    </p>
+    <p class="text-sm text-muted-foreground">
+      Potrzebujesz nowego linku resetującego?
+      <a href="/auth/recover" class="font-semibold text-primary">Wyślij ponownie</a>
+    </p>
+  </div>
+</AuthLayout>
+
