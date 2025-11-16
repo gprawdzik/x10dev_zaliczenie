@@ -44,7 +44,27 @@ export const passwordRecoverySchema = z.object({
     .email('Nieprawidłowy format email'),
 });
 
+/**
+ * Schemat walidacji formularza zmiany hasła.
+ * Wymaga nowego hasła spełniającego wymagania bezpieczeństwa oraz jego potwierdzenia.
+ */
+export const changePasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(10, 'Nowe hasło musi mieć minimum 10 znaków')
+      .regex(/[A-Z]/, 'Hasło musi zawierać przynajmniej jedną wielką literę')
+      .regex(/[a-z]/, 'Hasło musi zawierać przynajmniej jedną małą literę')
+      .regex(/[0-9]/, 'Hasło musi zawierać przynajmniej jedną cyfrę'),
+    confirmNewPassword: z.string().min(1, 'Potwierdzenie hasła jest wymagane'),
+  })
+  .refine(data => data.newPassword === data.confirmNewPassword, {
+    message: 'Hasła muszą być identyczne',
+    path: ['confirmNewPassword'],
+  });
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type PasswordRecoveryInput = z.infer<typeof passwordRecoverySchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 

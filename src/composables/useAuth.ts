@@ -62,14 +62,14 @@ export function useAuth() {
 
   /**
    * Zmienia hasło użytkownika
-   * @param currentPassword - Obecne hasło (nie jest używane przez Supabase, ale pozostawiamy dla walidacji)
+   * Używa JWT tokena do weryfikacji tożsamości użytkownika (nie wymaga obecnego hasła)
    * @param newPassword - Nowe hasło
    * @returns Promise z wynikiem operacji
    */
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = async (newPassword: string) => {
     try {
       // Supabase Auth nie wymaga obecnego hasła dla zalogowanego użytkownika
-      // Możemy zaimplementować dodatkową walidację obecnego hasła przez re-authentication
+      // Weryfikacja następuje przez JWT token z aktywnej sesji
       const { error } = await supabaseClient.auth.updateUser({
         password: newPassword,
       });

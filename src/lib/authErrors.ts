@@ -10,6 +10,10 @@ export const authErrorMessages: AuthErrorDictionary = {
   'Invalid login credentials': 'Nieprawidłowy email lub hasło.',
   'Too many requests': 'Zbyt wiele prób logowania. Spróbuj ponownie za kilka minut.',
 
+  // Password Change
+  'New password should be different': 'Nowe hasło musi różnić się od obecnego hasła.',
+  'Password is too weak': 'Hasło jest zbyt słabe. Spełnij wszystkie wymagania bezpieczeństwa.',
+
   // Generic
   'Auth session missing':
     'Sesja wygasła lub jest niedostępna. Odśwież stronę i spróbuj ponownie.',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import PasswordChangeForm from './PasswordChangeForm.vue';
-import AccountDeleteSection from './AccountDeleteSection.vue';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import PasswordChangeForm from './PasswordChangeForm.vue'
+import AccountDeleteSection from './AccountDeleteSection.vue'
 </script>
 
 <template>
@@ -10,9 +10,6 @@ import AccountDeleteSection from './AccountDeleteSection.vue';
     <Card>
       <CardHeader>
         <CardTitle>Zmiana hasła</CardTitle>
-        <CardDescription>
-          Zaktualizuj swoje hasło. Nowe hasło musi mieć co najmniej 10 znaków.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <PasswordChangeForm />
@@ -39,4 +36,3 @@ import AccountDeleteSection from './AccountDeleteSection.vue';
   width: 100%;
 }
 </style>
-
