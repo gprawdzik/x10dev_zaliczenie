@@ -28,7 +28,7 @@ const visiblePages = computed(() => {
   const maxVisible = 5;
   const totalPages = Math.max(1, props.totalPages);
   let start = Math.max(1, props.currentPage - 2);
-  let end = Math.min(totalPages, start + maxVisible - 1);
+  const end = Math.min(totalPages, start + maxVisible - 1);
 
   if (end - start < maxVisible - 1) {
     start = Math.max(1, end - maxVisible + 1);

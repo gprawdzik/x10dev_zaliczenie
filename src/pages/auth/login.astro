@@ -1,0 +1,28 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import LoginForm from '@/components/auth/LoginForm.vue';
+
+const redirectParam = Astro.url.searchParams.get('redirect') ?? '';
+const redirectTarget = redirectParam.startsWith('/') ? redirectParam : null;
+---
+
+<AuthLayout
+  title="StravaGoals — Logowanie"
+  description="Zaloguj się, aby zarządzać celami treningowymi w StravaGoals"
+  heading="Zaloguj się"
+  subheading="Uzyskaj dostęp do swojego panelu i kontynuuj realizację planu"
+>
+  <LoginForm client:load redirect-target={redirectTarget ?? undefined} />
+
+  <div slot="links" class="space-y-2">
+    <p class="text-sm text-muted-foreground">
+      Nie masz konta?
+      <a href="/auth/register" class="font-semibold text-primary">Zarejestruj się</a>
+    </p>
+    <p class="text-sm text-muted-foreground">
+      Zapomniałeś hasła?
+      <a href="/auth/recover" class="font-semibold text-primary">Odzyskaj dostęp</a>
+    </p>
+  </div>
+</AuthLayout>
+

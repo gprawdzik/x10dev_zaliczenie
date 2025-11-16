@@ -1,4 +1,4 @@
--- Migration: Drop User Foreign Key Constraints
+a z-- Migration: Drop User Foreign Key Constraints
 -- Purpose: Temporarily remove foreign key constraints on user_id columns for development
 -- Tables affected: activities, goals, ai_suggestions
 -- Author: Database Migration

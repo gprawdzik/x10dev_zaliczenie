@@ -3,13 +3,13 @@ Twoim zadaniem jest zaimplementowanie widoku frontendu w oparciu o podany plan i
 Najpierw przejrzyj plan implementacji:
 
 <implementation_plan>
-@view-settings-implementation-plan.md
+@view-activities-implementation-plan.md
 </implementation_plan>
 
 Teraz przejrzyj zasady implementacji:
 
 <implementation_rules>
-@shared.mdc, @frontend.mdc
+@shared.mdc, @frontend.mdc, @backend.mdc
 </implementation_rules>
 
 Przejrzyj zdefiniowane typy:

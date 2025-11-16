@@ -1,0 +1,25 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import PasswordRecoveryForm from '@/components/auth/PasswordRecoveryForm.vue';
+---
+
+<AuthLayout
+  title="StravaGoals — Odzyskiwanie konta"
+  description="Wyślij prośbę o zresetowanie hasła w StravaGoals"
+  heading="Odzyskaj dostęp"
+  subheading="Podaj adres email, a wyślemy instrukcje resetu po ukończeniu integracji"
+>
+  <PasswordRecoveryForm client:load />
+
+  <div slot="links" class="space-y-2">
+    <p class="text-sm text-muted-foreground">
+      Pamiętasz hasło?
+      <a href="/auth/login" class="font-semibold text-primary">Wróć do logowania</a>
+    </p>
+    <p class="text-sm text-muted-foreground">
+      Nie masz jeszcze konta?
+      <a href="/auth/register" class="font-semibold text-primary">Załóż je w kilka minut</a>
+    </p>
+  </div>
+</AuthLayout>
+

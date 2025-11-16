@@ -1,0 +1,21 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import RegisterForm from '@/components/auth/RegisterForm.vue';
+---
+
+<AuthLayout
+  title="StravaGoals — Rejestracja"
+  description="Załóż konto w StravaGoals i śledź swoje cele treningowe"
+  heading="Załóż konto"
+  subheading="Utwórz darmowe konto i zaplanuj treningi na cały rok"
+>
+  <RegisterForm client:load />
+
+  <div slot="links">
+    <p class="text-sm text-muted-foreground">
+      Masz już konto?
+      <a href="/auth/login" class="font-semibold text-primary">Zaloguj się</a>
+    </p>
+  </div>
+</AuthLayout>
+

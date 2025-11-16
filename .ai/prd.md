@@ -64,6 +64,8 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   Kryteria akceptacji:
   - formularz rejestracyjny akceptuje email i hasło (min 10 znaków)
   - po poprawnej rejestracji użytkownik zostaje zalogowany
+  - oddzielna strona do rejestracji
+  - rejestracja za pomocą supabase auth
 
 - ID: US-002
   Tytuł: Logowanie istniejącego użytkownika
@@ -71,6 +73,8 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   Kryteria akceptacji:
   - formularz logowania akceptuje poprawne dane
   - przy błędnych danych wyświetla komunikat o błędzie
+  - oddzielna strona do logowania
+  - logowanie za pomocą supabase auth
 
 - ID: US-003
   Tytuł: Zmiana hasła
@@ -79,6 +83,7 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   - wymagana autoryzacja obecnym hasłem
   - nowe hasło spełnia wymagania długości
   - po zmianie użytkownik może się zalogować przy użyciu nowego hasła
+  - zmiana hasla za pomocą supabase auth
 
 - ID: US-004
   Tytuł: Usunięcie konta
@@ -155,9 +160,17 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   Tytuł: Wyświetlanie aktywności
   Opis: Użytkownik może wyświetlić wygenerowane aktywności.
   Kryteria akceptacji:
-    - Użytkownik widzi swoje aktywności. 
-    - paginacja
-    - sortowanie
+  - Użytkownik widzi swoje aktywności.
+  - paginacja
+  - sortowanie
+
+- ID: US-015
+  Tytuł: Wylogowanie użytkownika
+  Opis: Użytkownik może się wylogować z systemy.
+  Kryteria akceptacji:
+  - Wylogowanie następuje poprzez link "Użytkownik"/"Wyloguj".
+  - po wylogowaniu jest przekirowywany na stronę logowania
+  - wylogowanie za pomocą supabase auth
 
 ## 6. Metryki sukcesu
 
