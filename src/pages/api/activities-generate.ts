@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
     
-    const result = await generateActivities(userId, selectedSports, overrides);
+    const result = await generateActivities(userId, selectedSports, overrides, { supabase: locals.supabase });
     return jsonResponse(result satisfies GenerateActivitiesResponse, 201);
   } catch (error) {
     return handleGenerateActivitiesError(error);

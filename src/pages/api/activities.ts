@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   try {
     const userId = await resolveUserId(request, locals.supabase);
     const params = parseListActivitiesQuery(request.url);
-    const paginatedActivities = await listActivities(userId, params);
+    const paginatedActivities = await listActivities(userId, params, { supabase: locals.supabase });
     return jsonResponse(paginatedActivities, 200);
   } catch (error) {
     return handleListActivitiesError(error);

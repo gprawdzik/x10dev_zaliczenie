@@ -10,7 +10,6 @@ const protectedRoutes = [
   '/goals',
   '/activities',
   '/progress',
-  '/api/sports',
   '/api/goals',
   '/api/activities',
   '/api/activities-generate',

@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { createSportSchema, type CreateSportCommand } from '../../validators/createSport.js';
 import { createSport, SportCreationError, SportCreationErrors } from '../../services/sports/createSport.js';
 import { getSports, GetSportsError } from '../../services/sports/getSports.js';
+import { requireAuth, AuthError } from '../../middleware/requireAuth.js';
 import type { ErrorDto, SportDto } from '../../types.js';
 
 // Mark this endpoint as server-rendered to enable request body access
@@ -48,6 +49,7 @@ function errorResponse(status: number, code: string, message: string, details?: 
  * POST /api/sports
  *
  * Creates a new sport in the database.
+ * Requires authentication - only authenticated users can create sports.
  *
  * Request body:
  * {
@@ -59,12 +61,23 @@ function errorResponse(status: number, code: string, message: string, details?: 
  * Responses:
  * - 201: Sport created successfully
  * - 400: Invalid input data
+ * - 401: Unauthorized (not authenticated)
  * - 409: Sport with this code already exists
  * - 500: Internal server error
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Step 1: Parse and validate request body
+    // Step 1: Verify authentication
+    try {
+      await requireAuth(request, { supabase: locals.supabase });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        return errorResponse(401, error.code, error.message, error.details);
+      }
+      throw error;
+    }
+
+    // Step 2: Parse and validate request body
     let command: CreateSportCommand;
     try {
       command = await parseBody<CreateSportCommand>(request, createSportSchema);
@@ -85,10 +98,10 @@ export const POST: APIRoute = async ({ request }) => {
       return errorResponse(400, 'invalid_input', error instanceof Error ? error.message : 'Invalid request body');
     }
 
-    // Step 2: Execute business logic - create sport
+    // Step 3: Execute business logic - create sport using authenticated client
     let sport: SportDto;
     try {
-      sport = await createSport(command);
+      sport = await createSport(locals.supabase, command);
     } catch (error) {
       // Handle business logic errors
       if (error instanceof SportCreationError) {
@@ -114,7 +127,7 @@ export const POST: APIRoute = async ({ request }) => {
       return errorResponse(500, 'internal_error', 'An unexpected error occurred');
     }
 
-    // Step 3: Return success response
+    // Step 4: Return success response
     return new Response(JSON.stringify(sport), {
       status: 201,
       headers: {

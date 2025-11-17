@@ -1,4 +1,5 @@
-import {supabaseClient } from '../../db/supabase.client.js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../../db/database.types.js';
 import type { CreateSportCommand } from '../../validators/createSport.js';
 import type { SportDto } from '../../types.js';
 
@@ -30,19 +31,16 @@ export class SportCreationError extends Error {
  *
  * This function performs the following steps:
  * 1. Validates that the command contains all required data (caller should validate with Zod first)
- * 2. Attempts to insert the sport into the database using admin privileges
+ * 2. Attempts to insert the sport into the database using authenticated client
  * 3. Handles duplicate code errors (unique constraint violation)
  * 4. Returns the created sport with all database-generated fields
  *
+ * @param client - Authenticated Supabase client (respects RLS policies)
  * @param command - Validated command object containing sport data
  * @returns Promise resolving to the created sport DTO
  * @throws SportCreationError if the operation fails
  */
-export async function createSport(command: CreateSportCommand): Promise<SportDto> {
-  // Use admin client if available (bypasses RLS), otherwise use regular client
-  // In MVP, we use service_role key for simplicity
-  const client = supabaseClient;
-
+export async function createSport(client: SupabaseClient<Database>, command: CreateSportCommand): Promise<SportDto> {
   if (!client) {
     throw new SportCreationError(
       SportCreationErrors.DATABASE_ERROR,
