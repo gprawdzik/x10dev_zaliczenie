@@ -46,3 +46,4 @@ screenshots
 .output
 /x10dev_zaliczenie.iml
 /.eslintcache
+/npm-cache/

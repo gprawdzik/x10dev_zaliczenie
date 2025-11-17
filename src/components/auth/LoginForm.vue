@@ -96,7 +96,12 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <form class="flex flex-col gap-6" @submit.prevent="handleSubmit" novalidate>
+  <form
+    class="flex flex-col gap-6"
+    @submit.prevent="handleSubmit"
+    novalidate
+    data-testid="login-form"
+  >
     <div
       v-if="flashMessage"
       class="rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground"
@@ -121,6 +126,7 @@ const handleSubmit = async () => {
         placeholder="jan.kowalski@example.com"
         :aria-invalid="!!fieldErrors.email"
         :disabled="isProcessing"
+        data-testid="login-email-input"
       />
       <p v-if="fieldErrors.email" class="text-sm text-destructive" aria-live="polite">
         {{ fieldErrors.email }}
@@ -138,6 +144,7 @@ const handleSubmit = async () => {
         placeholder="••••••••••"
         :aria-invalid="!!fieldErrors.password"
         :disabled="isProcessing"
+        data-testid="login-password-input"
       />
       <p v-if="fieldErrors.password" class="text-sm text-destructive" aria-live="polite">
         {{ fieldErrors.password }}
@@ -154,11 +161,12 @@ const handleSubmit = async () => {
       }"
       role="status"
       aria-live="polite"
+      data-testid="login-status"
     >
       {{ statusMessage }}
     </div>
 
-    <Button type="submit" :disabled="isProcessing">
+    <Button type="submit" :disabled="isProcessing" data-testid="login-submit-button">
       <span v-if="isProcessing">Trwa logowanie...</span>
       <span v-else>Zaloguj się</span>
     </Button>

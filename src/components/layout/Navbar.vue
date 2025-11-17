@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import type { User } from '@supabase/supabase-js';
-import { Button } from '@/components/ui/button';
-import ThemeToggle from '@/components/ui/ThemeToggle.vue';
-import { supabaseClient } from '@/db/supabase.client.js';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import type { User } from '@supabase/supabase-js'
+import { Button } from '@/components/ui/button'
+import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import { supabaseClient } from '@/db/supabase.client.js'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,62 +11,62 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 
 // Stan mobilnego menu
-const isMobileMenuOpen = ref(false);
+const isMobileMenuOpen = ref(false)
 
 // Aktualna ścieżka (do podświetlania aktywnego linku)
 // Używamy pustego stringa jako wartość początkową dla SSR
-const currentPath = ref('');
+const currentPath = ref('')
 
 // Informacje o zalogowanym użytkowniku
-const user = ref<User | null>(null);
-const isLoadingUser = ref(true);
-const authError = ref<string | null>(null);
+const user = ref<User | null>(null)
+const isLoadingUser = ref(true)
+const authError = ref<string | null>(null)
 
-let authSubscription: ReturnType<typeof supabaseClient.auth.onAuthStateChange> | null = null;
+let authSubscription: ReturnType<typeof supabaseClient.auth.onAuthStateChange> | null = null
 
-const userDisplayLabel = computed(() => user.value?.email ?? 'Zaloguj');
+const userDisplayLabel = computed(() => user.value?.email ?? 'Zaloguj')
 
 async function loadCurrentUser() {
   try {
     const {
       data: { user: currentUser },
       error,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser()
 
     if (error) {
-      throw error;
+      throw error
     }
 
-    user.value = currentUser ?? null;
-    authError.value = null;
+    user.value = currentUser ?? null
+    authError.value = null
   } catch (error) {
-    console.error('Navbar: unable to load current user', error);
-    user.value = null;
-    authError.value = 'Nie udało się pobrać informacji o profilu.';
+    console.error('Navbar: unable to load current user', error)
+    user.value = null
+    authError.value = 'Nie udało się pobrać informacji o profilu.'
   } finally {
-    isLoadingUser.value = false;
+    isLoadingUser.value = false
   }
 }
 
 // Po montowaniu komponentu pobierz aktualną ścieżkę i status sesji
 onMounted(async () => {
-  currentPath.value = window.location.pathname;
-  await loadCurrentUser();
+  currentPath.value = window.location.pathname
+  await loadCurrentUser()
 
   authSubscription = supabaseClient.auth.onAuthStateChange((_event, session) => {
-    user.value = session?.user ?? null;
-    authError.value = null;
-    isLoadingUser.value = false;
-  });
-});
+    user.value = session?.user ?? null
+    authError.value = null
+    isLoadingUser.value = false
+  })
+})
 
 onBeforeUnmount(() => {
-  authSubscription?.data.subscription.unsubscribe();
-  authSubscription = null;
-});
+  authSubscription?.data.subscription.unsubscribe()
+  authSubscription = null
+})
 
 // Nawigacja - linki
 const navLinks = [
@@ -75,24 +75,24 @@ const navLinks = [
   { href: '/activities', label: 'Aktywności', icon: '🏃' },
   { href: '/progress', label: 'Postępy', icon: '📈' },
   { href: '/settings', label: 'Ustawienia', icon: '⚙️' },
-];
+]
 
 /**
  * Sprawdza czy link jest aktywny
  */
 const isActive = (href: string) => {
   if (href === '/') {
-    return currentPath.value === '/';
+    return currentPath.value === '/'
   }
-  return currentPath.value.startsWith(href);
-};
+  return currentPath.value.startsWith(href)
+}
 
 /**
  * Przełącza mobilne menu
  */
 const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
-};
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
 </script>
 
 <template>
@@ -123,15 +123,24 @@ const toggleMobileMenu = () => {
 
         <DropdownMenu v-if="user && !isLoadingUser">
           <DropdownMenuTrigger as-child>
-            <Button variant="ghost" size="sm" class="hidden md:flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="hidden md:flex items-center gap-2"
+              data-testid="navbar-user-trigger"
+            >
               <span class="text-base">👤</span>
               <span class="text-sm">{{ userDisplayLabel }}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" class="w-60">
             <DropdownMenuLabel class="flex flex-col gap-1">
-              <span class="text-xs uppercase tracking-wide text-muted-foreground">Zalogowano jako</span>
-              <span class="text-sm text-foreground">{{ user.email }}</span>
+              <span class="text-xs uppercase tracking-wide text-muted-foreground"
+                >Zalogowano jako</span
+              >
+              <span class="text-sm text-foreground" data-testid="navbar-user-email">{{
+                user.email
+              }}</span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem as-child>
@@ -194,9 +203,7 @@ const toggleMobileMenu = () => {
           Zalogowano jako
           <span class="font-semibold">{{ user.email }}</span>
         </p>
-        <p v-else class="mobile-auth-text text-muted-foreground">
-          Nie jesteś zalogowany.
-        </p>
+        <p v-else class="mobile-auth-text text-muted-foreground">Nie jesteś zalogowany.</p>
 
         <div class="mobile-auth-actions">
           <Button
@@ -428,4 +435,3 @@ const toggleMobileMenu = () => {
   color: hsl(var(--destructive));
 }
 </style>
-

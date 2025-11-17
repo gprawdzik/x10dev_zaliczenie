@@ -10,15 +10,17 @@ export class HomePage extends BasePage {
   readonly mainHeading: Locator;
   readonly loginLink: Locator;
   readonly registerLink: Locator;
+  readonly userTrigger: Locator;
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
     this.navbar = page.locator('nav');
     this.mainHeading = page.locator('h1');
     this.loginLink = page.getByRole('link', { name: /login|zaloguj/i });
     this.registerLink = page.getByRole('link', { name: /register|zarejestruj|sign up/i });
+    this.userTrigger = page.getByTestId('navbar-user-trigger');
   }
 
   /**
@@ -33,7 +35,7 @@ export class HomePage extends BasePage {
    */
   async isUserLoggedIn(): Promise<boolean> {
     try {
-      await this.page.getByRole('button', { name: /logout|wyloguj/i }).waitFor({ timeout: 2000 });
+      await this.userTrigger.waitFor({ timeout: 4000 });
       return true;
     } catch {
       return false;

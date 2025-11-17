@@ -14,13 +14,13 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators using resilient selection methods
     this.emailInput = page.getByLabel(/email|e-mail/i);
     this.passwordInput = page.getByLabel(/password|hasło/i);
     this.submitButton = page.getByRole('button', { name: /login|zaloguj|sign in/i });
     this.errorMessage = page.locator('[role="alert"]');
-    this.forgotPasswordLink = page.getByRole('link', { name: /forgot password|zapomniałem hasła/i });
+    this.forgotPasswordLink = page.getByRole('link', { name: /recover|odzyskaj dostęp/i });
   }
 
   /**
