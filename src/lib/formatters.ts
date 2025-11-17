@@ -1,4 +1,4 @@
-import type { ActivityDto, ActivityViewModel } from '@/types';
+import type { ActivityDto, ActivityViewModel } from '../types.js';
 
 const DEFAULT_LOCALE = 'pl-PL';
 
@@ -35,7 +35,7 @@ export function formatElevation(value: number | null | undefined): string {
   return `${Math.round(value)} m`;
 }
 
-export function formatDuration(duration: string | null | undefined): string {
+export function formatDuration(duration: string | unknown | null | undefined): string {
   const totalSeconds = parseDurationToSeconds(duration);
   if (totalSeconds <= 0) {
     return '0m';
@@ -51,7 +51,7 @@ export function formatDuration(duration: string | null | undefined): string {
   return `${hours}h ${minutes}m`;
 }
 
-export function formatPace(distanceInMeters: number | null | undefined, duration: string | null | undefined): string {
+export function formatPace(distanceInMeters: number | null | undefined, duration: string | unknown | null | undefined): string {
   const totalSeconds = parseDurationToSeconds(duration);
   if (!distanceInMeters || distanceInMeters <= 0 || totalSeconds <= 0) {
     return '—';
@@ -64,8 +64,8 @@ export function formatPace(distanceInMeters: number | null | undefined, duration
   return `${minutes}:${paddedSeconds} /km`;
 }
 
-export function parseDurationToSeconds(duration: string | null | undefined): number {
-  if (!duration) {
+export function parseDurationToSeconds(duration: string | unknown | null | undefined): number {
+  if (!duration || typeof duration !== 'string') {
     return 0;
   }
 

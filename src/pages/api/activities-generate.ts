@@ -68,9 +68,7 @@ async function parseGenerateActivitiesBody(request: Request): Promise<GenerateAc
   } catch {
     throw new ZodError([
       {
-        code: 'invalid_type',
-        expected: 'object',
-        received: 'string',
+        code: 'custom',
         path: [],
         message: 'Request body must be valid JSON',
       },

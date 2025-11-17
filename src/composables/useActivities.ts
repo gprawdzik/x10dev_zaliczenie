@@ -6,8 +6,8 @@ import type {
   ActivitySortField,
   ActivityViewModel,
   Paginated,
-} from '@/types';
-import { activityDtoToViewModel } from '@/lib/formatters';
+} from '../types.js';
+import { activityDtoToViewModel } from '../lib/formatters.js';
 
 const DEFAULT_PAGE_LIMIT = 20;
 const DEFAULT_SORT_BY: ActivitySortField = 'start_date';
@@ -108,7 +108,9 @@ export function useActivities(options: UseActivitiesOptions = {}) {
       if (!response.ok) {
         const payload = await safeParseJson(response);
         const message =
-          (payload?.error?.message as string | undefined) ??
+          (payload && typeof payload === 'object' && 'error' in payload && 
+           payload.error && typeof payload.error === 'object' && 'message' in payload.error &&
+           typeof payload.error.message === 'string' ? payload.error.message : null) ??
           'Nie udało się załadować aktywności. Spróbuj ponownie później.';
         throw new Error(message);
       }

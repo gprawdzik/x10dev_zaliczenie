@@ -14,6 +14,13 @@ AI
 
 - Openrouter.ai
 
+Testing:
+
+- Vitest (testy jednostkowe i komponentowe)
+- Vue Test Utils (testowanie komponentów Vue)
+- Playwright (testy E2E)
+- vi z Vitest (mockowanie modułów i API)
+
 CI/CD i Hosting:
 
 - Github Actions do tworzenia pipeline'ów CI/CD

@@ -9,6 +9,7 @@ StravaGoals is a web application that enables users to define, track, and visual
 - **Frontend:** Astro 5.15 with Vue 3.5, TypeScript 5, Tailwind CSS 4.1
 - **Backend:** Supabase
 - **AI Module:** Openrouter.ai
+- **Testing:** Vitest (unit & component tests), Vue Test Utils, Playwright (E2E tests)
 - **CI/CD & Hosting:** GitHub Actions (CI pipelines), mikr.us (Docker hosting)
 
 ## Getting Started Locally
@@ -50,13 +51,55 @@ The app will be available at `http://localhost:4321` by default (Astro developme
 
 ## Available Scripts
 
+### Development
+
 - `npm run dev` : Start development server
 - `npm run build` : Build for production
 - `npm run preview` : Preview production build locally
+
+### Testing
+
 - `npm run test:unit` : Run unit tests (Vitest)
-- `npm run test:e2e` : Run end-to-end tests (Cypress)
+- `npm run test:unit:watch` : Run unit tests in watch mode
+- `npm run test:unit:ui` : Open Vitest UI
+- `npm run test:unit:coverage` : Generate test coverage report
+- `npm run test:e2e` : Run end-to-end tests (Playwright)
+- `npm run test:e2e:ui` : Open Playwright UI
+- `npm run test:e2e:headed` : Run E2E tests with visible browser
+- `npm run test:e2e:debug` : Debug E2E tests
+- `npm run test:e2e:codegen` : Generate E2E tests with Playwright codegen
+
+### Code Quality
+
 - `npm run lint` : Run ESLint and auto-fix issues
 - `npm run format` : Run Prettier formatter on source files
+
+> **Note:** Before running E2E tests for the first time, install Playwright browsers with `npx playwright install chromium`. See [TESTING_SETUP.md](TESTING_SETUP.md) for complete setup instructions.
+
+## Testing
+
+This project uses a comprehensive testing strategy:
+
+- **Unit Tests (Vitest)**: Test individual functions, utilities, and Vue components in isolation
+- **E2E Tests (Playwright)**: Test complete user flows and interactions in a real browser environment
+
+### Running Tests
+
+```bash
+# Unit tests
+npm run test:unit              # Run once
+npm run test:unit:watch        # Watch mode
+npm run test:unit:coverage     # With coverage report
+
+# E2E tests (requires browsers installed: npx playwright install chromium)
+npm run test:e2e               # Run all E2E tests
+npm run test:e2e:ui            # Interactive UI mode
+```
+
+For detailed testing documentation, see:
+
+- [TESTING_SETUP.md](TESTING_SETUP.md) - Complete setup and installation guide
+- [tests/README.md](tests/README.md) - Comprehensive testing guide with examples
 
 ## Project Scope
 

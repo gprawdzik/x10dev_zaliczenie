@@ -145,9 +145,7 @@ async function parseJsonBody<T>(request: Request, schema: ZodSchema<T>): Promise
   if (!rawBody.trim()) {
     throw new ZodError([
       {
-        code: 'invalid_type',
-        expected: 'object',
-        received: 'undefined',
+        code: 'custom',
         path: [],
         message: 'Request body must not be empty',
       },

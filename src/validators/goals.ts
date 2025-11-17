@@ -23,9 +23,9 @@ const positiveNumberSchema = z
 
 export const createGoalSchema = z
   .object({
-    scope_type: z.enum(GOAL_SCOPE_TYPES, { description: 'Goal scope type' }),
+    scope_type: z.enum(GOAL_SCOPE_TYPES),
     year: yearSchema,
-    metric_type: z.enum(GOAL_METRIC_TYPES, { description: 'Tracked metric type' }),
+    metric_type: z.enum(GOAL_METRIC_TYPES),
     target_value: positiveNumberSchema,
     sport_id: uuidSchema.nullable().optional(),
   })
@@ -49,7 +49,7 @@ export const createGoalSchema = z
 
 export const updateGoalSchema = z
   .object({
-    metric_type: z.enum(GOAL_METRIC_TYPES, { description: 'Tracked metric type' }).optional(),
+    metric_type: z.enum(GOAL_METRIC_TYPES).optional(),
     target_value: positiveNumberSchema.optional(),
   })
   .refine((value) => Boolean(value.metric_type || value.target_value), {

@@ -8,36 +8,40 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-.DS_Store
 dist
 dist-ssr
-coverage
 *.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-*.tsbuildinfo
-
-.eslintcache
-
+# Environment
 .env
+.env.local
+.env.*.local
 
-allfileshas.txt
+# Test coverage
+coverage
+.nyc_output
 
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
+# Playwright
+playwright-report
+test-results
+screenshots
 
 # Vitest
-__screenshots__/
+.vitest
+
+# Build
+.astro
+.output
 /x10dev_zaliczenie.iml
-/npm-cache/
-tmp
+/.eslintcache

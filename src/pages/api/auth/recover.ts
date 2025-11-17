@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro'
 
-import { passwordRecoverySchema } from '@/validators/auth'
-import { createSupabaseServerClient } from '@/db/supabase.server'
-import { getAuthErrorMessage } from '@/lib/authErrors'
+import { passwordRecoverySchema } from '../../../validators/auth.js'
+import { createSupabaseServerClient } from '../../../db/supabase.server.js'
+import { getAuthErrorMessage } from '../../../lib/authErrors.js'
 
 const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
