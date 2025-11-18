@@ -101,6 +101,19 @@ For detailed testing documentation, see:
 - [TESTING_SETUP.md](TESTING_SETUP.md) - Complete setup and installation guide
 - [tests/README.md](tests/README.md) - Comprehensive testing guide with examples
 
+### Test Teardown
+
+End-to-end runs automatically trigger `tests/global.teardown.ts`, which wipes every activity, AI suggestion, and goal created by the dedicated E2E user. Configure the following variables (see `.env.dist` as a template):
+
+- `PUBLIC_SUPABASE_URL` – Supabase project used by tests
+- `SUPABASE_SERVICE_ROLE_KEY` (preferred) or `PUBLIC_SUPABASE_KEY` – credentials for cleanup
+- `E2E_USERNAME_ID` – Supabase UUID of the E2E account
+
+Optional flags:
+
+- Set `SKIP_TEARDOWN=true` to keep test data during local debugging
+- Set `DEBUG=true` to log detailed teardown context
+
 ## Project Scope
 
 - **Authentication:** Email/password registration, login, logout, password change, account deletion

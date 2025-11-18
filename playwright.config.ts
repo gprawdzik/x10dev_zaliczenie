@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import path, { dirname, resolve } from 'node:path';
+import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +13,9 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
  */
 export default defineConfig({
   testDir: './tests/e2e',
+
+  /* Global teardown - cleanup test data after all tests */
+  globalTeardown: './tests/global.teardown.ts',
 
   timeout: 6000, // timeout
   expect: {

@@ -32,6 +32,7 @@ Niniejszy dokument opisuje plan testów dla aplikacji StravaGoals. Celem jest za
 - Sugestie AI (generowanie, akceptacja, odrzucenie).
 - Zarządzanie sportami (dodawanie przez administratora).
 - Ustawienia użytkownika (zmiana hasła, usuwanie konta).
+- Mechanizm teardown (automatyczne czyszczenie danych testowych).
 
 ### 2.2. Funkcjonalności wyłączone z testów
 
@@ -83,19 +84,71 @@ Niniejszy dokument opisuje plan testów dla aplikacji StravaGoals. Celem jest za
 - **TC-AI-03**: Pomyślne odrzucenie sugestii.
 - **TC-AI-04**: Obsługa błędu, gdy API Openrouter.ai jest niedostępne.
 
+### 4.5. Mechanizm Teardown
+
+- **TC-TEARDOWN-01**: Pomyślne usunięcie wszystkich aktywności użytkownika testowego po zakończeniu testów.
+- **TC-TEARDOWN-02**: Weryfikacja, że teardown nie usuwa danych innych użytkowników.
+- **TC-TEARDOWN-03**: Graceful handling gdy `E2E_USERNAME_ID` nie jest ustawione (pominięcie z ostrzeżeniem).
+- **TC-TEARDOWN-04**: Obsługa błędów połączenia z bazą danych podczas teardown.
+- **TC-TEARDOWN-05**: Weryfikacja, że teardown wykonuje się automatycznie po wszystkich testach E2E.
+- **TC-TEARDOWN-06**: Weryfikacja raportowania liczby usuniętych rekordów w logach.
+
 ## 5. Środowisko testowe
 
 - **Lokalne środowisko deweloperskie**: Do uruchamiania testów jednostkowych, komponentowych i integracyjnych podczas rozwoju.
 - **Środowisko CI (GitHub Actions)**: Automatyczne uruchamianie wszystkich testów (jednostkowych, integracyjnych, E2E) po każdym pushu do repozytorium.
 - **Baza danych**: Dedykowana instancja/projekt Supabase do testów E2E i integracyjnych, aby izolować dane testowe od deweloperskich.
 
+### 5.1. Mechanizm Teardown (Czyszczenie Danych Testowych)
+
+Aby zapewnić czystość środowiska testowego i uniknąć interferencji między testami, zaimplementowano mechanizm **Global Teardown** w Playwright:
+
+#### 5.1.1. Cel i Zakres
+
+- **Automatyczne czyszczenie**: Po zakończeniu wszystkich testów E2E, system automatycznie usuwa dane testowe z bazy danych.
+- **Zakres czyszczenia**: Usuwane są wszystkie aktywności przypisane do użytkownika testowego (identyfikowanego przez `E2E_USERNAME_ID`).
+- **Bezpieczeństwo**: Mechanizm działa wyłącznie w środowisku testowym i jest zabezpieczony przed przypadkowym usunięciem danych produkcyjnych.
+
+#### 5.1.2. Konfiguracja
+
+Wymagane zmienne środowiskowe w `.env.test`:
+
+- `E2E_USERNAME` - email użytkownika testowego
+- `E2E_PASSWORD` - hasło użytkownika testowego
+- `E2E_USERNAME_ID` - UUID użytkownika testowego w Supabase
+- `PUBLIC_SUPABASE_URL` - URL projektu Supabase
+- `PUBLIC_SUPABASE_KEY` - klucz API Supabase (preferowany: service role key)
+
+#### 5.1.3. Działanie
+
+1. Testy E2E tworzą dane testowe (aktywności, cele, sugestie AI)
+2. Po zakończeniu wszystkich testów uruchamia się `tests/global.teardown.ts`
+3. Teardown łączy się z bazą danych Supabase
+4. Wszystkie aktywności dla użytkownika `E2E_USERNAME_ID` są usuwane
+5. W logach pojawia się raport z liczbą usuniętych rekordów
+
+#### 5.1.4. Opcje Konfiguracji
+
+- **Pominięcie teardown lokalnie**: `SKIP_TEARDOWN=true npm run test:e2e`
+- **Tryb debug**: `DEBUG=true npm run test:e2e`
+- **Rozszerzenie**: Możliwość czyszczenia dodatkowych tabel (ai_suggestions, goals)
+
+#### 5.1.5. Monitorowanie
+
+- Logi teardown są zapisywane w konsoli podczas wykonywania testów
+- W trybie debug dostępne są szczegółowe informacje o operacjach bazy danych
+- Opcjonalnie: raport teardown zapisywany w `playwright-report/teardown-report.json`
+
+Szczegółowy plan implementacji dostępny w: `.ai/test-teardown-plan.md`
+
 ## 6. Narzędzia do testowania
 
 - **Framework do testów jednostkowych i komponentowych**: **Vitest** (już skonfigurowany).
-- **Framework do testów E2E**: **Playwright** .
+- **Framework do testów E2E**: **Playwright**.
 - **Biblioteka do testowania komponentów Vue**: **Vue Test Utils**.
 - **Biblioteka do mockowania**: **`vi` z Vitest** do mockowania modułów i API.
 - **CI/CD**: **GitHub Actions**.
+- **Mechanizm Teardown**: **Playwright Global Teardown** do automatycznego czyszczenia danych testowych.
 
 ## 7. Harmonogram testów
 
@@ -118,6 +171,7 @@ Niniejszy dokument opisuje plan testów dla aplikacji StravaGoals. Celem jest za
 - Wszystkie testy automatyczne przechodzą pomyślnie (zielony build w CI).
 - Nie ma żadnych otwartych błędów krytycznych ani blokujących.
 - Gęstość znanych błędów o niższym priorytecie jest na akceptowalnym poziomie.
+- Mechanizm teardown działa poprawnie i czyści dane testowe po zakończeniu testów.
 
 ## 9. Role i odpowiedzialności w procesie testowania
 
