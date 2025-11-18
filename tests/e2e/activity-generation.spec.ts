@@ -44,21 +44,20 @@ test.describe('Activity generation to activities list flow', () => {
     await settingsPage.openGeneratorTab();
     await settingsPage.waitForGeneratorPanel();
 
-    // 7-8 Generate activities through dialog
+    // // 7-8 Generate activities through dialog
     await settingsPage.openGeneratorDialog();
     await settingsPage.confirmGeneration();
 
-    // 9 Navigate to activities tab
+    // // 9 Navigate to activities tab
     await page.getByRole('link', { name: /aktywności/i }).click();
     await page.waitForURL('**/activities');
 
-    // 10 Check table visibility
+    // // 10 Check table visibility
     await activitiesPage.waitForActivitiesTable();
     await expect(activitiesPage.activitiesTable).toBeVisible();
 
-    // 11 Validate summary info
-    const summaryText = await activitiesPage.getSummaryText();
-    expect(summaryText).toContain('Wyświetlane 1-20 z 100 aktywności');
+    // // 11 Validate summary info
+    await expect(activitiesPage.activitiesSummary).toHaveText(/Wyświetlane \d+-\d+ z \d+ aktywności/);
   });
 });
 

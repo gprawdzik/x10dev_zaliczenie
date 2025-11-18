@@ -69,6 +69,7 @@ const handleLimitChange = (value: string) => {
 const sports = ref<SportDto[]>([]);
 const sportsLoading = ref(false);
 const sportsError = ref<string | null>(null);
+const isHydrated = ref(false);
 
 const fetchSports = async () => {
   sportsLoading.value = true;
@@ -89,6 +90,7 @@ const fetchSports = async () => {
 
 onMounted(() => {
   void fetchSports();
+  isHydrated.value = true;
 });
 
 const sportOptions = computed(() =>
@@ -100,7 +102,11 @@ const sportOptions = computed(() =>
 </script>
 
 <template>
-  <section class="space-y-6">
+<section
+  class="space-y-6"
+  data-testid="activities-view"
+  :data-hydrated="isHydrated"
+>
     <header class="space-y-1">
       <h1 class="text-3xl font-bold tracking-tight text-foreground">
         Historia treningów
@@ -239,10 +245,12 @@ const sportOptions = computed(() =>
           </Button>
         </div>
         <template v-else>
-          <ActivitiesTable
-            :activities="activities"
-            :is-loading="isLoading"
-          />
+          <div data-testid="activities-table-container">
+            <ActivitiesTable
+              :activities="activities"
+              :is-loading="isLoading"
+            />
+          </div>
 
           <div class="flex flex-col gap-4 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
             <p data-testid="activities-summary">

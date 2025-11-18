@@ -293,6 +293,7 @@ function openConfirmationDialog(): void {
                   v-for="sport in selectedSportsDisplay"
                   :key="sport.code"
                   class="rounded-full border border-border px-3 py-1 text-sm"
+                  data-testid="generator-sport-chip"
                 >
                   {{ sport.name }}
                   <span class="text-xs text-muted-foreground">({{ sport.code }})</span>
