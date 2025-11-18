@@ -250,7 +250,7 @@ function openConfirmationDialog(): void {
 </script>
 
 <template>
-  <div class="activity-generator-panel">
+  <div class="activity-generator-panel" data-testid="activity-generator-panel">
     <Card>
       <CardHeader>
         <CardTitle>Generator danych aktywności</CardTitle>
@@ -275,15 +275,20 @@ function openConfirmationDialog(): void {
                   size="sm"
                   :disabled="sportsState.isLoading || isGenerating"
                   @click="rerollSports"
+                  data-testid="generator-reroll-button"
                 >
                   Wylosuj ponownie
                 </Button>
               </div>
 
-              <div v-if="sportsState.isLoading" class="text-sm text-muted-foreground">
+              <div
+                v-if="sportsState.isLoading"
+                class="text-sm text-muted-foreground"
+                data-testid="generator-sports-loading"
+              >
                 Trwa pobieranie listy sportów...
               </div>
-              <div v-else class="flex flex-wrap gap-2">
+              <div v-else class="flex flex-wrap gap-2" data-testid="generator-selected-sports">
                 <span
                   v-for="sport in selectedSportsDisplay"
                   :key="sport.code"
@@ -292,12 +297,20 @@ function openConfirmationDialog(): void {
                   {{ sport.name }}
                   <span class="text-xs text-muted-foreground">({{ sport.code }})</span>
                 </span>
-                <p v-if="!selectedSportsDisplay.length" class="text-sm text-muted-foreground">
+                <p
+                  v-if="!selectedSportsDisplay.length"
+                  class="text-sm text-muted-foreground"
+                  data-testid="generator-no-sports"
+                >
                   Brak wybranych sportów. Spróbuj ponownie.
                 </p>
               </div>
 
-              <p v-if="sportsState.error" class="text-xs text-destructive">
+              <p
+                v-if="sportsState.error"
+                class="text-xs text-destructive"
+                data-testid="generator-sports-error"
+              >
                 {{ sportsState.error }}
               </p>
             </section>
@@ -312,11 +325,16 @@ function openConfirmationDialog(): void {
 
           <div class="flex justify-end border-t border-border/60 pt-4">
             <Dialog v-model:open="isDialogOpen">
-              <Button type="button" :disabled="isGenerating" @click="openConfirmationDialog">
+              <Button
+                type="button"
+                :disabled="isGenerating"
+                @click="openConfirmationDialog"
+                data-testid="generator-open-dialog"
+              >
                 Generuj dane
               </Button>
 
-              <DialogContent>
+              <DialogContent data-testid="generator-dialog">
                 <DialogHeader>
                   <DialogTitle>Potwierdź generowanie danych</DialogTitle>
                   <DialogDescription class="space-y-1 text-sm">
@@ -339,7 +357,12 @@ function openConfirmationDialog(): void {
                     </Button>
                   </DialogClose>
 
-                  <Button type="button" :disabled="isGenerating" @click="handleGenerateActivities">
+                  <Button
+                    type="button"
+                    :disabled="isGenerating"
+                    @click="handleGenerateActivities"
+                    data-testid="generator-confirm-button"
+                  >
                     {{ confirmButtonLabel }}
                   </Button>
                 </DialogFooter>
@@ -347,7 +370,11 @@ function openConfirmationDialog(): void {
             </Dialog>
           </div>
 
-          <p v-if="isGenerating" class="text-sm text-muted-foreground">
+          <p
+            v-if="isGenerating"
+            class="text-sm text-muted-foreground"
+            data-testid="generator-progress-indicator"
+          >
             Trwa generowanie danych aktywności...
           </p>
         </div>

@@ -245,7 +245,7 @@ const sportOptions = computed(() =>
           />
 
           <div class="flex flex-col gap-4 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-            <p>
+            <p data-testid="activities-summary">
               {{ summaryText }}
             </p>
 

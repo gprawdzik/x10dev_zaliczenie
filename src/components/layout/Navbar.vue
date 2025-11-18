@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 // Stan mobilnego menu
+defineOptions({ name: 'AppNavbar' })
+
 const isMobileMenuOpen = ref(false)
 
 // Aktualna ścieżka (do podświetlania aktywnego linku)
@@ -74,7 +76,6 @@ const navLinks = [
   { href: '/goals', label: 'Cele', icon: '🎯' },
   { href: '/activities', label: 'Aktywności', icon: '🏃' },
   { href: '/progress', label: 'Postępy', icon: '📈' },
-  { href: '/settings', label: 'Ustawienia', icon: '⚙️' },
 ]
 
 /**

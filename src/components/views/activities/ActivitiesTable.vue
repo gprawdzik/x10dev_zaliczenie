@@ -31,8 +31,15 @@ const skeletonRows = Array.from({ length: 5 });
 </script>
 
 <template>
-  <div class="px-6 py-4" aria-live="polite">
-    <Table v-if="hasActivities || props.isLoading">
+  <div
+    class="px-6 py-4"
+    aria-live="polite"
+    data-testid="activities-table-wrapper"
+  >
+    <Table
+      v-if="hasActivities || props.isLoading"
+      data-testid="activities-table"
+    >
       <TableHeader>
         <TableRow>
           <TableHead
@@ -93,6 +100,7 @@ const skeletonRows = Array.from({ length: 5 });
     <div
       v-else
       class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/10 px-6 py-12 text-center"
+      data-testid="activities-empty-state"
     >
       <p class="text-base font-medium text-foreground">
         Nie znaleziono żadnych aktywności
