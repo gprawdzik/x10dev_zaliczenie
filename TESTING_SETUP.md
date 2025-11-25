@@ -208,28 +208,47 @@ The application requires certain environment variables (like `PUBLIC_SUPABASE_UR
 
 #### Local Development
 
-- Variables are loaded from `.env.test` file
-- Playwright's `dotenv` configuration loads these before tests run
-- The dev server automatically picks them up
+- Create a `.env.test` file in the project root with your configuration
+- Astro's `--mode test` automatically loads this file when running `npm run dev:e2e`
+- The dev server picks up these variables at startup
 
 #### GitHub Actions (CI)
 
-- Variables are stored as GitHub Secrets and set as environment variables in the workflow
-- Playwright config reads them from `process.env`
-- **Critical:** These variables must be explicitly passed to the webServer via `webServer.env` in `playwright.config.ts`
-- Without this configuration, the Astro dev server won't have access to them, resulting in "Missing env" errors
+- Variables are stored as **GitHub Secrets in the "test" environment**
+  - Go to: Repository Settings → Environments → test → Environment secrets
+- The workflow uses `environment: test` to access these secrets
+- Variables are passed directly to the Astro dev server via `webServer.env` in `playwright.config.ts`
+- **No `.env.test` file is created in CI** - variables are injected directly into the process environment
+- This approach is more secure (no sensitive data in files) and simpler
 
-The `playwright.config.ts` file includes a `webServer.env` configuration that passes all required environment variables to the Astro dev server process. This ensures consistency between local and CI environments.
+The `playwright.config.ts` includes `webServer.env` configuration:
+
+```typescript
+webServer: {
+  command: 'npm run dev:e2e',
+  env: {
+    PUBLIC_SUPABASE_URL: process.env.PUBLIC_SUPABASE_URL || '',
+    PUBLIC_SUPABASE_KEY: process.env.PUBLIC_SUPABASE_KEY || '',
+    // ... other variables
+  },
+}
+```
+
+This passes environment variables directly to the Astro dev server without needing intermediate files.
 
 ## 🐛 Troubleshooting
 
 ### If you see "Missing env: PUBLIC_SUPABASE_URL" in CI:
 
-This means the environment variables are not being passed to the Astro dev server. Verify:
+This error occurs when Astro can't find the required environment variables. Variables should be passed via `webServer.env` in Playwright config. Verify:
 
-1. GitHub Secrets are set correctly in your repository settings
-2. The workflow file (`.github/workflows/test.yml`) includes all required env variables
-3. The `playwright.config.ts` webServer configuration includes the `env` property with all variables
+1. **GitHub Environment exists**: Repository Settings → Environments → ensure "test" environment is created
+2. **Secrets are in the correct environment**:
+   - Go to: Repository Settings → Environments → test → Environment secrets (NOT Repository secrets)
+   - Add all required secrets: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_KEY`, `E2E_USERNAME`, `E2E_PASSWORD`, `E2E_USERNAME_ID`
+3. **Workflow uses the environment**: The `test` job must include `environment: test` line
+4. **Secret names match**: Names in the workflow must match exactly (case-sensitive)
+5. **Playwright config**: Verify that `playwright.config.ts` has `webServer.env` with all required variables
 
 ### If `npm install` fails:
 

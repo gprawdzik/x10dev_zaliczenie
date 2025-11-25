@@ -80,7 +80,9 @@ export default defineConfig({
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
-    // Pass environment variables to the webserver process
+    // Pass environment variables to the Astro dev server process
+    // This ensures variables are available in CI without needing a .env.test file
+    // In local dev, the dotenv.config() above loads .env.test first
     env: {
       PUBLIC_SUPABASE_URL: process.env.PUBLIC_SUPABASE_URL || '',
       PUBLIC_SUPABASE_KEY: process.env.PUBLIC_SUPABASE_KEY || '',

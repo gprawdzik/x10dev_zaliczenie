@@ -43,6 +43,7 @@ jobs:
     name: Test (Unit + E2E)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    environment: test # Use secrets from the "test" environment in GitHub
 
     # Environment variables are set here and passed to Playwright
     # Playwright's webServer config (in playwright.config.ts) then passes them to Astro dev server
