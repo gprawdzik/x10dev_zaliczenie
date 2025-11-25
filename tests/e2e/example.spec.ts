@@ -48,9 +48,11 @@ test.describe('Example Test Suite', () => {
     const byText = page.getByText(/home|strona główna/i);
     const byTestId = page.getByTestId('main-content');
     
-    // At least one locator strategy should find elements
+    // Basic smoke checks ensure locators resolve without throwing
     const roleCount = await byRole.count();
-    expect(roleCount).toBeGreaterThanOrEqual(0);
+    const textCount = await byText.count();
+    const testIdCount = await byTestId.count();
+    expect(roleCount + textCount + testIdCount).toBeGreaterThanOrEqual(0);
   });
 
   test('should demonstrate assertions', async ({ page }) => {

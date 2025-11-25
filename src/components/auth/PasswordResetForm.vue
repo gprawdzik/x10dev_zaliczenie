@@ -1,182 +1,78 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-
+import { computed } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
 import { useAuth } from '@/composables/useAuth'
-import { supabaseClient } from '@/db/supabase.client.js'
-import type { ChangePasswordInput } from '@/validators/auth'
+import { usePasswordRecoverySession } from '@/composables/usePasswordRecoverySession.js'
+import { useFormSubmission } from '@/composables/useFormSubmission.js'
 import { changePasswordSchema } from '@/validators/auth'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { getAuthErrorMessage } from '@/lib/authErrors'
-
-type SessionState = 'checking' | 'ready' | 'invalid'
-type SubmissionState = 'idle' | 'processing' | 'success' | 'error'
-type StatusVariant = 'info' | 'success' | 'error'
+import FormField from '@/components/ui/FormField.vue'
+import FormStatus from '@/components/ui/FormStatus.vue'
+import { getAuthErrorMessage } from '@/lib/authErrors.js'
 
 const { changePassword } = useAuth()
+const session = usePasswordRecoverySession()
 
-const sessionState = ref<SessionState>('checking')
-const submissionState = ref<SubmissionState>('idle')
-const statusVariant = ref<StatusVariant>('info')
-const statusMessage = ref('Trwa weryfikacja linku resetującego...')
-
-const formValues = reactive<ChangePasswordInput>({
-  newPassword: '',
-  confirmNewPassword: '',
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(changePasswordSchema),
 })
 
-const fieldErrors = reactive<Record<keyof ChangePasswordInput, string>>({
-  newPassword: '',
-  confirmNewPassword: '',
+const submission = useFormSubmission({
+  onSubmit: async (data: { newPassword: string; confirmNewPassword: string }) => {
+    if (!session.isReady()) {
+      throw new Error('Sesja resetowania hasła nie jest aktywna.')
+    }
+    await changePassword(data.newPassword)
+  },
+  onSuccess: () => {
+    submission.message.value = 'Hasło zostało zaktualizowane. Możesz się teraz zalogować.'
+  },
+  onError: (error) => {
+    submission.message.value = getAuthErrorMessage(error)
+  },
+  processingMessage: 'Aktualizujemy Twoje hasło...',
 })
 
 const isFormDisabled = computed(
-  () => sessionState.value !== 'ready' || submissionState.value === 'processing'
+  () => !session.isReady() || submission.isProcessing.value,
 )
 
-const statusClasses = computed(() => {
-  if (statusVariant.value === 'success') {
-    return 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-500/50 dark:bg-emerald-950/40 dark:text-emerald-100'
-  }
-
-  if (statusVariant.value === 'error') {
-    return 'border-destructive/50 bg-destructive/10 text-destructive'
-  }
-
-  return 'border-border bg-muted/30 text-muted-foreground'
+const showSessionStatus = computed(() => {
+  return session.isChecking() || session.isInvalid()
 })
 
-const clearFieldErrors = () => {
-  fieldErrors.newPassword = ''
-  fieldErrors.confirmNewPassword = ''
-}
-
-const setStatus = (message: string, variant: StatusVariant) => {
-  statusMessage.value = message
-  statusVariant.value = variant
-}
-
-const removeAuthParamsFromUrl = () => {
-  if (typeof window === 'undefined') {
-    return
+const sessionStatusMessage = computed(() => {
+  if (session.isChecking()) {
+    return 'Trwa weryfikacja linku resetującego...'
   }
-
-  const url = new URL(window.location.href)
-  url.searchParams.delete('code')
-  window.history.replaceState({}, document.title, url.pathname)
-  window.location.hash = ''
-}
-
-const establishRecoverySession = async () => {
-  try {
-    const currentUrl = new URL(window.location.href)
-    const code = currentUrl.searchParams.get('code')
-
-    if (code) {
-      const { error } = await supabaseClient.auth.exchangeCodeForSession(code)
-
-      if (error) {
-        throw error
-      }
-
-      sessionState.value = 'ready'
-      setStatus('', 'info')
-      removeAuthParamsFromUrl()
-      return
-    }
-
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
-    const accessToken = hashParams.get('access_token')
-    const refreshToken = hashParams.get('refresh_token')
-
-    if (accessToken && refreshToken) {
-      const { error } = await supabaseClient.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      })
-
-      if (error) {
-        throw error
-      }
-
-      sessionState.value = 'ready'
-      setStatus('', 'info')
-      removeAuthParamsFromUrl()
-      return
-    }
-
-    throw new Error(
-      'Link resetujący jest nieprawidłowy lub wygasł. Użyj ponownie opcji odzyskiwania konta.'
-    )
-  } catch (error) {
-    console.error('Password reset session error:', error)
-    sessionState.value = 'invalid'
-    setStatus(
-      getAuthErrorMessage(error) ||
-        'Nie udało się zweryfikować linku resetującego. Spróbuj ponownie.',
-      'error'
-    )
+  if (session.isInvalid()) {
+    return session.errorMessage.value
   }
-}
+  return ''
+})
 
-const handleSubmit = async () => {
-  if (sessionState.value !== 'ready') {
-    return
+const sessionStatusVariant = computed<'info' | 'success' | 'error'>(() => {
+  if (session.isInvalid()) {
+    return 'error'
   }
+  return 'info'
+})
 
-  clearFieldErrors()
-  setStatus('', 'info')
-
-  const validation = changePasswordSchema.safeParse(formValues)
-  if (!validation.success) {
-    submissionState.value = 'error'
-    validation.error.issues.forEach((issue) => {
-      const fieldPath = issue.path[0] as keyof ChangePasswordInput | undefined
-      if (fieldPath && fieldPath in fieldErrors) {
-        fieldErrors[fieldPath] = issue.message
-      }
-    })
-    setStatus('Popraw zaznaczone pola i spróbuj ponownie.', 'error')
-    return
-  }
-
-  submissionState.value = 'processing'
-  setStatus('Aktualizujemy Twoje hasło...', 'info')
-
-  try {
-    await changePassword(validation.data.newPassword)
-    submissionState.value = 'success'
-    setStatus('Hasło zostało zaktualizowane. Możesz się teraz zalogować.', 'success')
-  } catch (error) {
-    console.error('Password reset error:', error)
-    submissionState.value = 'error'
-    setStatus(getAuthErrorMessage(error), 'error')
-  }
-}
-
-onMounted(async () => {
-  if (typeof window === 'undefined') {
-    return
-  }
-
-  await establishRecoverySession()
+const onSubmit = handleSubmit(async (values) => {
+  await submission.execute(values)
 })
 </script>
 
 <template>
-  <form class="flex flex-col gap-6" @submit.prevent="handleSubmit" novalidate>
-    <div
-      v-if="statusMessage"
-      class="rounded-md border p-3 text-sm"
-      :class="statusClasses"
-      role="status"
-      aria-live="polite"
-    >
-      {{ statusMessage }}
-    </div>
+  <form class="flex flex-col gap-6" @submit="onSubmit" novalidate>
+    <FormStatus
+      v-if="showSessionStatus"
+      :message="sessionStatusMessage"
+      :variant="sessionStatusVariant"
+    />
 
-    <div v-if="sessionState === 'invalid'" class="text-sm text-muted-foreground">
+    <div v-if="session.isInvalid()" class="text-sm text-muted-foreground">
       <p class="mb-2">
         Jeśli potrzebujesz nowego linku resetującego, przejdź ponownie przez proces odzyskiwania
         konta.
@@ -186,51 +82,39 @@ onMounted(async () => {
       </a>
     </div>
 
-    <div v-else>
-      <div class="flex flex-col gap-2">
-        <Label for="new-password">Nowe hasło</Label>
-        <Input
-          id="new-password"
-          v-model="formValues.newPassword"
-          type="password"
-          name="newPassword"
-          autocomplete="new-password"
-          :disabled="isFormDisabled"
-          :aria-invalid="Boolean(fieldErrors.newPassword)"
-        />
-        <p v-if="fieldErrors.newPassword" class="text-sm text-destructive" aria-live="polite">
-          {{ fieldErrors.newPassword }}
-        </p>
-      </div>
+    <div v-else-if="session.isReady()">
+      <FormField
+        name="newPassword"
+        label="Nowe hasło"
+        type="password"
+        autocomplete="new-password"
+        :disabled="isFormDisabled"
+      />
 
-      <div class="mt-4 flex flex-col gap-2">
-        <Label for="confirm-new-password">Potwierdź nowe hasło</Label>
-        <Input
-          id="confirm-new-password"
-          v-model="formValues.confirmNewPassword"
-          type="password"
+      <div class="mt-4">
+        <FormField
           name="confirmNewPassword"
+          label="Potwierdź nowe hasło"
+          type="password"
           autocomplete="new-password"
           :disabled="isFormDisabled"
-          :aria-invalid="Boolean(fieldErrors.confirmNewPassword)"
         />
-        <p
-          v-if="fieldErrors.confirmNewPassword"
-          class="text-sm text-destructive"
-          aria-live="polite"
-        >
-          {{ fieldErrors.confirmNewPassword }}
-        </p>
       </div>
     </div>
 
+    <FormStatus
+      v-if="submission.message.value"
+      :message="submission.message.value"
+      :variant="submission.variant.value"
+    />
+
     <Button type="submit" :disabled="isFormDisabled">
-      <span v-if="submissionState === 'processing'">Aktualizujemy hasło...</span>
-      <span v-else-if="submissionState === 'success'">Hasło zaktualizowane</span>
+      <span v-if="submission.isProcessing.value">Aktualizujemy hasło...</span>
+      <span v-else-if="submission.isSuccess.value">Hasło zaktualizowane</span>
       <span v-else>Ustaw nowe hasło</span>
     </Button>
 
-    <p v-if="submissionState === 'success'" class="text-sm text-muted-foreground">
+    <p v-if="submission.isSuccess.value" class="text-sm text-muted-foreground">
       Możesz teraz przejść do
       <a href="/auth/login" class="font-semibold text-primary underline-offset-2 hover:underline">
         strony logowania
@@ -239,4 +123,3 @@ onMounted(async () => {
     </p>
   </form>
 </template>
-

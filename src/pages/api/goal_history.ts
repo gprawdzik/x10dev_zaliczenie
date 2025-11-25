@@ -1,8 +1,6 @@
 import type { APIRoute } from 'astro';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { ZodError } from 'zod';
 
-import type { Database } from '../../db/database.types.js';
 import { AuthError } from '../../middleware/requireAuth.js';
 import { requireAuth } from '../../middleware/requireAuth.js';
 import {

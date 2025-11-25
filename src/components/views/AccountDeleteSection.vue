@@ -46,10 +46,13 @@ const handleDeleteAccount = async () => {
       window.location.href = '/';
     }, 1500);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Błąd podczas usuwania konta:', error);
     
-    const errorMessage = error?.message || 'Wystąpił błąd podczas usuwania konta. Spróbuj ponownie.';
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Wystąpił błąd podczas usuwania konta. Spróbuj ponownie.';
     toast.error('Błąd usuwania konta', errorMessage);
   } finally {
     isDeleting.value = false;
