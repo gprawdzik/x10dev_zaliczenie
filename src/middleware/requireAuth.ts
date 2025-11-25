@@ -1,7 +1,10 @@
-import type { SupabaseClient, User } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Database } from '../db/database.types.js';
 import { supabaseClient } from '../db/supabase.client.js';
+
+// Infer User type from SupabaseClient to avoid direct imports from internal packages
+type User = NonNullable<Awaited<ReturnType<SupabaseClient['auth']['getUser']>>['data']['user']>
 
 export const AuthErrorCodes = {
   CLIENT_UNAVAILABLE: 'AUTH_CLIENT_UNAVAILABLE',

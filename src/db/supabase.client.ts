@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { createBrowserClient, type CookieOptions } from '@supabase/ssr'
+import { createBrowserClient } from '@supabase/ssr'
+import type { CookieOptions } from '@supabase/ssr'
 
 import type { Database } from '../db/database.types.js'
 

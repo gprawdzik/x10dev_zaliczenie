@@ -1,6 +1,10 @@
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { supabaseClient } from '../db/supabase.client.js'
+
+// Infer types from SupabaseClient to avoid direct imports from internal packages
+type AuthChangeEvent = Parameters<Parameters<SupabaseClient['auth']['onAuthStateChange']>[0]>[0]
+type Session = NonNullable<Awaited<ReturnType<SupabaseClient['auth']['getSession']>>['data']['session']>
 
 const getEmailRedirectUrl = () => {
   if (typeof window === 'undefined') {

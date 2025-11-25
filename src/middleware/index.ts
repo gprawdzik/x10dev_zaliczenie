@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
+import type { CookieOptions } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/db/database.types.js'
