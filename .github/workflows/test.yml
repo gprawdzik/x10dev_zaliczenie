@@ -44,6 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    # Environment variables are set here and passed to Playwright
+    # Playwright's webServer config (in playwright.config.ts) then passes them to Astro dev server
     env:
       CI: true
       ENV: test

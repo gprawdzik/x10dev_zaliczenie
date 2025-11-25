@@ -80,6 +80,15 @@ export default defineConfig({
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    // Pass environment variables to the webserver process
+    env: {
+      PUBLIC_SUPABASE_URL: process.env.PUBLIC_SUPABASE_URL || '',
+      PUBLIC_SUPABASE_KEY: process.env.PUBLIC_SUPABASE_KEY || '',
+      E2E_USERNAME: process.env.E2E_USERNAME || '',
+      E2E_PASSWORD: process.env.E2E_PASSWORD || '',
+      E2E_USERNAME_ID: process.env.E2E_USERNAME_ID || '',
+      ENV: process.env.ENV || 'test',
+    },
   },
 });
 
