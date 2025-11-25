@@ -32,6 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --force
 
+      - name: Work around npm optional Rollup deps bug
+        run: |
+          node -e "try { require('@rollup/rollup-linux-x64-gnu'); } catch { process.exit(1); }" || \
+          npm install @rollup/rollup-linux-x64-gnu --no-save
+
       - name: Run linting
         run: npm run lint
 
@@ -64,6 +69,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --force
+
+      - name: Work around npm optional Rollup deps bug
+        run: |
+          node -e "try { require('@rollup/rollup-linux-x64-gnu'); } catch { process.exit(1); }" || \
+          npm install @rollup/rollup-linux-x64-gnu --no-save
 
       - name: Run unit tests with coverage
         run: npm run test:unit:coverage
@@ -108,6 +118,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --force
+
+      - name: Work around npm optional Rollup deps bug
+        run: |
+          node -e "try { require('@rollup/rollup-linux-x64-gnu'); } catch { process.exit(1); }" || \
+          npm install @rollup/rollup-linux-x64-gnu --no-save
 
       - name: Build production
         run: npm run build
