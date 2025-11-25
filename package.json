@@ -78,5 +78,15 @@
     "supabase": "^2.54.11",
     "typescript": "~5.9.0",
     "vitest": "^3.2.4"
+  },
+  "optionalDependencies": {
+    "@oxlint/darwin-arm64": "1.23.0",
+    "@oxlint/darwin-x64": "1.23.0",
+    "@oxlint/linux-arm64-gnu": "1.23.0",
+    "@oxlint/linux-arm64-musl": "1.23.0",
+    "@oxlint/linux-x64-gnu": "1.23.0",
+    "@oxlint/linux-x64-musl": "1.23.0",
+    "@oxlint/win32-arm64": "1.23.0",
+    "@oxlint/win32-x64": "1.23.0"
   }
 }
