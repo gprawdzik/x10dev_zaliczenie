@@ -22,10 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: none
       - run: npm ci
       - run: npm run lint
-      - run: npm i
       - run: npm run test:unit -- --runInBand
       - name: Upload coverage
         uses: actions/upload-artifact@v4
