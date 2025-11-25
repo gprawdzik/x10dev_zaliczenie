@@ -27,7 +27,7 @@ jobs:
           npm install --ignore-scripts=false
       - run: npm ci
       - run: npm run lint
-      - run: npm run test:unit -- --runInBand
+      - run: npm run test:unit --
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
