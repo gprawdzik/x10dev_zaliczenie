@@ -6,7 +6,11 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
+// In CI environment, use secrets from GitHub Actions
+// Locally, load from .env.test file
+if (!process.env.CI) {
+  dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.

@@ -5,6 +5,7 @@
 The testing environment has been successfully prepared with the following changes:
 
 ### 1. Removed Cypress
+
 - ✅ Removed Cypress dependencies from `package.json`
 - ✅ Removed `eslint-plugin-cypress` from ESLint configuration
 - ✅ Deleted `cypress/` directory
@@ -12,17 +13,20 @@ The testing environment has been successfully prepared with the following change
 - ✅ Removed Cypress scripts from `package.json`
 
 ### 2. Added Vitest & Playwright
+
 - ✅ Added `@playwright/test` for E2E testing
 - ✅ Added `@vitest/ui` for interactive test UI
 - ✅ Added `@vitest/coverage-v8` for code coverage
 - ✅ Added `@vitejs/plugin-vue` for Vue component testing
 
 ### 3. Configuration Files
+
 - ✅ Created `playwright.config.ts` with Chromium browser configuration
 - ✅ Updated `vitest.config.ts` with proper Vue support and coverage settings
 - ✅ Updated ESLint configuration to remove Cypress plugin
 
 ### 4. Test Structure
+
 - ✅ Created `tests/e2e/` directory for E2E tests
 - ✅ Created `tests/page-objects/` for Page Object Model
 - ✅ Created `tests/fixtures/` for test data
@@ -30,6 +34,7 @@ The testing environment has been successfully prepared with the following change
 - ✅ Added example unit tests with mocking
 
 ### 5. Scripts
+
 - ✅ Added comprehensive npm scripts for both test types
 - ✅ Updated `.gitignore` with test-related directories
 
@@ -43,7 +48,36 @@ Run the following command to install all new dependencies:
 npm install
 ```
 
-### Step 2: Install Playwright Browsers
+### Step 2: Configure Environment Variables
+
+For E2E tests, you need to set up environment variables. The configuration differs between local development and CI:
+
+#### Local Development (using .env.test file)
+
+1. Edit `.env.test` and fill in your values:
+
+```bash
+PUBLIC_SUPABASE_URL=your_supabase_url_here
+PUBLIC_SUPABASE_KEY=your_supabase_anon_key_here
+E2E_USERNAME=test@example.com
+E2E_PASSWORD=your_test_password_here
+E2E_USERNAME_ID=your_test_user_uuid_here
+```
+
+#### CI Environment (GitHub Actions)
+
+In CI, the configuration uses GitHub Secrets instead of the `.env.test` file:
+
+- `ENV=test` (set automatically)
+- `PUBLIC_SUPABASE_URL` (from secrets)
+- `PUBLIC_SUPABASE_KEY` (from secrets)
+- `E2E_USERNAME` (from secrets)
+- `E2E_PASSWORD` (from secrets)
+- `E2E_USERNAME_ID` (from secrets)
+
+The `playwright.config.ts` automatically detects the CI environment and uses the appropriate configuration source.
+
+### Step 3: Install Playwright Browsers
 
 Playwright requires browser binaries to be installed:
 
@@ -57,7 +91,7 @@ Or install all browsers (optional):
 npx playwright install
 ```
 
-### Step 3: Build the Application
+### Step 4: Build the Application
 
 Before running E2E tests, build the application:
 
@@ -65,14 +99,16 @@ Before running E2E tests, build the application:
 npm run build
 ```
 
-### Step 4: Verify Installation
+### Step 5: Verify Installation
 
 #### Test Unit Tests:
+
 ```bash
 npm run test:unit
 ```
 
 #### Test E2E Setup:
+
 ```bash
 npm run test:e2e
 ```
@@ -80,6 +116,7 @@ npm run test:e2e
 ## 📋 Available Test Scripts
 
 ### Unit Tests (Vitest)
+
 ```bash
 npm run test:unit              # Run all unit tests
 npm run test:unit:watch        # Run in watch mode
@@ -88,6 +125,7 @@ npm run test:unit:coverage     # Generate coverage report
 ```
 
 ### E2E Tests (Playwright)
+
 ```bash
 npm run test:e2e               # Run all E2E tests
 npm run test:e2e:ui            # Open Playwright UI
@@ -123,12 +161,14 @@ x10dev_zaliczenie/
 ## 🔧 Configuration Details
 
 ### Vitest
+
 - Environment: jsdom (for DOM testing)
 - Coverage: v8 provider
 - Globals: enabled
 - Path alias: `@` points to `./src`
 
 ### Playwright
+
 - Browser: Chromium (Desktop Chrome)
 - Base URL: http://localhost:4321
 - Trace: on-first-retry
@@ -139,6 +179,7 @@ x10dev_zaliczenie/
 ## 📚 Documentation
 
 For detailed information about writing and running tests, see:
+
 - `tests/README.md` - Comprehensive testing guide
 - [Vitest Documentation](https://vitest.dev/)
 - [Playwright Documentation](https://playwright.dev/)
@@ -162,20 +203,26 @@ For detailed information about writing and running tests, see:
 ## 🐛 Troubleshooting
 
 ### If `npm install` fails:
+
 Try clearing npm cache:
+
 ```bash
 npm cache clean --force
 npm install
 ```
 
 ### If Playwright installation fails:
+
 Try installing with sudo (macOS/Linux):
+
 ```bash
 sudo npx playwright install chromium
 ```
 
 ### If tests can't find the application:
+
 Make sure to build first:
+
 ```bash
 npm run build
 npm run preview
@@ -194,6 +241,7 @@ npm run test:e2e:headed
 ```
 
 Or let Playwright handle the server automatically:
+
 ```bash
 npm run test:e2e
 ```
@@ -202,4 +250,3 @@ npm run test:e2e
 
 **Status**: Environment prepared ✅  
 **Next Action**: Run `npm install` to complete setup
-
