@@ -27,14 +27,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Clean and prepare dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install --ignore-scripts=false
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
 
       - name: Run linting
         run: npm run lint
@@ -64,14 +60,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Clean and prepare dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install --ignore-scripts=false
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
 
       - name: Run unit tests with coverage
         run: npm run test:unit:coverage
@@ -112,14 +104,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Clean and prepare dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install --ignore-scripts=false
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
 
       - name: Build production
         run: npm run build
