@@ -1,5 +1,7 @@
 # StravaGoals
 
+[![Testing CI](https://github.com/gprawdzik/x10dev_zaliczenie/actions/workflows/test.yml/badge.svg)](https://github.com/gprawdzik/x10dev_zaliczenie/actions/workflows/test.yml)
+
 ## Description
 
 StravaGoals is a web application that enables users to define, track, and visualize annual training goals based on simulated Strava activity data. Users can create, edit, and delete goals, review their versioned history, and generate AI-driven suggestions for new or adjusted goals.
@@ -100,6 +102,7 @@ For detailed testing documentation, see:
 
 - [TESTING_SETUP.md](TESTING_SETUP.md) - Complete setup and installation guide
 - [tests/README.md](tests/README.md) - Comprehensive testing guide with examples
+- [docs/35_ci_cd_configuration.md](docs/35_ci_cd_configuration.md) - CI/CD setup and configuration guide
 
 ### Test Teardown
 
@@ -113,6 +116,40 @@ Optional flags:
 
 - Set `SKIP_TEARDOWN=true` to keep test data during local debugging
 - Set `DEBUG=true` to log detailed teardown context
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and testing. The pipeline automatically runs on every push and pull request to the `main` branch.
+
+### Pipeline Steps
+
+Pipeline składa się z 3 niezależnych jobów:
+
+1. **Lint** (parallel) - Code quality checks (oxlint + eslint) - ~2-3 min
+2. **Test** (parallel) - Unit tests with coverage + E2E browser tests (Vitest + Playwright) - ~7-8 min
+3. **Build** (after lint + test) - Production build validation (Astro) - ~2-3 min
+
+Total time: ~8-10 minutes (parallel execution)
+
+### Configuration
+
+To run the CI/CD pipeline, configure the following GitHub Secrets in your repository:
+
+- `PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `PUBLIC_SUPABASE_KEY` - Supabase anon/public API key
+- `E2E_USERNAME` - Email of the dedicated E2E test user
+- `E2E_PASSWORD` - Password for the E2E test user
+- `E2E_USERNAME_ID` - UUID of the E2E test user in Supabase
+
+For detailed CI/CD setup instructions, see [docs/35_ci_cd_configuration.md](docs/35_ci_cd_configuration.md) or [.github/CI_CD_SETUP.md](.github/CI_CD_SETUP.md).
+
+### Artifacts
+
+The pipeline generates the following artifacts:
+
+- **Coverage Report** (30 days retention) - HTML coverage report from unit tests
+- **Playwright Report** (30 days retention, on failure) - Detailed E2E test results with screenshots and videos
+- **Production Build** (7 days retention, on success) - Compiled application ready for deployment
 
 ## Project Scope
 
@@ -247,9 +284,11 @@ All API routes live under `src/pages/api`. Each endpoint expects a valid Supabas
 
 ## Project Status
 
-- MVP features fully implemented and available for local testing.
-- Environment variable configuration pending (placeholders provided above).
-- CI/CD pipelines (GitHub Actions) and hosting configuration are planned but not yet set up.
+- ✅ MVP features fully implemented and available for local testing
+- ✅ Comprehensive test suite (unit + E2E) with coverage reporting
+- ✅ CI/CD pipeline configured with GitHub Actions
+- ⏳ Environment variable configuration pending (placeholders provided above)
+- ⏳ Production hosting configuration (mikr.us) planned but not yet deployed
 
 For detailed product requirements, see the [PRD document](.ai/prd.md).
 
