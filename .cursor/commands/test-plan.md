@@ -1,9 +1,3 @@
----
-description:
-globs:
-alwaysApply: false
----
-
 Jesteś doświadczonym inżynierem QA, którego zadaniem jest stworzenie kompleksowego planu testów dla projektu programistycznego. Przeanalizuj poniższe informacje o projekcie:
 
 Przeszukaj codebase zanim podejmiesz jakąkolwiek akcję.

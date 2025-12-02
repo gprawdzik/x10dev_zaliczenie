@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config'
 import vue from '@astrojs/vue'
 // import tailwind from '@astrojs/tailwind'
-import cloudflare from "@astrojs/cloudflare";
+import cloudflare from '@astrojs/cloudflare'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://astro.build/config
@@ -27,6 +27,14 @@ export default defineConfig({
       alias: {
         '@': '/src',
       },
+      // Naprawia problemy z importami bez rozszerzeń w @supabase/ssr
+      extensions: ['.js', '.ts', '.jsx', '.tsx', '.json'],
+    },
+    optimizeDeps: {
+      include: ['@supabase/ssr'],
+    },
+    ssr: {
+      noExternal: ['@supabase/ssr'],
     },
   },
   // Konfiguracja output - 'server' dla SSR i API endpoints

@@ -6,10 +6,11 @@
     "moduleResolution": "NodeNext",
     "jsx": "preserve",
     "jsxImportSource": "vue",
+    "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "env.d.ts"],
+  "include": ["src/**/*", "env.d.ts", "env.supabase-ssr.d.ts"],
   "exclude": ["node_modules", "dist", "src/**/__tests__/*"]
 }
