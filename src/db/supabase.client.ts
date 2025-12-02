@@ -1,4 +1,3 @@
-/// <reference path="../../env.supabase-ssr.d.ts" />
 import { createClient } from '@supabase/supabase-js'
 import { createBrowserClient } from '@supabase/ssr/dist/module/createBrowserClient.js'
 import type { SerializeOptions } from 'cookie'

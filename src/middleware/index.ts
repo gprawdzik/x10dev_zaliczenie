@@ -1,4 +1,3 @@
-/// <reference path="../../env.supabase-ssr.d.ts" />
 import { defineMiddleware } from 'astro:middleware'
 import { createServerClient } from '@supabase/ssr/dist/module/createServerClient.js'
 import type { SerializeOptions } from 'cookie'

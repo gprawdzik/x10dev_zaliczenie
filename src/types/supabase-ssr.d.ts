@@ -39,7 +39,7 @@ type CookieOptionsWithName = {
 } & CookieOptions
 
 declare module '@supabase/ssr/dist/module/createBrowserClient' {
-  export function createBrowserClient<Database = any, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
+  export function createBrowserClient<Database = Record<string, never>, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
     supabaseUrl: string,
     supabaseKey: string,
     options?: SupabaseClientOptions<SchemaName> & {
@@ -50,7 +50,7 @@ declare module '@supabase/ssr/dist/module/createBrowserClient' {
     }
   ): SupabaseClient<Database, SchemaName>
 
-  export function createBrowserClient<Database = any, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
+  export function createBrowserClient<Database = Record<string, never>, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
     supabaseUrl: string,
     supabaseKey: string,
     options?: SupabaseClientOptions<SchemaName> & {
@@ -67,7 +67,7 @@ declare module '@supabase/ssr/dist/module/createBrowserClient.js' {
 }
 
 declare module '@supabase/ssr/dist/module/createServerClient' {
-  export function createServerClient<Database = any, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
+  export function createServerClient<Database = Record<string, never>, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
     supabaseUrl: string,
     supabaseKey: string,
     options: SupabaseClientOptions<SchemaName> & {
@@ -77,7 +77,7 @@ declare module '@supabase/ssr/dist/module/createServerClient' {
     }
   ): SupabaseClient<Database, SchemaName>
 
-  export function createServerClient<Database = any, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
+  export function createServerClient<Database = Record<string, never>, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
     supabaseUrl: string,
     supabaseKey: string,
     options: SupabaseClientOptions<SchemaName> & {
@@ -89,7 +89,7 @@ declare module '@supabase/ssr/dist/module/createServerClient' {
 }
 
 declare module '@supabase/ssr/dist/module/createServerClient.js' {
-  export function createServerClient<Database = any, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
+  export function createServerClient<Database = Record<string, never>, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
     supabaseUrl: string,
     supabaseKey: string,
     options: SupabaseClientOptions<SchemaName> & {
@@ -99,7 +99,7 @@ declare module '@supabase/ssr/dist/module/createServerClient.js' {
     }
   ): SupabaseClient<Database, SchemaName>
 
-  export function createServerClient<Database = any, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
+  export function createServerClient<Database = Record<string, never>, SchemaName extends string & keyof Omit<Database, '__InternalSupabase'> = 'public' extends keyof Omit<Database, '__InternalSupabase'> ? 'public' : string & keyof Omit<Database, '__InternalSupabase'>>(
     supabaseUrl: string,
     supabaseKey: string,
     options: SupabaseClientOptions<SchemaName> & {

@@ -1,13 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+import type { Database } from '../db/database.types.js'
 import { supabaseClient } from '../db/supabase.client.js'
 
 // Infer types from SupabaseClient to avoid direct imports from internal packages
 // Using a helper type to extract the callback parameter type
-type OnAuthStateChangeCallback = SupabaseClient<any>['auth']['onAuthStateChange'] extends (
+type OnAuthStateChangeCallback = SupabaseClient<Database>['auth']['onAuthStateChange'] extends (
   callback: infer C
-) => any
-  ? C extends (event: infer E, session: infer S) => any
+) => unknown
+  ? C extends (event: infer E, session: infer S) => unknown
     ? { event: E; session: S }
     : never
   : never
