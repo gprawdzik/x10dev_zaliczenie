@@ -3,8 +3,17 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabaseClient } from '../db/supabase.client.js'
 
 // Infer types from SupabaseClient to avoid direct imports from internal packages
-type AuthChangeEvent = Parameters<Parameters<SupabaseClient['auth']['onAuthStateChange']>[0]>[0]
-type Session = NonNullable<Awaited<ReturnType<SupabaseClient['auth']['getSession']>>['data']['session']>
+// Using a helper type to extract the callback parameter type
+type OnAuthStateChangeCallback = SupabaseClient<any>['auth']['onAuthStateChange'] extends (
+  callback: infer C
+) => any
+  ? C extends (event: infer E, session: infer S) => any
+    ? { event: E; session: S }
+    : never
+  : never
+
+type AuthChangeEvent = OnAuthStateChangeCallback['event']
+type Session = NonNullable<OnAuthStateChangeCallback['session']>
 
 const getEmailRedirectUrl = () => {
   if (typeof window === 'undefined') {

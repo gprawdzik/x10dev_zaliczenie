@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { createBrowserClient } from '@supabase/ssr'
-import type { CookieOptions } from '@supabase/ssr'
+import type { SerializeOptions } from 'cookie'
 
 import type { Database } from '../db/database.types.js'
+
+type CookieOptions = Partial<SerializeOptions>
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_KEY

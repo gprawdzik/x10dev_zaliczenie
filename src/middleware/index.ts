@@ -1,9 +1,11 @@
 import { defineMiddleware } from 'astro:middleware'
 import { createServerClient } from '@supabase/ssr'
-import type { CookieOptions } from '@supabase/ssr'
+import type { SerializeOptions } from 'cookie'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/db/database.types.js'
+
+type CookieOptions = Partial<SerializeOptions>
 
 const protectedRoutes = [
   '/',
