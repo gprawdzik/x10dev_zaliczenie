@@ -1,13 +1,13 @@
 import { defineConfig } from 'astro/config'
 import vue from '@astrojs/vue'
 // import tailwind from '@astrojs/tailwind'
-import node from '@astrojs/node'
+import cloudflare from "@astrojs/cloudflare";
 import tailwindcss from '@tailwindcss/vite'
 
 // https://astro.build/config
 export default defineConfig({
   // Adapter Node.js - wymagany dla server-rendered endpoints
-  adapter: node({
+  adapter: cloudflare({
     mode: 'standalone',
   }),
   integrations: [
