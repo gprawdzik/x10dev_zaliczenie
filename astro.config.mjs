@@ -7,9 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://astro.build/config
 export default defineConfig({
   // Adapter Node.js - wymagany dla server-rendered endpoints
-  adapter: cloudflare({
-    mode: 'standalone',
-  }),
+  adapter: cloudflare(),
   integrations: [
     // Vue integration - pozwala używać komponentów Vue jako islands
     vue({
