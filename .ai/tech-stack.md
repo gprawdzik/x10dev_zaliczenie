@@ -24,4 +24,4 @@ Testing:
 CI/CD i Hosting:
 
 - Github Actions do tworzenia pipeline'ów CI/CD
-- mikr.us do hostowania aplikacji za pośrednictwem obrazu docker
+- Cloudflare Pages do hostowania aplikacji

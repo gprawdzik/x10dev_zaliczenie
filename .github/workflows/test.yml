@@ -89,33 +89,3 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 30
-
-  build:
-    name: Build Production
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [lint, test]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --force
-
-      - name: Build production
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: production-build
-          path: dist
-          retention-days: 7

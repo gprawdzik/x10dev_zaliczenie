@@ -1,6 +1,7 @@
 # StravaGoals
 
 [![Testing CI](https://github.com/gprawdzik/x10dev_zaliczenie/actions/workflows/test.yml/badge.svg)](https://github.com/gprawdzik/x10dev_zaliczenie/actions/workflows/test.yml)
+[![Deploy to Cloudflare Pages](https://github.com/gprawdzik/x10dev_zaliczenie/actions/workflows/master.yml/badge.svg)](https://github.com/gprawdzik/x10dev_zaliczenie/actions/workflows/master.yml)
 
 ## Description
 
@@ -12,7 +13,7 @@ StravaGoals is a web application that enables users to define, track, and visual
 - **Backend:** Supabase
 - **AI Module:** Openrouter.ai
 - **Testing:** Vitest (unit & component tests), Vue Test Utils, Playwright (E2E tests)
-- **CI/CD & Hosting:** GitHub Actions (CI pipelines), mikr.us (Docker hosting)
+- **CI/CD & Hosting:** GitHub Actions (CI/CD pipelines), Cloudflare Pages (hosting)
 
 ## Getting Started Locally
 
@@ -76,6 +77,10 @@ The app will be available at `http://localhost:4321` by default (Astro developme
 - `npm run lint` : Run ESLint and auto-fix issues
 - `npm run format` : Run Prettier formatter on source files
 
+### Deployment
+
+- `npm run deploy` : Build and deploy to Cloudflare Pages
+
 > **Note:** Before running E2E tests for the first time, install Playwright browsers with `npx playwright install chromium`. See [TESTING_SETUP.md](TESTING_SETUP.md) for complete setup instructions.
 
 ## Testing
@@ -119,11 +124,11 @@ Optional flags:
 
 ## CI/CD
 
-This project uses GitHub Actions for continuous integration and testing. The pipeline automatically runs on every push and pull request to the `main` branch.
+This project uses GitHub Actions for continuous integration, testing, and deployment.
 
-### Pipeline Steps
+### Testing Pipeline (`test.yml`)
 
-Pipeline składa się z 3 niezależnych jobów:
+Runs on every push and pull request to the `main` branch:
 
 1. **Lint** (parallel) - Code quality checks (oxlint + eslint) - ~2-3 min
 2. **Test** (parallel) - Unit tests with coverage + E2E browser tests (Vitest + Playwright) - ~7-8 min
@@ -131,25 +136,39 @@ Pipeline składa się z 3 niezależnych jobów:
 
 Total time: ~8-10 minutes (parallel execution)
 
-### Configuration
-
-To run the CI/CD pipeline, configure the following GitHub Secrets in your repository:
-
+**Required GitHub Secrets (test environment):**
 - `PUBLIC_SUPABASE_URL` - Your Supabase project URL
 - `PUBLIC_SUPABASE_KEY` - Supabase anon/public API key
 - `E2E_USERNAME` - Email of the dedicated E2E test user
 - `E2E_PASSWORD` - Password for the E2E test user
 - `E2E_USERNAME_ID` - UUID of the E2E test user in Supabase
 
-For detailed CI/CD setup instructions, see [docs/35_ci_cd_configuration.md](docs/35_ci_cd_configuration.md) or [.github/CI_CD_SETUP.md](.github/CI_CD_SETUP.md).
-
-### Artifacts
-
-The pipeline generates the following artifacts:
-
+**Artifacts:**
 - **Coverage Report** (30 days retention) - HTML coverage report from unit tests
 - **Playwright Report** (30 days retention, on failure) - Detailed E2E test results with screenshots and videos
 - **Production Build** (7 days retention, on success) - Compiled application ready for deployment
+
+### Deployment Pipeline (`master.yml`)
+
+Automatically deploys to Cloudflare Pages on every push to the `main` branch:
+
+1. **Lint** - Code quality validation
+2. **Unit Tests** - Run tests with coverage (E2E tests skipped for faster deployment)
+3. **Build** - Create production build
+4. **Deploy** - Deploy to Cloudflare Pages
+
+**Required GitHub Secrets (production environment):**
+- `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Pages edit permissions
+- `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare account ID
+- `PUBLIC_SUPABASE_URL` - Supabase project URL for production
+- `PUBLIC_SUPABASE_KEY` - Supabase anon/public API key for production
+
+**Deployment URL:** https://stravagoals.pages.dev
+
+For detailed CI/CD setup instructions, see:
+- [docs/35_ci_cd_configuration.md](docs/35_ci_cd_configuration.md) - Testing pipeline setup
+- [docs/36_cloudflare_deployment_setup.md](docs/36_cloudflare_deployment_setup.md) - Cloudflare deployment setup
+- [.github/CI_CD_SETUP.md](.github/CI_CD_SETUP.md) - General CI/CD configuration
 
 ## Project Scope
 
@@ -287,8 +306,8 @@ All API routes live under `src/pages/api`. Each endpoint expects a valid Supabas
 - ✅ MVP features fully implemented and available for local testing
 - ✅ Comprehensive test suite (unit + E2E) with coverage reporting
 - ✅ CI/CD pipeline configured with GitHub Actions
+- ✅ Cloudflare Pages deployment configured with automated CI/CD
 - ⏳ Environment variable configuration pending (placeholders provided above)
-- ⏳ Production hosting configuration (mikr.us) planned but not yet deployed
 
 For detailed product requirements, see the [PRD document](.ai/prd.md).
 
