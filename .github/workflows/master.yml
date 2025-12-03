@@ -1,9 +1,6 @@
 name: Deploy to Cloudflare Pages
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -66,6 +63,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [lint, test]
+
+    environment:
+      name: production
+
+    env:
+      PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+      PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
 
     steps:
       - name: Checkout code
