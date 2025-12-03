@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/wrangler/main/wrangler-schema.json",
-  "name": "strava-goals",
+  "name": "stravagoals",
   "compatibility_date": "2025-12-03",
   "compatibility_flags": ["nodejs_compat"],
   "main": "dist/_worker.js",
