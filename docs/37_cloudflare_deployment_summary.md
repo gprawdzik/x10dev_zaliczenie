@@ -47,8 +47,7 @@ Deployment pipeline with 4 jobs:
 **Total Pipeline Time:** ~10-15 minutes
 
 **Triggers:**
-- Push to `main` branch
-- Manual workflow dispatch
+- Manual workflow dispatch only (workflow_dispatch)
 
 **GitHub Secrets Required:**
 - `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Pages edit permissions
@@ -129,13 +128,36 @@ All versions are the latest stable major versions as of December 2025.
 
 ## Setup Requirements
 
+### Step 0: Create Cloudflare Pages Project (REQUIRED FIRST)
+
+**⚠️ The project must exist before running the deployment workflow!**
+
+Choose one method:
+
+**Method 1: Using Wrangler CLI (Recommended)**
+```bash
+npm install -g wrangler
+wrangler login
+wrangler pages project create stravagoals
+wrangler pages project list  # Verify
+```
+
+**Method 2: Using Cloudflare Dashboard**
+1. Go to Cloudflare Dashboard > Workers & Pages
+2. Click "Create application > Pages"
+3. Choose "Direct Upload"
+4. Name: "stravagoals"
+5. Click "Create project"
+
+### Step 1: Configure GitHub Secrets
+
 To activate the deployment pipeline, configure the following in GitHub:
 
-### 1. Create Production Environment
+### Step 2: Create Production Environment
 1. Go to: `Settings > Environments`
 2. Create new environment: `production`
 
-### 2. Add Cloudflare Secrets
+### Step 3: Add Cloudflare Secrets
 In the production environment, add:
 - `CLOUDFLARE_API_TOKEN`
   - Create at: https://dash.cloudflare.com/profile/api-tokens
@@ -144,15 +166,10 @@ In the production environment, add:
 - `CLOUDFLARE_ACCOUNT_ID`
   - Find in: Cloudflare Dashboard URL or sidebar
 
-### 3. Add Supabase Secrets
+### Step 4: Add Supabase Secrets
 In the production environment, add:
 - `PUBLIC_SUPABASE_URL` - Production Supabase project URL
 - `PUBLIC_SUPABASE_KEY` - Production Supabase anon key
-
-### 4. Verify Cloudflare Pages Project
-Ensure project "stravagoals" exists in Cloudflare Dashboard:
-- Go to: `Workers & Pages > stravagoals`
-- Or create new project with name "stravagoals"
 
 ## Deployment URL
 
@@ -235,9 +252,9 @@ L2:2: Expected a scalar value, a sequence, or a mapping
 
 ## Next Steps
 
-1. ✅ Configure GitHub Secrets in production environment
-2. ✅ Verify Cloudflare Pages project exists
-3. ✅ Test deployment by pushing to main branch
+1. ⏳ **Create Cloudflare Pages project "stravagoals"** (required before first deployment)
+2. ⏳ Configure GitHub Secrets in production environment
+3. ⏳ Test deployment by manually triggering workflow
 4. ⏳ Monitor first deployment
 5. ⏳ Configure custom domain (optional)
 6. ⏳ Set up monitoring and notifications

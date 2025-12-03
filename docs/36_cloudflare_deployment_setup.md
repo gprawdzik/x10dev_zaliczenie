@@ -40,6 +40,28 @@ The following packages are required for Cloudflare deployment:
 - `@astrojs/cloudflare`: ^12.6.12 (Astro adapter for Cloudflare)
 - Wrangler CLI is available via npx for deployment
 
+## Prerequisites: Create Cloudflare Pages Project
+
+**⚠️ CRITICAL:** Before running the deployment workflow for the first time, you must create the Cloudflare Pages project.
+
+### Quick Setup
+
+**Using Wrangler CLI (Recommended):**
+```bash
+npm install -g wrangler
+wrangler login
+wrangler pages project create stravagoals
+```
+
+**Or via Cloudflare Dashboard:**
+1. Go to https://dash.cloudflare.com/
+2. Navigate to Workers & Pages
+3. Click "Create application > Pages > Direct Upload"
+4. Name: "stravagoals"
+5. Click "Create project"
+
+If you see error "Project not found [code: 8000007]", the project hasn't been created yet.
+
 ## GitHub Actions Workflow
 
 ### Workflow File: `.github/workflows/master.yml`
@@ -68,8 +90,7 @@ The deployment workflow consists of four jobs:
 ### Workflow Triggers
 
 The workflow is triggered on:
-- Push to `main` branch
-- Manual workflow dispatch via GitHub Actions UI
+- Manual workflow dispatch via GitHub Actions UI only
 
 ### Required GitHub Secrets
 
@@ -110,12 +131,19 @@ This command:
 
 ### CI/CD Deployment
 
-Automatic deployment happens when:
-1. Code is pushed to the `main` branch
+Manual deployment is triggered via GitHub Actions UI when:
+1. Workflow is manually dispatched
 2. All lint checks pass
 3. All unit tests pass
 4. Production build completes successfully
 5. Wrangler deploys the built application to Cloudflare Pages
+
+**To trigger manually:**
+1. Go to GitHub repository > Actions tab
+2. Select "Deploy to Cloudflare Pages" workflow
+3. Click "Run workflow" button
+4. Select branch (default: main)
+5. Click "Run workflow"
 
 ### Deployment URL
 

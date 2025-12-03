@@ -123,4 +123,4 @@ Logowanie błędów: konsola + monitoring (np. Sentry w Astro integrations), opc
 7. **CI** – uruchom lint + testy.
 8. **Dokumentacja** – aktualizacja OpenAPI / README.
 9. **Code review & merge**.
-10. **Deployment** – GitHub Actions → Docker image → mikr.us.
+10. **Deployment** – GitHub Actions → Docker image → Cloudflare Pages.

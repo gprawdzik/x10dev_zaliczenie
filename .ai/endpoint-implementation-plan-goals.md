@@ -125,7 +125,7 @@ Brak body.
 6. **Docs & README**
    - [ ] Zaktualizować `docs/…` + OpenAPI generator (opcjonalnie).
 7. **CI/CD**
-   - [ ] Dodać lint + test job, wdrożenie na mikr.us po merge.
+   - [ ] Dodać lint + test job, wdrożenie na Cloudflare Pages po merge.
 
 ---
 

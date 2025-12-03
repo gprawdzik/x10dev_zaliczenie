@@ -150,7 +150,7 @@ Total time: ~8-10 minutes (parallel execution)
 
 ### Deployment Pipeline (`master.yml`)
 
-Automatically deploys to Cloudflare Pages on every push to the `main` branch:
+Deploys to Cloudflare Pages when manually triggered:
 
 1. **Lint** - Code quality validation
 2. **Unit Tests** - Run tests with coverage (E2E tests skipped for faster deployment)

@@ -1,4 +1,4 @@
-Poniższa analiza odnosi się punkt-po-punkcie do sześciu pytań, zestawiając wymagania z PRD StravaGoals z proponowanym zestawem technologii (Astro 5 + Vue 3.5 + TS 5 + Tailwind 4.1, Supabase, Openrouter.ai, GitHub Actions, mikr.us).
+Poniższa analiza odnosi się punkt-po-punkcie do sześciu pytań, zestawiając wymagania z PRD StravaGoals z proponowanym zestawem technologii (Astro 5 + Vue 3.5 + TS 5 + Tailwind 4.1, Supabase, Openrouter.ai, GitHub Actions, Cloudflare Pages).
 
 1. Szybkie dostarczenie MVP
    - Astro domyślnie renderuje statycznie i ma niski próg konfiguracji – proste strony (landing, auth, dashboard) powstaną bardzo szybko.
@@ -15,7 +15,7 @@ Poniższa analiza odnosi się punkt-po-punkcie do sześciu pytań, zestawiając 
      Werdykt: Umiarkowanie skalowalne; wystarczy do v1–v2, później może wymagać przeniesienia cięższych zadań do dedykowanych mikroserwisów.
 
 3. Koszt utrzymania i rozwoju
-   - Astro generuje statyczne pliki ⇒ hosting na mikr.us minimalny koszt.
+   - Astro generuje statyczne pliki ⇒ hosting na Cloudflare Pages minimalny koszt.
    - Supabase ma darmowy tier z 500 MB bazy, 50k użytkowników anonowych i 500k requ miesięcznie – mieści MVP.
    - Openrouter.ai płaci się per-zapytanie; nasz moduł AI jest „na żądanie”, więc koszt rośnie liniowo do użycia.  
      − Jeżeli AI-generacja celów stanie się kluczowa i częsta, opłaty za Openrouter mogą znacząco wzrosnąć (brak lokalnego modelu).  
@@ -38,7 +38,7 @@ Poniższa analiza odnosi się punkt-po-punkcie do sześciu pytań, zestawiając 
    - Astro generuje statyczne pliki ⇒ brak klasycznych luk SSR/CSRF po stronie frontu.
    - GitHub Actions z obrazem Docker ułatwia skanowanie zależności i powtarzalne buildy.  
      − Moduł AI wysyła dane użytkownika do Openrouter.ai – trzeba dokładnie zanonimizować payloady, by nie łamać GDPR.  
-     − mikr.us wymaga konfiguracji HTTPS i nagłówków bezpieczeństwa; Astro to wspiera, trzeba tylko ustawić.  
+     − Cloudflare Pages wymaga konfiguracji HTTPS i nagłówków bezpieczeństwa; Astro to wspiera, trzeba tylko ustawić.  
      Werdykt: Stack umożliwia wdrożenie solidnych zabezpieczeń; kluczowy obszar ryzyka to transfer danych do usług AI.
 
 Rekomendacja końcowa  

@@ -29,7 +29,7 @@ Cel: szybko zweryfikować podstawową funkcjonalność aplikacji StravaGoals, be
    - Frontend: Vue 3 + TypeScript + Tailwind 4  
    - Backend: Supabase (Auth, PostgreSQL, real-time, Storage)  
    - CI/CD: GitHub Actions  
-   - Hosting PoC: mikr.us w Dockerze  
+   - Hosting PoC: Cloudflare Pages w Dockerze  
 4. **Plan pracy i harmonogram**  
    1) **Projekt architektury** (endpoints, modele danych, układ komponentów)  
    2) **Implementacja backendu**  

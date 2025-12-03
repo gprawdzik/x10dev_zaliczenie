@@ -4,12 +4,24 @@
 
 This guide explains how to configure and use the Cloudflare Pages deployment pipeline for the StravaGoals application.
 
+## ⚠️ Important: First-Time Setup
+
+**Before running the deployment workflow, you must create the Cloudflare Pages project first!**
+
+If you see this error:
+
+```
+✘ [ERROR] Project not found. The specified project name does not match any of your existing projects.
+```
+
+Jump to the [Create Cloudflare Pages Project](#3-create-cloudflare-pages-project) section below.
+
 ## Prerequisites
 
 Before deploying to Cloudflare Pages, ensure you have:
 
 1. A Cloudflare account
-2. A Cloudflare Pages project named "stravagoals"
+2. A Cloudflare Pages project named "stravagoals" (see setup instructions below)
 3. GitHub repository with the code
 4. Supabase project for production
 
@@ -36,12 +48,54 @@ Before deploying to Cloudflare Pages, ensure you have:
 
 ### 3. Create Cloudflare Pages Project
 
-The project should already exist with the name "stravagoals". If not:
+**IMPORTANT:** The project must be created before running the deployment workflow.
 
-1. Go to **Workers & Pages** in Cloudflare Dashboard
-2. Click **Create application > Pages**
-3. You can create an empty project or connect to GitHub
-4. Name it **stravagoals** (must match `wrangler.json` configuration)
+#### Option 1: Create via Cloudflare Dashboard
+
+1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Go to **Workers & Pages**
+3. Click **Create application**
+4. Select **Pages** tab
+5. Click **Connect to Git** or **Direct Upload**
+
+**For Direct Upload:**
+
+- Click **Direct Upload**
+- Name your project: **stravagoals** (must match `wrangler.json`)
+- You'll see "No deployments yet" - this is expected
+- The GitHub Actions workflow will handle deployments
+
+**For Connect to Git (alternative):**
+
+- Connect your GitHub repository
+- Select the repository
+- Configure build settings:
+  - Framework preset: **Astro**
+  - Build command: **npm run build**
+  - Build output directory: **dist**
+- Name: **stravagoals**
+- Click **Save and Deploy** (first deployment)
+- After initial setup, GitHub Actions will handle future deployments
+
+#### Option 2: Create via Wrangler CLI (Recommended for CI/CD)
+
+If you want to create the project via command line:
+
+```bash
+# Install wrangler globally (if not already installed)
+npm install -g wrangler
+
+# Login to Cloudflare
+wrangler login
+
+# Create the Pages project
+wrangler pages project create stravagoals
+
+# Verify project was created
+wrangler pages project list
+```
+
+This will create an empty project that the GitHub Actions workflow can deploy to.
 
 ## GitHub Repository Setup
 
@@ -57,10 +111,12 @@ Navigate to your GitHub repository:
 3. Add the following secrets:
 
 **Cloudflare Secrets:**
+
 - `CLOUDFLARE_API_TOKEN` - The API token created in step 1
 - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare account ID from step 2
 
 **Supabase Secrets:**
+
 - `PUBLIC_SUPABASE_URL` - Your production Supabase project URL
   - Format: `https://xxxxxxxxxxxxxxxxxxxxxxxxx.supabase.co`
   - Find in: Supabase Dashboard > Project Settings > API
@@ -80,7 +136,7 @@ You can add protection rules to the production environment:
 
 ### Automatic Deployment
 
-The deployment happens automatically when:
+The deployment happens manually when:
 
 1. Code is pushed to the `main` branch
 2. All linting checks pass
@@ -102,17 +158,20 @@ You can also trigger deployment manually:
 The deployment workflow (`.github/workflows/master.yml`) consists of 4 jobs:
 
 ### 1. Lint Job
+
 - Runs code quality checks (oxlint, eslint)
 - Fails if code quality issues are found
 - Duration: ~2-3 minutes
 
 ### 2. Test Job
+
 - Runs unit tests with Vitest
 - Generates code coverage report
 - Skips E2E tests for faster deployment
 - Duration: ~5-7 minutes
 
 ### 3. Build Job
+
 - Compiles the Astro application
 - Creates production-ready build
 - Uploads build artifacts
@@ -120,6 +179,7 @@ The deployment workflow (`.github/workflows/master.yml`) consists of 4 jobs:
 - Duration: ~2-3 minutes
 
 ### 4. Deploy Job
+
 - Downloads build artifacts
 - Deploys to Cloudflare Pages using Wrangler
 - Sets up environment variables
@@ -164,25 +224,65 @@ You can also configure a custom domain in Cloudflare Pages settings.
 **Cause:** Invalid or missing `CLOUDFLARE_API_TOKEN`
 
 **Solution:**
+
 1. Verify the token is correctly set in GitHub Secrets
 2. Check if the token has expired
 3. Ensure the token has "Cloudflare Pages - Edit" permission
 4. Create a new token if necessary
 
-### Deployment Fails with "Project not found"
+### Deployment Fails with "Project not found" (Error Code: 8000007)
 
-**Cause:** The Cloudflare Pages project doesn't exist or name mismatch
+**Error Message:**
+
+```
+✘ [ERROR] A request to the Cloudflare API (/accounts/***/pages/projects/stravagoals) failed.
+Project not found. The specified project name does not match any of your existing projects.
+```
+
+**Cause:** The Cloudflare Pages project "stravagoals" hasn't been created yet.
 
 **Solution:**
-1. Verify project "stravagoals" exists in Cloudflare Dashboard
-2. Check `wrangler.json` - ensure `name` is "stravagoals"
-3. Verify `CLOUDFLARE_ACCOUNT_ID` is correct
+
+**Option A: Create via Wrangler CLI (Fastest)**
+
+```bash
+# Install wrangler if needed
+npm install -g wrangler
+
+# Login to Cloudflare
+wrangler login
+
+# Create the project
+wrangler pages project create stravagoals
+
+# Verify it was created
+wrangler pages project list
+```
+
+**Option B: Create via Cloudflare Dashboard**
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Navigate to **Workers & Pages**
+3. Click **Create application > Pages**
+4. Choose **Direct Upload**
+5. Name the project: **stravagoals**
+6. Click **Create project**
+
+**Option C: Verify Existing Project**
+
+1. Check if project exists in Cloudflare Dashboard
+2. Verify project name matches exactly: "stravagoals" (case-sensitive)
+3. Ensure `wrangler.json` has correct project name
+4. Verify `CLOUDFLARE_ACCOUNT_ID` secret is correct
+
+After creating the project, re-run the GitHub Actions workflow.
 
 ### Build Succeeds but Application Errors
 
 **Cause:** Missing or incorrect environment variables
 
 **Solution:**
+
 1. Check `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_KEY` in GitHub Secrets
 2. Verify Supabase project is accessible
 3. Check Cloudflare Pages deployment logs for runtime errors
@@ -193,6 +293,7 @@ You can also configure a custom domain in Cloudflare Pages settings.
 **Cause:** GitHub Actions or Cloudflare processing delays
 
 **Solution:**
+
 1. Check GitHub Actions status page for incidents
 2. Verify Cloudflare status page
 3. Consider using GitHub Actions caching (already implemented)
@@ -224,6 +325,7 @@ npm run test:e2e
 If a deployment causes issues:
 
 ### Option 1: Deploy Previous Commit
+
 ```bash
 # Find the previous working commit
 git log
@@ -236,6 +338,7 @@ git push origin rollback
 ```
 
 ### Option 2: Use Cloudflare Rollback
+
 1. Go to Cloudflare Dashboard > Workers & Pages > stravagoals
 2. Find the previous successful deployment
 3. Click **...** menu > **Rollback to this deployment**
@@ -246,6 +349,7 @@ git push origin rollback
 ### GitHub Actions Notifications
 
 Configure GitHub notifications for workflow failures:
+
 1. Go to **Settings > Notifications**
 2. Enable **Actions** under "Email notifications"
 3. You'll receive emails when workflows fail
@@ -253,6 +357,7 @@ Configure GitHub notifications for workflow failures:
 ### Cloudflare Pages Notifications
 
 Configure Cloudflare notifications:
+
 1. Go to **Notifications** in Cloudflare Dashboard
 2. Create a new notification
 3. Choose **Pages** events
@@ -308,4 +413,3 @@ If you encounter issues:
 3. Review workflow logs in GitHub Actions
 4. Review deployment logs in Cloudflare Dashboard
 5. Consult the troubleshooting section above
-

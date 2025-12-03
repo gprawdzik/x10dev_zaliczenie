@@ -58,47 +58,11 @@ jobs:
           path: coverage
           retention-days: 30
 
-  build:
-    name: Build Production
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [lint, test]
-
-    environment:
-      name: production
-
-    env:
-      PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
-      PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --force
-
-      - name: Build production
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-build
-          path: dist
-          retention-days: 7
-
   deploy:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [build]
+    needs: [lint, test]
     environment:
       name: production
       url: ${{ steps.deploy.outputs.url }}

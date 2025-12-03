@@ -1010,7 +1010,7 @@ const supabase = createServerClient(
    - Refresh token: 30 dni (domyślnie)
 
 4. **URL Configuration:**
-   - Site URL: `https://your-app.mikr.us` (produkcja) lub `http://localhost:4321` (dev)
+   - Site URL: `https://your-app.cloudflare.dev` (produkcja) lub `http://localhost:4321` (dev)
    - Redirect URLs: Whitelist dla `{SITE_URL}/auth/callback`
 
 ### 4.2. Row Level Security (RLS)

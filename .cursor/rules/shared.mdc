@@ -28,7 +28,7 @@ Openrouter.ai
 
 GitHub Actions for building CI/CD pipelines
 
-mikr.us for hosting the application via a Docker image
+Cloudflare Pages for hosting the application via a Docker image
 
 ## Project Structure
 

@@ -17,7 +17,7 @@ AI
 CI/CD i Hosting:
 
 - Github Actions do tworzenia pipeline’ów CI/CD
-- mikr.us do hostowania aplikacji za pośrednictwem obrazu docker
+- Cloudflare Pages do hostowania aplikacji za pośrednictwem obrazu docker
 
 AI
 
@@ -26,7 +26,7 @@ AI
 CI/CD i Hosting:
 
 - Github Actions do tworzenia pipeline’ów CI/CD
-- mikr.us do hostowania aplikacji za pośrednictwem obrazu docker
+- Cloudflare Pages do hostowania aplikacji za pośrednictwem obrazu docker
   </tech-stack>
 
 Dokonaj krytycznej lecz rzeczowej analizy czy <tech-stack> odpowiednio adresuje potrzeby @prd.md. Rozważ następujące pytania:
