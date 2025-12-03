@@ -2,22 +2,5 @@
   "$schema": "https://raw.githubusercontent.com/cloudflare/wrangler/main/wrangler-schema.json",
   "name": "stravagoals",
   "compatibility_date": "2025-12-03",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "dist/_worker.js",
-  "assets": {
-    "directory": "dist"
-  },
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
-  },
-  "placement": {
-    "mode": "smart"
-  },
-  "vars": {
-    "NODE_VERSION": "20"
-  },
-  "build": {
-    "command": "npm run build"
-  }
+  "pages_build_output_dir": "dist"
 }
