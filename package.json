@@ -11,6 +11,7 @@
     "dev:e2e": "astro dev --mode test",
     "build": "astro check && astro build",
     "preview": "astro preview",
+    "deploy": "astro build && wrangler pages deploy dist --project-name=stravagoals",
     "astro": "astro",
     "test:unit": "vitest",
     "test:unit:watch": "vitest --watch",
