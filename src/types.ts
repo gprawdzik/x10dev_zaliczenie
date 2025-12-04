@@ -7,7 +7,7 @@ export type CreateSportDto = Omit<TablesInsert<"sports">, "id">;
 // Goal DTOs
 export type GoalDto = Tables<"goals">;
 export type CreateGoalDto = Omit<TablesInsert<"goals">, "id" | "created_at" | "user_id">;
-export type UpdateGoalDto = Partial<Pick<TablesUpdate<"goals">, "metric_type" | "target_value">>;
+export type UpdateGoalDto = Pick<TablesUpdate<"goals">, "target_value">;
 
 // Goal History DTO
 export type GoalHistoryDto = Tables<"goal_history">;

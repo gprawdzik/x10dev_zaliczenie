@@ -129,21 +129,18 @@ export type Database = {
           changed_at: string | null
           goal_id: string
           id: string
-          previous_metric_type: Database["public"]["Enums"]["goal_metric_type"]
           previous_target_value: number
         }
         Insert: {
           changed_at?: string | null
           goal_id: string
           id?: string
-          previous_metric_type: Database["public"]["Enums"]["goal_metric_type"]
           previous_target_value: number
         }
         Update: {
           changed_at?: string | null
           goal_id?: string
           id?: string
-          previous_metric_type?: Database["public"]["Enums"]["goal_metric_type"]
           previous_target_value?: number
         }
         Relationships: [
@@ -165,7 +162,6 @@ export type Database = {
           sport_id: string | null
           target_value: number
           user_id: string
-          year: number
         }
         Insert: {
           created_at?: string | null
@@ -175,7 +171,6 @@ export type Database = {
           sport_id?: string | null
           target_value: number
           user_id: string
-          year: number
         }
         Update: {
           created_at?: string | null
@@ -185,7 +180,6 @@ export type Database = {
           sport_id?: string | null
           target_value?: number
           user_id?: string
-          year?: number
         }
         Relationships: [
           {
