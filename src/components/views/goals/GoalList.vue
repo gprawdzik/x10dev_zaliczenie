@@ -30,8 +30,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import { Skeleton } from '@/components/ui/skeleton/index.js';
 
 import GoalCard from './GoalCard.vue';

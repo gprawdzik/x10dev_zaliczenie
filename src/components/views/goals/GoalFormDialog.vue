@@ -96,6 +96,15 @@ import FormStatus from '@/components/ui/FormStatus.vue'
 
 import type { GoalDto, SportDto } from '../../../types.js'
 
+type GoalFormPayload =
+  | { target_value: number }
+  | {
+      scope_type: 'global' | 'per_sport'
+      sport_id: string | null
+      metric_type: 'distance' | 'time' | 'elevation_gain'
+      target_value: number
+    }
+
 interface Props {
   open: boolean
   mode: 'create' | 'edit'
@@ -109,7 +118,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   close: []
-  save: [data: any]
+  save: [data: GoalFormPayload]
 }>()
 
 const isSubmitting = ref(false)

@@ -49,7 +49,7 @@
             </svg>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent>
           <DropdownMenuItem @click="$emit('edit', goal)"> Edytuj </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="$emit('delete', goal)" class="text-destructive">

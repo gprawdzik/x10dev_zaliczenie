@@ -3,9 +3,9 @@ import { ref, computed } from 'vue';
 import type { GoalDto, Paginated } from '../types.js';
 import type { GoalsQuery } from '../validators/goals.js';
 
-type UseGoalsOptions = Partial<{}>;
+type UseGoalsOptions = Record<string, never>;
 
-export function useGoals(options: UseGoalsOptions = {}) {
+export function useGoals(_options: UseGoalsOptions = {}) {
   const isServer = typeof window === 'undefined';
   const goals = ref<GoalDto[]>([]);
   const isLoading = ref(false);
