@@ -4,59 +4,36 @@ Zanim zaczniemy, zapoznaj się z poniższymi informacjami:
 
 1. Route API specification:
    <route_api_specification>
-   List activities
-
-- Method: GET
-- Path: `/api/activities`
-- Query params: `from` (gte start_date), `to` (lte start_date), `sport_type` (eq), `type` (eq), `page`, `limit`, `sort_by`, `sort_dir`
-- Response 200 JSON: array of activities
-
-```json
-[
-  {
-    "id": "uuid",
-    "user_id": "uuid",
-    "name": "Lunch Run",
-    "type": "Run",
-    "sport_type": "running",
-    "start_date": "2025-09-01T12:00:00Z",
-    "start_date_local": "2025-09-01T14:00:00+02:00",
-    "timezone": "Europe/Warsaw",
-    "utc_offset": 7200,
-    "distance": 10000,
-    "moving_time": "3600s",
-    "elapsed_time": "3700s",
-    "total_elevation_gain": 120,
-    "average_speed": 2.7
-  }
-]
-```
-
-- Errors: 401
-
-Generate 100 activities for last 12 months (per PRD)
+   Annual cumulative progress for charts (My Goals)
 
 - Method: POST
-- Path: `/api/activities-generate`
-- Description: Simulates 100 activities using defined distributions; inserts into `activities` for the authenticated user.
-- Body JSON (optional overrides):
+- Path: `/functions/v1/progress-annual`
+- Body JSON:
 
 ```json
 {
-  "primary_sports": ["running", "cycling", "swimming", "hiking"],
-  "distribution": { "primary": 0.5, "secondary": 0.3, "tertiary": 0.15, "quaternary": 0.05 },
-  "timezone": "Europe/Warsaw"
+  "year": 2025,
+  "metric_type": "distance",
+  "sport_id": null
 }
 ```
 
-- Response 201 JSON:
+- Response 200 JSON:
 
 ```json
-{ "created_count": 100 }
+{
+  "year": 2025,
+  "metric_type": "distance",
+  "scope_type": "global",
+  "series": [
+    { "date": "2025-01-01", "value": 0 },
+    { "date": "2025-01-02", "value": 5000 }
+  ],
+  "target_value": 2000000
+}
 ```
 
-- Errors: 401, 422 (invalid overrides), 500
-  </route_api_specification>
+</route_api_specification>
 
 2. Related database resources:
    <related_db_resources>
@@ -166,5 +143,5 @@ Końcowym wynikiem powinien być dobrze zorganizowany plan wdrożenia w formacie
 
 Końcowe wyniki powinny składać się wyłącznie z planu wdrożenia w formacie markdown i nie powinny powielać ani powtarzać żadnej pracy wykonanej w sekcji analizy.
 
-Pamiętaj, aby zapisać swój plan wdrożenia jako .ai/activity-implementation-plan.md. Upewnij się, że plan jest szczegółowy, przejrzysty i zapewnia kompleksowe wskazówki dla zespołu programistów.
+Pamiętaj, aby zapisać swój plan wdrożenia jako .ai/endpoint-implementation-goal-progress.md. Upewnij się, że plan jest szczegółowy, przejrzysty i zapewnia kompleksowe wskazówki dla zespołu programistów.
 ```

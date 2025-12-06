@@ -66,7 +66,7 @@ Najpierw przejrzyj następujące informacje:
 
 5. Endpoint Implementation:
    <endpoint_implementation>
-   @goals.ts
+   @progress.ts
    </endpoint_implementation>
 
 6. Type Definitions:

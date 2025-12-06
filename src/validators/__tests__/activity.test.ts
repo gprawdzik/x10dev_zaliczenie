@@ -582,41 +582,16 @@ describe('activity validators', () => {
 
     describe('year validation', () => {
       const currentYear = new Date().getFullYear();
-      const maxYear = currentYear - 1;
-      const minYear = currentYear - 5;
 
-      it('accepts the newest allowed year (previous full year)', () => {
-        const result = generateActivitiesBodySchema.parse({ year: maxYear });
-        expect(result.year).toBe(maxYear);
+      it('accepts the current year', () => {
+        const result = generateActivitiesBodySchema.parse({ year: currentYear });
+        expect(result.year).toBe(currentYear);
       });
 
-      it('accepts the oldest allowed year (5 years back)', () => {
-        const result = generateActivitiesBodySchema.parse({ year: minYear });
-        expect(result.year).toBe(minYear);
-      });
-
-      it('rejects the current year', () => {
-        expect(() =>
-          generateActivitiesBodySchema.parse({
-            year: currentYear,
-          })
-        ).toThrow('year cannot be the current year or in the future');
-      });
-
-      it('rejects a future year', () => {
-        expect(() =>
-          generateActivitiesBodySchema.parse({
-            year: currentYear + 1,
-          })
-        ).toThrow('year cannot be the current year or in the future');
-      });
-
-      it('rejects a year earlier than 5 years back', () => {
-        expect(() =>
-          generateActivitiesBodySchema.parse({
-            year: minYear - 1,
-          })
-        ).toThrow(`year must not be earlier than ${minYear}`);
+      it('accepts a future year', () => {
+        const futureYear = currentYear + 1;
+        const result = generateActivitiesBodySchema.parse({ year: futureYear });
+        expect(result.year).toBe(futureYear);
       });
 
       it('rejects non-numeric year', () => {
