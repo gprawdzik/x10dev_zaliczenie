@@ -45,6 +45,7 @@ export async function getAnnualProgress(
   const { year, metric_type, sport_id } = params;
   const scope_type = sport_id ? 'per_sport' : 'global';
 
+  const goalTarget = await resolveGoalTarget(client, userId, metric_type, sport_id);
   const sportCode = sport_id ? await resolveSportCode(client, sport_id) : null;
   const activities = await fetchActivitiesForYear(client, userId, year, sportCode);
   const series = buildCumulativeSeries(activities, metric_type, year);
@@ -53,7 +54,7 @@ export async function getAnnualProgress(
     year,
     metric_type,
     scope_type,
-    target_value: 0,
+    target_value: normalizeTargetValue(metric_type, goalTarget),
     series,
   };
 }
@@ -276,6 +277,52 @@ function assertUserId(userId: string): void {
       'userId is required to load progress'
     );
   }
+}
+
+async function resolveGoalTarget(
+  client: ProgressSupabaseClient,
+  userId: string,
+  metric: ProgressAnnualRequest['metric_type'],
+  sportId: string | null
+): Promise<number> {
+  const scope = sportId ? 'per_sport' : 'global';
+
+  let query = client
+    .from('goals')
+    .select('target_value')
+    .eq('user_id', userId)
+    .eq('metric_type', metric)
+    .eq('scope_type', scope);
+
+  if (sportId) {
+    query = query.eq('sport_id', sportId);
+  } else {
+    query = query.is('sport_id', null);
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) {
+    console.error('Failed to resolve goal target for progress', error);
+    return 0;
+  }
+
+  return data?.target_value ?? 0;
+}
+
+function normalizeTargetValue(
+  metric: ProgressAnnualRequest['metric_type'],
+  value: number | null | undefined
+): number {
+  if (!Number.isFinite(value ?? 0)) {
+    return 0;
+  }
+
+  if (metric === 'time') {
+    // Stored in hours; convert to seconds to match activity series
+    return (value ?? 0) * 3600;
+  }
+
+  return value ?? 0;
 }
 
 let cachedSupabaseClient: ProgressSupabaseClient | null = null;

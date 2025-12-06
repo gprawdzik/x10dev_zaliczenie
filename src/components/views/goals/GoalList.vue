@@ -22,8 +22,10 @@
         :key="goal.id"
         :goal="goal"
         :sport-name="getSportName(goal.sport_id)"
+        :progress-value="props.progressMap[goal.id]"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
+        @progress="$emit('progress', $event)"
       />
     </div>
   </div>
@@ -40,15 +42,18 @@ interface Props {
   goals: GoalDto[];
   sports: Record<string, SportDto>;
   isLoading?: boolean;
+  progressMap?: Record<string, number>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
+  progressMap: () => ({}),
 });
 
 defineEmits<{
   edit: [goal: GoalDto];
   delete: [goal: GoalDto];
+  progress: [goal: GoalDto];
 }>();
 
 const getSportName = (sportId: string | null): string | undefined => {

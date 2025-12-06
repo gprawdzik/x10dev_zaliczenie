@@ -113,29 +113,32 @@ export function useAuth() {
         throw new Error('No user logged in');
       }
 
-      // UWAGA: Usuwanie konta w Supabase wymaga specjalnej implementacji
-      // Opcja 1: Wywołać RPC function która obsługuje usuwanie
-      // Opcja 2: Wywołać dedykowany endpoint API
-      // Opcja 3: Użyć admin API (tylko po stronie serwera)
-      
-      // Na potrzeby MVP używamy endpoint API
-      const response = await fetch('/api/user/account', {
+      // Usuwamy konto przez serwerowy endpoint korzystający z Supabase admin API
+      const response = await fetch('/api/auth/delete-account', {
         method: 'DELETE',
-      });
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to delete account');
+        const errorBody = await response.json().catch(() => null)
+        const message =
+          (errorBody as { error?: { message?: string } } | null)?.error?.message ??
+          'Failed to delete account'
+        throw new Error(message)
       }
 
       // Wyloguj użytkownika po usunięciu konta
-      await supabaseClient.auth.signOut();
+      await supabaseClient.auth.signOut()
 
-      return { success: true };
+      return { success: true }
     } catch (error) {
-      console.error('Error deleting account:', error);
-      throw error;
+      console.error('Error deleting account:', error)
+      throw error
     }
-  };
+  }
 
   /**
    * Wylogowuje użytkownika

@@ -10,13 +10,12 @@ Najpierw przejrzyj następujące informacje:
 2. Opis widoku:
    <view_description>
 
-- **Dashboard „Moje cele”** (`/`)
-  Dashboard moje cele jest juz wykonany. Skupiamy się tylko na postępach.
-
+- **Dashboard „Moje cele”** (`/goals`)
   • Cel: Pokazuje bieżący postęp celów
+  • Info: Strona, widok celów, dodawanie/edycja/usuwanie celów jest już zrobione. Skupiamy się na rozbudowie w formie wykresów kumulacyjnych.
   • Kluczowe informacje: Wykres kumulatywny
   • Kluczowe komponenty: `ProgressChart`, `GoalCard`, `BottomNavBar` / `TopNavBar`, `Toast`, `SkeletonRow`  
-   • UX / dostępność / bezpieczeństwo: Lazy loading wykresu, paginacja kart, skeletony, dark-mode
+  • UX / dostępność / bezpieczeństwo: Lazy loading wykresu, paginacja kart, skeletony, dark-mode
   </view_description>
 
 3. User Stories:
@@ -190,4 +189,4 @@ Oto przykład tego, jak powinien wyglądać plik wyjściowy (treść jest do zas
 3. [...]
 ```
 
-Rozpocznij analizę i planowanie już teraz. Twój ostateczny wynik powinien składać się wyłącznie z planu wdrożenia w języku polskim w formacie markdown, który zapiszesz w pliku .ai/view-progress-implementation-plan.md i nie powinien powielać ani powtarzać żadnej pracy wykonanej w podziale implementacji.
+Rozpocznij analizę i planowanie już teraz. Twój ostateczny wynik powinien składać się wyłącznie z planu wdrożenia w języku polskim w formacie markdown, który zapiszesz w pliku .ai/view-goals-progress-implementation-plan.md i nie powinien powielać ani powtarzać żadnej pracy wykonanej w podziale implementacji.
