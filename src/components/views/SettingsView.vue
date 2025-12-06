@@ -12,7 +12,9 @@ const activeTab = ref('profile')
 const isAdmin = ref(false)
 const isHydrated = ref(false)
 
-const checkIsAdmin = (user: any) => {
+type SupabaseUser = import('@supabase/supabase-js').User | null
+
+const checkIsAdmin = (user: SupabaseUser) => {
   const metadata = (user?.app_metadata ?? {}) as Record<string, unknown>
 
   const role = metadata.role

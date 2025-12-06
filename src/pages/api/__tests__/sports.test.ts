@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi, type MockedFunction } from 'vitest';
+import type { User } from '@supabase/supabase-js';
 
-import { beforeAll } from 'vitest';
-import { requireAuth } from '@/middleware/requireAuth';
+import { requireAuth, type RequireAuthResult } from '@/middleware/requireAuth';
 import { createSport } from '@/services/sports/createSport';
+import type { SportDto } from '@/types';
 
 vi.mock('@/services/sports/getSports', () => ({
   getSports: vi.fn(),
@@ -55,8 +56,21 @@ const makeRequest = (body: unknown) =>
     body: JSON.stringify(body),
   });
 
+const makeUser = (appMetadata: Record<string, unknown>): User =>
+  ({
+    id: 'test-user',
+    app_metadata: appMetadata,
+    aud: 'authenticated',
+    role: 'authenticated',
+  } as unknown as User);
+
+const makeContext = (body: unknown) =>
+  ({
+    request: makeRequest(body),
+    locals: { supabase: {} },
+  } satisfies Parameters<(typeof import('../sports.js'))['POST']>[0]);
+
 describe('POST /api/sports admin guard', () => {
-  const locals = { supabase: {} as unknown as never };
   const mockedRequireAuth = requireAuth as MockedFunction<typeof requireAuth>;
   const mockedCreateSport = createSport as MockedFunction<typeof createSport>;
 
@@ -68,20 +82,17 @@ describe('POST /api/sports admin guard', () => {
     mockedRequireAuth.mockResolvedValue({
       userId: 'user-1',
       accessToken: 'token',
-      user: { app_metadata: { role: 'admin' } },
-    } as any);
+      user: makeUser({ role: 'admin' }),
+    } satisfies RequireAuthResult);
     mockedCreateSport.mockResolvedValue({
       id: 'sport-1',
       code: 'run',
       name: 'Running',
       description: null,
       consolidated: null,
-    } as any);
+    } satisfies SportDto);
 
-    const response = await POST({
-      request: makeRequest({ code: 'run', name: 'Running' }),
-      locals,
-    } as any);
+    const response = await POST(makeContext({ code: 'run', name: 'Running' }));
 
     expect(response.status).toBe(201);
     const json = await response.json();
@@ -93,13 +104,10 @@ describe('POST /api/sports admin guard', () => {
     mockedRequireAuth.mockResolvedValue({
       userId: 'user-2',
       accessToken: 'token',
-      user: { app_metadata: { role: 'user' } },
-    } as any);
+      user: makeUser({ role: 'user' }),
+    } satisfies RequireAuthResult);
 
-    const response = await POST({
-      request: makeRequest({ code: 'run', name: 'Running' }),
-      locals,
-    } as any);
+    const response = await POST(makeContext({ code: 'run', name: 'Running' }));
 
     expect(response.status).toBe(403);
     const json = await response.json();
@@ -111,20 +119,17 @@ describe('POST /api/sports admin guard', () => {
     mockedRequireAuth.mockResolvedValue({
       userId: 'user-3',
       accessToken: 'token',
-      user: { app_metadata: { roles: ['editor', 'admin'] } },
-    } as any);
+      user: makeUser({ roles: ['editor', 'admin'] }),
+    } satisfies RequireAuthResult);
     mockedCreateSport.mockResolvedValue({
       id: 'sport-2',
       code: 'bike',
       name: 'Cycling',
       description: null,
       consolidated: null,
-    } as any);
+    } satisfies SportDto);
 
-    const response = await POST({
-      request: makeRequest({ code: 'bike', name: 'Cycling' }),
-      locals,
-    } as any);
+    const response = await POST(makeContext({ code: 'bike', name: 'Cycling' }));
 
     expect(response.status).toBe(201);
     const json = await response.json();
