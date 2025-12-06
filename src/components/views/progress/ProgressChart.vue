@@ -119,26 +119,6 @@ function buildPolyline(points: Array<{ x: number; y: number }>): string {
   return points.map((point) => `${point.x},${point.y}`).join(' ');
 }
 
-function buildArea(points: Array<{ x: number; y: number }>): string {
-  if (!points.length) return '';
-  const polyline = buildPolyline(points);
-  if (!polyline) return '';
-  const parsed = polyline
-    .split(' ')
-    .map((pair) => pair.split(',').map(Number))
-    .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
-
-  if (!parsed.length) return '';
-
-  const first = parsed[0];
-  const last = parsed[parsed.length - 1];
-  return [
-    `${first[0]},50`,
-    ...parsed.map(([x, y]) => `${x},${y}`),
-    `${last[0]},50`,
-  ].join(' ');
-}
-
 function getMetricLabel(metric: ProgressMetricType): string {
   switch (metric) {
     case 'distance':
@@ -247,7 +227,7 @@ function clampDay(dayIndex: number, total: number): number {
         <span class="value-label">Wartość: {{ latestValueLabel }}</span>
       </div>
       <div class="chart-area-wrapper">
-        <div class="y-axis-label" aria-hidden="true"></div>
+        <div class="y-axis-label" aria-hidden="true">{{ axisLabel }}</div>
         <div class="chart-svg-wrapper">
           <svg
             ref="svgRef"
