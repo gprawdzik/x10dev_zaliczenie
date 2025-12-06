@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import { createSportSchema, type CreateSportCommand } from '../../validators/createSport.js';
 import { createSport, SportCreationError, SportCreationErrors } from '../../services/sports/createSport.js';
 import { getSports, GetSportsError } from '../../services/sports/getSports.js';
-import { requireAuth, AuthError } from '../../middleware/requireAuth.js';
+import { requireAuth, AuthError, type RequireAuthResult } from '../../middleware/requireAuth.js';
 import type { ErrorDto, SportDto } from '../../types.js';
 
 // Mark this endpoint as server-rendered to enable request body access
@@ -45,11 +45,36 @@ function errorResponse(status: number, code: string, message: string, details?: 
   });
 }
 
+const ADMIN_ROLE = 'admin';
+
+function isAdminUser(user: RequireAuthResult['user']): boolean {
+  const metadata = (user?.app_metadata ?? {}) as Record<string, unknown>;
+
+  const role = metadata.role;
+  if (typeof role === 'string' && role.toLowerCase() === ADMIN_ROLE) {
+    return true;
+  }
+
+  const roles = metadata.roles;
+  if (
+    Array.isArray(roles) &&
+    roles.some((entry) => typeof entry === 'string' && entry.toLowerCase() === ADMIN_ROLE)
+  ) {
+    return true;
+  }
+
+  if (metadata.is_admin === true) {
+    return true;
+  }
+
+  return false;
+}
+
 /**
  * POST /api/sports
  *
  * Creates a new sport in the database.
- * Requires authentication - only authenticated users can create sports.
+ * Requires authentication - only administrators can create sports.
  *
  * Request body:
  * {
@@ -69,7 +94,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Step 1: Verify authentication
     try {
-      await requireAuth(request, { supabase: locals.supabase });
+      const authResult = await requireAuth(request, { supabase: locals.supabase });
+
+      // Step 2: Enforce admin role
+      if (!isAdminUser(authResult.user)) {
+        return errorResponse(403, 'forbidden', 'Only administrators can create sports');
+      }
     } catch (error) {
       if (error instanceof AuthError) {
         return errorResponse(401, error.code, error.message, error.details);
@@ -77,7 +107,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       throw error;
     }
 
-    // Step 2: Parse and validate request body
+    // Step 3: Parse and validate request body
     let command: CreateSportCommand;
     try {
       command = await parseBody<CreateSportCommand>(request, createSportSchema);
@@ -98,7 +128,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return errorResponse(400, 'invalid_input', error instanceof Error ? error.message : 'Invalid request body');
     }
 
-    // Step 3: Execute business logic - create sport using authenticated client
+    // Step 4: Execute business logic - create sport using authenticated client
     let sport: SportDto;
     try {
       sport = await createSport(locals.supabase, command);
@@ -127,7 +157,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return errorResponse(500, 'internal_error', 'An unexpected error occurred');
     }
 
-    // Step 4: Return success response
+    // Step 5: Return success response
     return new Response(JSON.stringify(sport), {
       status: 201,
       headers: {
