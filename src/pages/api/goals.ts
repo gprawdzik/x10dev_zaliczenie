@@ -40,12 +40,12 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const goalId = extractResourceId(searchParams.get('id'));
 
     if (goalId) {
-      const goal = await getGoal(userId, goalId);
+      const goal = await getGoal(userId, goalId, { supabase: locals.supabase });
       return jsonResponse(goal);
     }
 
     const query = parseGoalsQuery(searchParams);
-    const paginatedGoals = await listGoals(userId, query);
+    const paginatedGoals = await listGoals(userId, query, { supabase: locals.supabase });
     return jsonResponse(paginatedGoals);
   } catch (error) {
     return handleGoalsError(error, 'GET /api/goals');
@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { userId } = await requireAuth(request, { supabase: locals.supabase });
     ensureJsonRequest(request);
     const payload = await parseJsonBody<CreateGoalInput>(request, createGoalSchema);
-    const goal = await createGoal(userId, payload);
+    const goal = await createGoal(userId, payload, { supabase: locals.supabase });
     return jsonResponse(goal, 201);
   } catch (error) {
     return handleGoalsError(error, 'POST /api/goals');
@@ -79,7 +79,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     const updates = await parseJsonBody<UpdateGoalInput>(request, updateGoalSchema);
-    const updatedGoal = await updateGoal(userId, goalId, updates);
+    const updatedGoal = await updateGoal(userId, goalId, updates, { supabase: locals.supabase });
     return jsonResponse(updatedGoal);
   } catch (error) {
     return handleGoalsError(error, 'PATCH /api/goals');
@@ -99,7 +99,7 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    await deleteGoal(userId, goalId);
+    await deleteGoal(userId, goalId, { supabase: locals.supabase });
     return new Response(null, { status: 204 });
   } catch (error) {
     return handleGoalsError(error, 'DELETE /api/goals');
@@ -108,7 +108,6 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
 
 function parseGoalsQuery(searchParams: URLSearchParams): GoalsQuery {
   const rawFilters: Record<string, unknown> = {
-    year: searchParams.get('year') ?? undefined,
     sport_id: searchParams.get('sport_id') ?? undefined,
     scope_type: searchParams.get('scope_type') ?? undefined,
     metric_type: searchParams.get('metric_type') ?? undefined,

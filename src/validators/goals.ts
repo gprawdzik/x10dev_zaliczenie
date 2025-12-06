@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const GOAL_SCOPE_TYPES = ['global', 'per_sport'] as const;
 const GOAL_METRIC_TYPES = ['distance', 'time', 'elevation_gain'] as const;
-const GOAL_SORTABLE_FIELDS = ['created_at', 'year', 'target_value'] as const;
+const GOAL_SORTABLE_FIELDS = ['created_at', 'target_value'] as const;
 const GOAL_HISTORY_SORTABLE_FIELDS = ['changed_at'] as const;
 const SORT_DIRECTIONS = ['asc', 'desc'] as const;
 
@@ -11,11 +11,6 @@ const uuidSchema = z
   .trim()
   .uuid('Value must be a valid UUID');
 
-const yearSchema = z
-  .coerce.number()
-  .int('Year must be an integer')
-  .min(2000, 'Year must be no earlier than 2000')
-  .max(2100, 'Year must be no later than 2100');
 
 const positiveNumberSchema = z
   .coerce.number()
@@ -24,7 +19,6 @@ const positiveNumberSchema = z
 export const createGoalSchema = z
   .object({
     scope_type: z.enum(GOAL_SCOPE_TYPES),
-    year: yearSchema,
     metric_type: z.enum(GOAL_METRIC_TYPES),
     target_value: positiveNumberSchema,
     sport_id: uuidSchema.nullable().optional(),
@@ -49,15 +43,10 @@ export const createGoalSchema = z
 
 export const updateGoalSchema = z
   .object({
-    metric_type: z.enum(GOAL_METRIC_TYPES).optional(),
-    target_value: positiveNumberSchema.optional(),
-  })
-  .refine((value) => Boolean(value.metric_type || value.target_value), {
-    message: 'Provide at least one field to update (metric_type or target_value)',
+    target_value: positiveNumberSchema,
   });
 
 export const goalsQuerySchema = z.object({
-  year: yearSchema.optional(),
   sport_id: uuidSchema.optional(),
   scope_type: z.enum(GOAL_SCOPE_TYPES).optional(),
   metric_type: z.enum(GOAL_METRIC_TYPES).optional(),

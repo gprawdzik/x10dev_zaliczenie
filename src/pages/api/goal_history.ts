@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   try {
     const { userId } = await requireAuth(request, { supabase: locals.supabase });
     const params = parseGoalHistoryQuery(request.url);
-    const history = await listGoalHistory(userId, params);
+    const history = await listGoalHistory(userId, params, { supabase: locals.supabase });
     return jsonResponse(history);
   } catch (error) {
     return handleGoalHistoryError(error);

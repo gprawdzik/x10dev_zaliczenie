@@ -1,67 +1,66 @@
 ---
-// Strona Postępy (Progress)
 import AppLayout from '../layouts/AppLayout.astro';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card/index.js';
+import ProgressPanel from '@/components/views/progress/ProgressPanel.vue';
+import type { ProgressFilterState } from '@/lib/view-models/progress.js';
 
-// Generuj tę stronę statycznie (prerender)
-export const prerender = true;
+export const prerender = false;
+
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 6 }, (_, index) => currentYear - index);
+const initialFilters: ProgressFilterState = {
+  year: currentYear,
+  metric_type: 'distance',
+  sport_id: null,
+};
 ---
 
-<AppLayout 
-  title="Postępy - StravaGoals"
-  description="Analizuj swoje postępy i statystyki treningowe"
->
-  <div class="progress-page">
-    <div class="page-header">
-      <h1 class="page-title">Postępy</h1>
-      <p class="page-subtitle">
-        Wizualizacje i analiza Twoich postępów treningowych
-      </p>
-    </div>
+<AppLayout title="Postępy - StravaGoals" description="Analizuj swoje postępy i statystyki treningowe">
+  <div class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Moje postępy</p>
+        <h1 class="page-title">Postępy roczne</h1>
+        <p class="page-subtitle">Śledź kumulację aktywności według wybranych filtrów.</p>
+      </div>
+    </header>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>🚧 W budowie</CardTitle>
-        <CardDescription>Ta funkcjonalność będzie wkrótce dostępna</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p class="text-muted-foreground">
-          Tutaj będziesz mógł przeglądać szczegółowe analizy swoich postępów.
-          Funkcje do zaimplementowania:
-        </p>
-        <ul class="mt-4 space-y-2 text-sm text-muted-foreground">
-          <li>✓ Wykresy postępów dla celów rocznych</li>
-          <li>✓ Porównanie między latami</li>
-          <li>✓ Statystyki per sport</li>
-          <li>✓ Trendy i prognozy</li>
-          <li>✓ Eksport raportów</li>
-        </ul>
-      </CardContent>
-    </Card>
+    <section class="content">
+      <ProgressPanel client:load initialFilters={initialFilters} years={years} />
+    </section>
   </div>
 </AppLayout>
 
 <style>
-  .progress-page {
+  .page-shell {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1080px;
     margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
   }
 
   .page-header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
   }
 
   .page-title {
     font-size: 2rem;
     font-weight: 700;
     color: hsl(var(--foreground));
-    margin-bottom: 0.5rem;
   }
 
   .page-subtitle {
-    font-size: 1rem;
+    margin-top: 0.35rem;
     color: hsl(var(--muted-foreground));
   }
-</style>
 
+  .content {
+    margin-top: 1.5rem;
+  }
+</style>

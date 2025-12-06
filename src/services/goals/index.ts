@@ -54,9 +54,6 @@ export async function listGoals(
     .select('*', { count: 'exact' })
     .eq('user_id', userId);
 
-  if (params.year) {
-    query = query.eq('year', params.year);
-  }
   if (params.scope_type) {
     query = query.eq('scope_type', params.scope_type);
   }
@@ -141,7 +138,7 @@ export async function createGoal(
     if (isConflictError(error)) {
       throw new GoalsServiceError(
         GoalsServiceErrors.CONFLICT,
-        'A similar goal already exists for the selected year and metric',
+        'A similar goal already exists for the selected metric',
         { originalError: error.message }
       );
     }

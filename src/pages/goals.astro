@@ -1,67 +1,14 @@
 ---
-// Strona Cele (Goals)
 import AppLayout from '../layouts/AppLayout.astro';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card/index.js';
+import GoalsView from '../components/views/goals/GoalsView.vue';
 
-// Generuj tę stronę statycznie (prerender)
-export const prerender = true;
+// Strona wymaga kontekstu żądania (np. nagłówków) więc musi być SSR
+export const prerender = false;
 ---
 
-<AppLayout 
+<AppLayout
   title="Cele - StravaGoals"
-  description="Zarządzaj swoimi celami treningowymi"
+  description="Zarządzaj swoimi rocznymi celami treningowymi"
 >
-  <div class="goals-page">
-    <div class="page-header">
-      <h1 class="page-title">Cele treningowe</h1>
-      <p class="page-subtitle">
-        Definiuj i śledź swoje cele roczne dla różnych dyscyplin sportowych
-      </p>
-    </div>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>🚧 W budowie</CardTitle>
-        <CardDescription>Ta funkcjonalność będzie wkrótce dostępna</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p class="text-muted-foreground">
-          Tutaj będziesz mógł tworzyć, edytować i śledzić swoje cele treningowe.
-          Funkcje do zaimplementowania:
-        </p>
-        <ul class="mt-4 space-y-2 text-sm text-muted-foreground">
-          <li>✓ Tworzenie nowych celów (dystans, czas, wzniesienie)</li>
-          <li>✓ Edycja istniejących celów</li>
-          <li>✓ Podgląd postępu dla każdego celu</li>
-          <li>✓ Historia zmian celów</li>
-          <li>✓ Filtrowanie celów po roku i sporcie</li>
-        </ul>
-      </CardContent>
-    </Card>
-  </div>
+  <GoalsView client:load />
 </AppLayout>
-
-<style>
-  .goals-page {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .page-header {
-    margin-bottom: 2rem;
-  }
-
-  .page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: hsl(var(--foreground));
-    margin-bottom: 0.5rem;
-  }
-
-  .page-subtitle {
-    font-size: 1rem;
-    color: hsl(var(--muted-foreground));
-  }
-</style>
-
