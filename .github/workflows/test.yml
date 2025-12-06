@@ -1,4 +1,4 @@
-name: Testing CI
+name: Lint and Unit testing
 
 on:
   push:
