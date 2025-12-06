@@ -46,6 +46,7 @@ type GeneratorConfig = {
   profiles: SportProfile[];
   distribution: DistributionConfig;
   total: number;
+  targetYear?: number;
 };
 
 type LocalDateParts = {
@@ -201,6 +202,7 @@ export async function generateActivities(
 function resolveGeneratorConfig(sports: SportDto[], overrides: GenerateActivitiesOverrides = {}): GeneratorConfig {
   const timezone = (overrides.timezone ?? DEFAULT_TIMEZONE).trim() || DEFAULT_TIMEZONE;
   const distribution = normalizeDistribution(overrides.distribution ?? DEFAULT_DISTRIBUTION);
+  const targetYear = overrides.year;
   
   // Build profiles from SportDto array
   const profiles = sports.map(sport => buildSportProfile(sport));
@@ -213,6 +215,7 @@ function resolveGeneratorConfig(sports: SportDto[], overrides: GenerateActivitie
     profiles: finalProfiles,
     distribution,
     total: TOTAL_SYNTHETIC_ACTIVITIES,
+    targetYear,
   };
 }
 
@@ -280,7 +283,7 @@ function buildSyntheticActivities(userId: string, config: GeneratorConfig): Acti
 }
 
 function createSyntheticActivity(userId: string, config: GeneratorConfig): ActivityInsert {
-  const baseDate = pickRandomDateWithinYear();
+  const baseDate = pickRandomDateWithinYear(config.targetYear);
   const localized = buildLocalizedTimestamp(baseDate, config.timezone);
   const profile = pickSportProfile(config);
   const metrics = buildMetrics(profile, getSeasonalityMultiplier(localized.month));
@@ -302,10 +305,17 @@ function createSyntheticActivity(userId: string, config: GeneratorConfig): Activ
   };
 }
 
-function pickRandomDateWithinYear(): Date {
-  const now = Date.now();
-  const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
-  const timestamp = oneYearAgo + Math.random() * (now - oneYearAgo);
+function pickRandomDateWithinYear(targetYear?: number): Date {
+  if (!targetYear) {
+    const now = Date.now();
+    const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
+    const timestamp = oneYearAgo + Math.random() * (now - oneYearAgo);
+    return new Date(timestamp);
+  }
+
+  const start = Date.UTC(targetYear, 0, 1);
+  const end = Date.UTC(targetYear + 1, 0, 1);
+  const timestamp = start + Math.random() * (end - start);
   return new Date(timestamp);
 }
 

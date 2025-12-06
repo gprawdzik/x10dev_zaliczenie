@@ -18,6 +18,7 @@ export type GenerateActivitiesRequest = Partial<{
   primary_sports: string[];
   distribution: { primary: number; secondary: number; tertiary: number; quaternary: number };
   timezone: string;
+  year: number;
 }>;
 export type GenerateActivitiesResponse = { created_count: number };
 export type Paginated<T> = {
