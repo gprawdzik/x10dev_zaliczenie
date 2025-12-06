@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { supabaseClient } from '@/db/supabase.client'
 import ProfilePanel from './ProfilePanel.vue'
 import ActivityGeneratorPanel from './ActivityGeneratorPanel.vue'
 import SportManagerPanel from './SportManagerPanel.vue'
@@ -8,13 +9,42 @@ import SportManagerPanel from './SportManagerPanel.vue'
 // Stan aktywnej zakładki
 const activeTab = ref('profile')
 
-// Tymczasowo ustawiamy na true dla celów deweloperskich
-// W przyszłości będzie to pobierane z useUserStore
-const isAdmin = ref(true)
+const isAdmin = ref(false)
 const isHydrated = ref(false)
 
+const checkIsAdmin = (user: any) => {
+  const metadata = (user?.app_metadata ?? {}) as Record<string, unknown>
+
+  const role = metadata.role
+  if (typeof role === 'string' && role.toLowerCase() === 'admin') {
+    return true
+  }
+
+  const roles = metadata.roles
+  if (Array.isArray(roles) && roles.some((entry) => typeof entry === 'string' && entry.toLowerCase() === 'admin')) {
+    return true
+  }
+
+  if (metadata.is_admin === true) {
+    return true
+  }
+
+  return false
+}
+
 onMounted(() => {
-  isHydrated.value = true
+  supabaseClient.auth
+    .getUser()
+    .then(({ data }) => {
+      isAdmin.value = checkIsAdmin(data.user)
+    })
+    .catch((error) => {
+      console.error('Failed to fetch user for admin check', error)
+      isAdmin.value = false
+    })
+    .finally(() => {
+      isHydrated.value = true
+    })
 })
 </script>
 
