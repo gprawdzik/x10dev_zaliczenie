@@ -12,14 +12,18 @@ interface Props {
   pageSize: number;
   total: number;
   loading?: boolean;
+  error?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  error: null,
 });
 
 const emit = defineEmits<{
   (e: 'page-change', page: number): void;
+  (e: 'progress', goal: GoalCardVM): void;
+  (e: 'retry'): void;
 }>();
 
 const totalPages = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)));
@@ -50,13 +54,26 @@ function handleNext() {
 
   <SkeletonRow v-if="loading" :rows="pageSize" variant="card" />
 
+  <div v-else-if="error" class="error">
+    <div>
+      <p class="error-title">Nie udało się załadować celów</p>
+      <p class="error-text">{{ error }}</p>
+    </div>
+    <Button variant="outline" size="sm" @click="$emit('retry')">Spróbuj ponownie</Button>
+  </div>
+
   <div v-else-if="!items.length" class="empty">
     <p class="empty-title">Brak kart celów</p>
     <p class="empty-text">Dodaj cele lub zmień filtry, aby zobaczyć postęp.</p>
   </div>
 
   <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-    <ProgressGoalCard v-for="goal in items" :key="goal.id" :goal="goal" />
+    <ProgressGoalCard
+      v-for="goal in items"
+      :key="goal.id"
+      :goal="goal"
+      @click="$emit('progress', goal)"
+    />
   </div>
 </template>
 
@@ -80,6 +97,18 @@ function handleNext() {
 }
 
 .page-indicator {
+  @apply text-sm text-muted-foreground;
+}
+
+.error {
+  @apply flex items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-3;
+}
+
+.error-title {
+  @apply text-sm font-semibold text-destructive;
+}
+
+.error-text {
   @apply text-sm text-muted-foreground;
 }
 

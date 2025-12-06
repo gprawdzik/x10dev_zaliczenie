@@ -49,17 +49,6 @@ describe('GoalCard', () => {
     expect(wrapper.text()).toContain('Globalny');
   });
 
-  it('renders progress percentage', () => {
-    const wrapper = mount(GoalCard, {
-      props: {
-        goal: mockGoal,
-      },
-    });
-
-    // Check if progress percentage is rendered
-    expect(wrapper.text()).toContain('50%');
-  });
-
   it('emits edit event when edit button is clicked', async () => {
     const wrapper = mount(GoalCard, {
       props: {

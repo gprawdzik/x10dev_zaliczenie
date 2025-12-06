@@ -11,11 +11,23 @@ interface Props {
   year: number;
   loading?: boolean;
   error?: string | null;
+  targetValue?: number;
+  percent?: number;
+  scopeLabel?: string;
+  showValueBadge?: boolean;
+  showIdealLine?: boolean;
+  showStats?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   error: null,
+  targetValue: 0,
+  percent: 0,
+  scopeLabel: 'Cel globalny',
+  showValueBadge: true,
+  showIdealLine: false,
+  showStats: true,
 });
 
 const emit = defineEmits<{
@@ -25,11 +37,21 @@ const emit = defineEmits<{
 const hasData = computed(() => props.series.length > 0);
 const metricLabel = computed(() => getMetricLabel(props.metricType));
 const latestValueLabel = computed(() => formatValue(props.series.at(-1)?.value ?? 0, props.metricType));
+const targetValueLabel = computed(() =>
+  props.targetValue ? formatValue(props.targetValue ?? 0, props.metricType) : 'Brak celu'
+);
+const percentLabel = computed(() => {
+  if (!props.targetValue) return 'Brak celu';
+  const safePercent = Math.max(0, Math.min(props.percent ?? 0, 999));
+  return `${safePercent.toFixed(safePercent >= 100 ? 0 : 1)}%`;
+});
 const axisLabel = computed(() => getAxisLabel(props.metricType));
 const totalDays = computed(() => getTotalDays(props.year));
 const maxValue = computed(() => {
   if (!props.series.length) return 0;
-  return Math.max(...props.series.map((p) => p.value), 0);
+  const values = props.series.map((p) => p.value);
+  values.push(props.targetValue ?? 0);
+  return Math.max(...values, 0);
 });
 
 const svgRef = ref<SVGSVGElement | null>(null);
@@ -84,6 +106,21 @@ const yTicks = computed(() => {
     const value = maxValue.value * ratio;
     return { y, ratio: safeRatio, value };
   });
+});
+
+const targetLine = computed(() => {
+  if (!props.targetValue || maxValue.value <= 0) return null;
+  const y = 50 - (props.targetValue / maxValue.value) * 45;
+  return { y: Math.max(0, Math.min(y, 50)) };
+});
+
+const idealLine = computed(() => {
+  if (!props.showIdealLine || !props.targetValue || maxValue.value <= 0 || totalDays.value <= 1) {
+    return null;
+  }
+  const start = { x: 0, y: 50 };
+  const end = { x: 100, y: Math.max(0, 50 - (props.targetValue / maxValue.value) * 45) };
+  return `${start.x},${start.y} ${end.x},${end.y}`;
 });
 
 function handleRetry() {
@@ -206,6 +243,22 @@ function clampDay(dayIndex: number, total: number): number {
       <div>
         <p class="chart-eyebrow">Postępy {{ year }}</p>
         <p class="chart-title">Metryka: {{ metricLabel }}</p>
+        <p class="chart-scope">{{ scopeLabel }}</p>
+      </div>
+    </div>
+
+    <div v-if="props.showStats" class="chart-stats">
+      <div class="stat">
+        <p class="stat-label">Postęp</p>
+        <p class="stat-value">{{ percentLabel }}</p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Cel</p>
+        <p class="stat-value">{{ targetValueLabel }}</p>
+      </div>
+      <div class="stat" v-if="props.showValueBadge">
+        <p class="stat-label">Wartość</p>
+        <p class="stat-value">{{ latestValueLabel }}</p>
       </div>
     </div>
 
@@ -223,7 +276,7 @@ function clampDay(dayIndex: number, total: number): number {
     </div>
 
     <div v-else class="chart-body">
-      <div class="chart-value">
+      <div v-if="props.showValueBadge" class="chart-value">
         <span class="value-label">Wartość: {{ latestValueLabel }}</span>
       </div>
       <div class="chart-area-wrapper">
@@ -265,6 +318,21 @@ function clampDay(dayIndex: number, total: number): number {
               v-if="polylinePoints"
               :points="polylinePoints"
               class="chart-line"
+              vector-effect="non-scaling-stroke"
+            />
+            <polyline
+              v-if="idealLine"
+              :points="idealLine"
+              class="ideal-line"
+              vector-effect="non-scaling-stroke"
+            />
+            <line
+              v-if="targetLine"
+              class="target-line"
+              x1="0"
+              :y1="targetLine.y"
+              x2="100"
+              :y2="targetLine.y"
               vector-effect="non-scaling-stroke"
             />
             <line
@@ -327,9 +395,29 @@ function clampDay(dayIndex: number, total: number): number {
   @apply text-lg font-semibold text-foreground;
 }
 
+.chart-scope {
+  @apply text-sm text-muted-foreground;
+}
+
 .chart-body {
   @apply mt-4;
   @apply space-y-3;
+}
+
+.chart-stats {
+  @apply mt-4 grid grid-cols-1 gap-2 rounded-lg border border-border bg-muted/40 p-3 text-sm md:grid-cols-3;
+}
+
+.stat {
+  @apply flex flex-col gap-1;
+}
+
+.stat-label {
+  @apply text-muted-foreground;
+}
+
+.stat-value {
+  @apply text-base font-semibold;
 }
 
 .chart-value {
@@ -386,6 +474,21 @@ function clampDay(dayIndex: number, total: number): number {
   fill: hsl(var(--primary));
   stroke: hsl(var(--background));
   stroke-width: 0.4;
+}
+
+.target-line {
+  stroke: hsl(var(--primary));
+  stroke-width: 0.9;
+  stroke-dasharray: 4 2;
+  stroke-opacity: 0.7;
+}
+
+.ideal-line {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 1.6;
+  stroke-dasharray: 5 4;
+  stroke-opacity: 0.7;
 }
 
 .x-axis {

@@ -6,9 +6,53 @@ import GoalsView from '../components/views/goals/GoalsView.vue';
 export const prerender = false;
 ---
 
-<AppLayout
-  title="Cele - StravaGoals"
-  description="Zarządzaj swoimi rocznymi celami treningowymi"
->
-  <GoalsView client:load />
+<AppLayout title="Cele - StravaGoals" description="Zarządzaj i śledź swoje cele treningowe">
+  <div class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Moje cele</p>
+        <h1 class="page-title">Postępy i zarządzanie celami</h1>
+        <p class="page-subtitle">Analizuj postępy roczne oraz dodawaj i edytuj własne cele.</p>
+      </div>
+    </header>
+
+    <section class="content">
+      <GoalsView client:load />
+    </section>
+  </div>
 </AppLayout>
+
+<style>
+  .page-shell {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+
+  .page-subtitle {
+    margin-top: 0.35rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .content {
+    margin-top: 1.5rem;
+  }
+</style>
