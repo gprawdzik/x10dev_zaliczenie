@@ -54,11 +54,27 @@ const sportsState = reactive<SportsState>({
 })
 
 const selectedSports = ref<string[]>([])
+const selectedYear = ref<number | null>(null)
 const isDialogOpen = ref(false)
 const isGenerating = ref(false)
 const toast = useToastStore()
 
 const distributionSummary = 'Stały rozkład: 50% / 30% / 15% / 5%'
+const availableYears = computed(() => {
+  const currentYear = new Date().getFullYear()
+  return Array.from({ length: 5 }, (_, index) => currentYear - (index + 1))
+})
+const selectedYearString = computed({
+  get: () => (selectedYear.value ? String(selectedYear.value) : ''),
+  set: (value: string) => {
+    if (!value) {
+      selectedYear.value = null
+      return
+    }
+    const parsed = Number.parseInt(value, 10)
+    selectedYear.value = Number.isNaN(parsed) ? null : parsed
+  },
+})
 const selectedSportsDisplay = computed(() =>
   selectedSports.value.map((code): SportSelection => {
     const sport = sportsState.items.find((item) => item.code === code)
@@ -77,6 +93,9 @@ const sportsSummary = computed<string>(() => {
 
   return sportNames.join(', ')
 })
+const yearSummary = computed(() =>
+  selectedYear.value ? `${selectedYear.value}` : 'Ostatnie 12 miesięcy (dynamicznie)',
+)
 const confirmButtonLabel = computed(() => (isGenerating.value ? 'Generuję...' : 'Generuj'))
 
 onMounted(() => {
@@ -171,6 +190,10 @@ function buildRequestPayload(): GenerateActivitiesRequest {
 
   if (selectedSports.value.length) {
     payload.primary_sports = selectedSports.value
+  }
+
+  if (selectedYear.value !== null) {
+    payload.year = selectedYear.value
   }
 
   return payload
@@ -316,6 +339,27 @@ function openConfirmationDialog(): void {
               </p>
             </section>
 
+            <section class="space-y-3 p-4">
+              <div class="flex flex-col gap-2">
+                <p class="text-sm font-medium">Zakres roku</p>
+                <p class="text-xs text-muted-foreground">
+                  Wybierz pełny rok, dla którego mają być wygenerowane aktywności. Brak wyboru oznacza
+                  ostatnie 12 miesięcy od teraz. Dostępne są tylko zakończone lata (max 5 wstecz).
+                </p>
+              </div>
+              <select
+                v-model="selectedYearString"
+                class="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
+                :disabled="isGenerating"
+                data-testid="generator-year-select"
+              >
+                <option value="">Brak wyboru (ostatnie 12 miesięcy)</option>
+                <option v-for="year in availableYears" :key="year" :value="year">
+                  {{ year }}
+                </option>
+              </select>
+            </section>
+
             <section class="space-y-1 p-4">
               <p class="text-sm font-medium">Rozkład prawdopodobieństwa</p>
               <p class="text-sm text-muted-foreground">
@@ -344,6 +388,9 @@ function openConfirmationDialog(): void {
                     </p>
                     <p>
                       Sporty: <strong>{{ sportsSummary }}</strong>
+                    </p>
+                    <p>
+                      Rok: <strong>{{ yearSummary }}</strong>
                     </p>
                     <p>
                       Rozkład: <strong>{{ distributionSummary }}</strong>

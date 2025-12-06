@@ -537,6 +537,7 @@ describe('activity validators', () => {
 
     describe('complete payload validation', () => {
       it('accepts valid complete payload', () => {
+        const year = new Date().getFullYear() - 1;
         const result = generateActivitiesBodySchema.parse({
           primary_sports: ['Running', 'Cycling'],
           distribution: {
@@ -546,6 +547,7 @@ describe('activity validators', () => {
             quaternary: 0.05,
           },
           timezone: 'Europe/Warsaw',
+          year,
         });
 
         expect(result).toEqual({
@@ -557,6 +559,7 @@ describe('activity validators', () => {
             quaternary: 0.05,
           },
           timezone: 'Europe/Warsaw',
+          year,
         });
       });
 
@@ -574,6 +577,55 @@ describe('activity validators', () => {
         expect(result.primary_sports).toEqual(['Running']);
         expect(result.distribution).toBeUndefined();
         expect(result.timezone).toBeUndefined();
+      });
+    });
+
+    describe('year validation', () => {
+      const currentYear = new Date().getFullYear();
+      const maxYear = currentYear - 1;
+      const minYear = currentYear - 5;
+
+      it('accepts the newest allowed year (previous full year)', () => {
+        const result = generateActivitiesBodySchema.parse({ year: maxYear });
+        expect(result.year).toBe(maxYear);
+      });
+
+      it('accepts the oldest allowed year (5 years back)', () => {
+        const result = generateActivitiesBodySchema.parse({ year: minYear });
+        expect(result.year).toBe(minYear);
+      });
+
+      it('rejects the current year', () => {
+        expect(() =>
+          generateActivitiesBodySchema.parse({
+            year: currentYear,
+          })
+        ).toThrow('year cannot be the current year or in the future');
+      });
+
+      it('rejects a future year', () => {
+        expect(() =>
+          generateActivitiesBodySchema.parse({
+            year: currentYear + 1,
+          })
+        ).toThrow('year cannot be the current year or in the future');
+      });
+
+      it('rejects a year earlier than 5 years back', () => {
+        expect(() =>
+          generateActivitiesBodySchema.parse({
+            year: minYear - 1,
+          })
+        ).toThrow(`year must not be earlier than ${minYear}`);
+      });
+
+      it('rejects non-numeric year', () => {
+        expect(() =>
+          generateActivitiesBodySchema.parse({
+            // @ts-expect-error intentional invalid type for test
+            year: '2022',
+          })
+        ).toThrow('year must be a number');
       });
     });
   });

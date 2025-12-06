@@ -5,6 +5,10 @@ import {
   ACTIVITY_SORT_DIRECTIONS,
 } from '../types.js';
 
+const CURRENT_YEAR = new Date().getFullYear();
+const MAX_GENERATABLE_YEAR = CURRENT_YEAR - 1;
+const MIN_GENERATABLE_YEAR = CURRENT_YEAR - 5;
+
 const isoDateSchema = z
   .string()
   .datetime({ offset: true, message: 'Value must be a valid ISO 8601 date with timezone' });
@@ -92,6 +96,12 @@ export const generateActivitiesBodySchema = z.object({
     .min(1, 'timezone is required')
     .max(64, 'timezone must not exceed 64 characters')
     .refine(isValidTimeZone, 'timezone must be a valid IANA identifier')
+    .optional(),
+  year: z
+    .number({ invalid_type_error: 'year must be a number' })
+    .int('year must be an integer')
+    .min(MIN_GENERATABLE_YEAR, `year must not be earlier than ${MIN_GENERATABLE_YEAR}`)
+    .max(MAX_GENERATABLE_YEAR, 'year cannot be the current year or in the future')
     .optional(),
 });
 
