@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('close')">
-    <DialogContent class="delete-dialog">
+    <DialogContent class="delete-dialog" data-testid="goal-delete-dialog">
       <DialogHeader>
         <DialogTitle>Usuń cel</DialogTitle>
         <DialogDescription>

@@ -1,5 +1,5 @@
 <template>
-  <div class="goals-view">
+  <div class="goals-view" data-testid="goals-view" :data-hydrated="isHydrated">
     <GoalsHeader @add-goal="handleAddGoal" />
 
     <!-- Error states -->
@@ -115,6 +115,7 @@ const progressError = ref<string | null>(null)
 const progressChart = ref<ProgressChartVM | null>(null)
 const progressMap = ref<Record<string, number>>({})
 const isProgressBatchLoading = ref(false)
+const isHydrated = ref(false)
 
 // Computed sports map for easy lookup
 const sportsMap = computed(() => {
@@ -190,6 +191,7 @@ const handleChangeYear = async (nextYear: number) => {
 }
 
 onMounted(() => {
+  isHydrated.value = true
   void fetchAllProgress()
 })
 
