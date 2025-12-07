@@ -27,9 +27,21 @@ type ActivityTotals = {
   bySport: Record<string, MetricTotals>;
 };
 
+type SportLite = {
+  id: string;
+  code: string;
+  name: string;
+};
+
 type SportsLookup = {
-  byId: Map<string, SportDto>;
+  byId: Map<string, SportLite>;
   codeToName: Record<string, string>;
+};
+
+type SportsState = {
+  data: SportLite[] | null;
+  isLoading: boolean;
+  error: string | null;
 };
 
 const DEFAULT_GOAL_LIMIT = 100;
@@ -49,7 +61,7 @@ export function useDashboardData() {
     error: null,
   });
 
-  const sportsState = reactive<ApiState<SportDto[]>>({
+  const sportsState = reactive<SportsState>({
     data: null,
     isLoading: false,
     error: null,
@@ -58,15 +70,13 @@ export function useDashboardData() {
   const currentYear = new Date().getUTCFullYear();
   const currentMonth = new Date().getUTCMonth();
 
-  const metrics = computed<DashboardMetricsViewModel>(() =>
-    buildMetrics(
-      goalsState.data ?? [],
-      activitiesState.data ?? [],
-      sportsState.data ?? [],
-      currentYear,
-      currentMonth
-    )
-  );
+  const metrics = computed<DashboardMetricsViewModel>(() => {
+    const goalsList: GoalDto[] = goalsState.data ?? [];
+    const activitiesList: ActivityDto[] = activitiesState.data ?? [];
+    const sportsList: SportLite[] = sportsState.data ?? [];
+
+    return buildMetrics(goalsList, activitiesList, sportsList, currentYear, currentMonth);
+  });
 
   const errorMessage = computed(() => goalsState.error ?? activitiesState.error ?? sportsState.error);
   const isLoading = computed(
@@ -187,8 +197,17 @@ export function useDashboardData() {
         throw new Error(message);
       }
 
-      const payload = (await response.json()) as SportDto[];
-      sportsState.data = Array.isArray(payload) ? payload : [];
+      const payload = (await response.json()) as unknown;
+      const sportsPayload: SportLite[] = Array.isArray(payload)
+        ? (payload as SportDto[])
+            .filter((item): item is SportDto => Boolean(item && (item as SportDto).id && (item as SportDto).code))
+            .map((item) => ({
+              id: item.id,
+              code: item.code,
+              name: item.name,
+            }))
+        : [];
+      sportsState.data = sportsPayload;
     } catch (error) {
       console.error('Failed to load sports for dashboard', error);
       sportsState.data = [];
@@ -226,7 +245,7 @@ export function useDashboardData() {
 export function buildMetrics(
   goals: GoalDto[],
   activities: ActivityDto[],
-  sports: SportDto[],
+  sports: SportLite[],
   year: number,
   monthIndex: number
 ): DashboardMetricsViewModel {
@@ -363,8 +382,8 @@ export function buildActivityTotals(activities: ActivityDto[]): ActivityTotals {
   return totals;
 }
 
-function buildSportsLookup(sports: SportDto[]): SportsLookup {
-  const byId = new Map<string, SportDto>();
+function buildSportsLookup(sports: SportLite[]): SportsLookup {
+  const byId = new Map<string, SportLite>();
   const codeToName: Record<string, string> = {};
 
   for (const sport of sports) {

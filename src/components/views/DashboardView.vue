@@ -11,7 +11,6 @@ const {
   metrics,
   errorMessage,
   isLoading,
-  retry,
 } = useDashboardData();
 
 const showError = computed(() => errorMessage.value);
