@@ -7,7 +7,6 @@ import FormField from '@/components/ui/FormField.vue'
 import FormStatus from '@/components/ui/FormStatus.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useFormSubmission } from '@/composables/useFormSubmission.js'
-import { useNavigation } from '@/composables/useNavigation.js'
 import { getAuthErrorMessage } from '@/lib/authErrors.js'
 
 const passwordHints = [
@@ -18,7 +17,6 @@ const passwordHints = [
 ]
 
 const { signUp } = useAuth()
-const { navigateDelayed } = useNavigation()
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(registerSchema),
@@ -28,15 +26,9 @@ const submission = useFormSubmission({
   onSubmit: async (data: { email: string; password: string; confirmPassword: string }) => {
     return await signUp(data.email, data.password)
   },
-  onSuccess: (result) => {
-    if (!result.session) {
-      submission.message.value =
-        'Konto utworzono. Potwierdź adres email, aby dokończyć rejestrację.'
-      return
-    }
-
-    submission.message.value = 'Konto utworzone! Przekierowujemy do pulpitu...'
-    navigateDelayed('/', 900)
+  onSuccess: () => {
+    submission.message.value =
+      'Konto utworzono. Sprawdź skrzynkę i aktywuj konto linkiem z wiadomości.'
   },
   onError: (error) => {
     submission.message.value = getAuthErrorMessage(error)

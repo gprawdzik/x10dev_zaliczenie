@@ -11,7 +11,7 @@ import FormField from '@/components/ui/FormField.vue'
 import FormStatus from '@/components/ui/FormStatus.vue'
 import { getAuthErrorMessage } from '@/lib/authErrors.js'
 
-const { changePassword } = useAuth()
+const { changePassword, signOut } = useAuth()
 const session = usePasswordRecoverySession()
 
 const { handleSubmit } = useForm({
@@ -24,9 +24,12 @@ const submission = useFormSubmission({
       throw new Error('Sesja resetowania hasła nie jest aktywna.')
     }
     await changePassword(data.newPassword)
+    // Po skutecznej zmianie hasła wylogowujemy, aby nie pozostawić aktywnej sesji
+    await signOut()
   },
   onSuccess: () => {
-    submission.message.value = 'Hasło zostało zaktualizowane. Możesz się teraz zalogować.'
+    submission.message.value =
+      'Hasło zostało zaktualizowane. Zaloguj się ponownie, aby kontynuować.'
   },
   onError: (error) => {
     submission.message.value = getAuthErrorMessage(error)
