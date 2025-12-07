@@ -7,7 +7,6 @@ import FormField from '@/components/ui/FormField.vue'
 import FormStatus from '@/components/ui/FormStatus.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useFormSubmission } from '@/composables/useFormSubmission.js'
-import { useNavigation } from '@/composables/useNavigation.js'
 import { getAuthErrorMessage } from '@/lib/authErrors.js'
 
 const passwordHints = [
@@ -18,7 +17,6 @@ const passwordHints = [
 ]
 
 const { signUp } = useAuth()
-const { navigateDelayed } = useNavigation()
 
 const { handleSubmit } = useForm({
   validationSchema: toTypedSchema(registerSchema),
