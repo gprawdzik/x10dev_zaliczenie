@@ -7,6 +7,9 @@ declare namespace App {
   interface Locals {
     supabase: SupabaseClient<Database>
     user: User | null
+    runtime?: {
+      env?: Record<string, string | undefined>
+    }
   }
 }
 
