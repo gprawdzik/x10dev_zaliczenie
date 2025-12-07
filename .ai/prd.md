@@ -24,7 +24,7 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
 - Zarządzanie celami rocznymi
   - tworzenie, edycja, odczyt, przegląd i usunięcie celów
   - trzy metryki: dystans, czas, przewyższenie (Pilates i trening siłowy: tylko czas)
-  - zakres: globalny, konsolidacja, per-sport
+  - zakres: globalny, per-sport
   - walidacja jednostek metrycznych i ograniczeń metryk per sport
 - Historia celów
   - każda edycja tworzy nowy wpis append-only
@@ -48,6 +48,10 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   - przycisk "Pokaż sugestie" uruchamia proces
   - wyświetlanie listy sugestii i przycisków "Akceptuj" lub "Odrzuć"
   - akceptacja tworzy lub aktualizuje cel
+- Dashboard (strona główna po zalogowaniu)
+  - karta z łączną liczbą celów rocznych oraz liczbą celów osiągniętych
+  - sekcja z liczbą aktywności w bieżącym miesiącu z podziałem na sporty
+  - sekcja z liczbą aktywności w bieżącym roku z podziałem na sporty
 
 ## 4. Granice produktu
 
@@ -171,6 +175,14 @@ Brak tych funkcji utrudnia analizę dotychczasowych osiągnięć i planowanie pr
   - Wylogowanie następuje poprzez link "Użytkownik"/"Wyloguj".
   - po wylogowaniu jest przekirowywany na stronę logowania
   - wylogowanie za pomocą supabase auth
+
+- ID: US-016
+  Tytuł: Przegląd na dashboardzie
+  Opis: Zalogowany użytkownik widzi skrótowe metryki po wejściu na stronę główną.
+  Kryteria akceptacji:
+  - widoczna jest liczba celów rocznych oraz liczba celów już osiągniętych
+  - widoczna jest liczba aktywności w bieżącym miesiącu z podziałem na sporty
+  - widoczna jest liczba aktywności w bieżącym roku z podziałem na sporty
 
 ## 6. Metryki sukcesu
 
