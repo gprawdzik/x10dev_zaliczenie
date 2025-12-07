@@ -1,5 +1,5 @@
 <template>
-  <Card class="goal-card">
+  <Card class="goal-card" :data-testid="`goal-card-${goal.id}`">
     <CardHeader class="goal-header">
       <div class="goal-title-section">
         <div class="goal-icon">

@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('close')">
-    <DialogContent class="goal-form-dialog">
+    <DialogContent class="goal-form-dialog" data-testid="goal-form-dialog">
       <DialogHeader>
         <DialogTitle>{{ mode === 'create' ? 'Dodaj cel' : 'Edytuj cel' }}</DialogTitle>
         <DialogDescription>
@@ -8,7 +8,7 @@
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit.prevent="handleSubmit" class="goal-form">
+      <form @submit.prevent="handleSubmit" class="goal-form" data-testid="goal-form">
         <div class="form-section">
           <Label for="scope_type">Zakres celu</Label>
           <Select
@@ -64,7 +64,12 @@
           />
         </div>
 
-        <FormStatus v-if="errorMessage" variant="error" :message="errorMessage" />
+        <FormStatus
+          v-if="errorMessage"
+          variant="error"
+          :message="errorMessage"
+          data-testid="goal-form-error"
+        />
       </form>
 
       <DialogFooter>
