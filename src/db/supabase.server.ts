@@ -10,6 +10,14 @@ type ServerClientOptions = {
   useServiceKey?: boolean
 }
 
+type RuntimeEnv = {
+  PUBLIC_SUPABASE_URL?: string
+  PUBLIC_SUPABASE_KEY?: string
+  SUPABASE_SERVICE_ROLE_KEY?: string
+  // Allow additional keys when passed from runtime bindings
+  [key: string]: string | undefined
+}
+
 function assertEnv(value: string | undefined, key: string): string {
   if (!value) {
     throw new Error(`Missing required environment variable: ${key}`)
@@ -18,14 +26,17 @@ function assertEnv(value: string | undefined, key: string): string {
   return value
 }
 
-const supabaseUrl = assertEnv(import.meta.env.PUBLIC_SUPABASE_URL, 'PUBLIC_SUPABASE_URL')
-const supabaseAnonKey = assertEnv(import.meta.env.PUBLIC_SUPABASE_KEY, 'PUBLIC_SUPABASE_KEY')
-
 export function createSupabaseServerClient(
-  options: ServerClientOptions = {}
+  options: ServerClientOptions = {},
+  env: RuntimeEnv = import.meta.env
 ): SupabaseClient<Database> {
+  const fromEnv = (key: string) => env?.[key] ?? process.env?.[key]
+
+  const supabaseUrl = assertEnv(fromEnv('PUBLIC_SUPABASE_URL'), 'PUBLIC_SUPABASE_URL')
+  const supabaseAnonKey = assertEnv(fromEnv('PUBLIC_SUPABASE_KEY'), 'PUBLIC_SUPABASE_KEY')
+
   const key = options.useServiceKey
-    ? assertEnv(import.meta.env.SUPABASE_SERVICE_ROLE_KEY, 'SUPABASE_SERVICE_ROLE_KEY')
+    ? assertEnv(fromEnv('SUPABASE_SERVICE_ROLE_KEY'), 'SUPABASE_SERVICE_ROLE_KEY')
     : supabaseAnonKey
 
   return createClient<Database>(supabaseUrl, key, {

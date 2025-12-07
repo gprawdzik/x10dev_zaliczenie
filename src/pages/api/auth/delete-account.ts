@@ -13,8 +13,9 @@ export const prerender = false
 
 export const DELETE: APIRoute = async ({ request, locals }) => {
   try {
+    const env = locals.runtime?.env ?? import.meta.env
     const { userId } = await requireAuth(request, { supabase: locals.supabase })
-    const supabaseAdmin = createSupabaseServerClient({ useServiceKey: true })
+    const supabaseAdmin = createSupabaseServerClient({ useServiceKey: true }, env)
 
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
     if (error) {
