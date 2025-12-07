@@ -22,6 +22,9 @@ const redirectTarget = redirectParam.startsWith('/') ? redirectParam : null;
 const flashMessages = {
   'logout-success': 'Wylogowano pomyślnie. Do zobaczenia!',
   'session-expired': 'Twoja sesja wygasła. Zaloguj się ponownie.',
+  'activation-success': 'Email potwierdzony. Zaloguj się, aby kontynuować.',
+  'activation-failed': 'Nie udało się potwierdzić adresu email. Spróbuj ponownie.',
+  'activation-missing-code': 'Brakuje kodu potwierdzenia. Użyj linku z wiadomości email.',
 } as const;
 
 const flashKey = Astro.url.searchParams.get('flash') ?? '';

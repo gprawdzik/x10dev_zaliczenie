@@ -1,0 +1,38 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro'
+
+const supabase = Astro.locals.supabase
+
+if (!supabase) {
+  throw new Error('Supabase client is unavailable in Astro.locals')
+}
+
+const code = Astro.url.searchParams.get('code')
+
+if (!code) {
+  return Astro.redirect('/auth/login?flash=activation-missing-code')
+}
+
+const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+if (error) {
+  console.error('Email confirmation error:', error)
+  return Astro.redirect('/auth/login?flash=activation-failed')
+}
+
+// Nie pozostawiamy aktywnej sesji po potwierdzeniu emaila – wymagamy ręcznego logowania
+const { error: signOutError } = await supabase.auth.signOut()
+
+if (signOutError) {
+  console.error('Sign out after activation error:', signOutError)
+}
+
+return Astro.redirect('/auth/login?flash=activation-success')
+---
+
+<AuthLayout title="StravaGoals — Potwierdzenie" description="Przekierowanie..." heading="Trwa przekierowanie">
+  <p class="text-sm text-muted-foreground">
+    Przekierowujemy do strony logowania. Jeśli nic się nie dzieje, <a href="/auth/login" class="font-semibold text-primary underline-offset-2 hover:underline">kliknij tutaj</a>.
+  </p>
+</AuthLayout>
+

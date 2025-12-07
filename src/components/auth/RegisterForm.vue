@@ -28,15 +28,9 @@ const submission = useFormSubmission({
   onSubmit: async (data: { email: string; password: string; confirmPassword: string }) => {
     return await signUp(data.email, data.password)
   },
-  onSuccess: (result) => {
-    if (!result.session) {
-      submission.message.value =
-        'Konto utworzono. Potwierdź adres email, aby dokończyć rejestrację.'
-      return
-    }
-
-    submission.message.value = 'Konto utworzone! Przekierowujemy do pulpitu...'
-    navigateDelayed('/', 900)
+  onSuccess: () => {
+    submission.message.value =
+      'Konto utworzono. Sprawdź skrzynkę i aktywuj konto linkiem z wiadomości.'
   },
   onError: (error) => {
     submission.message.value = getAuthErrorMessage(error)

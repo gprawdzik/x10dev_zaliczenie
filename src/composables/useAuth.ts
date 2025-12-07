@@ -30,7 +30,8 @@ const getEmailRedirectUrl = () => {
  */
 export function useAuth() {
   /**
-   * Rejestruje nowego użytkownika i zwraca informacje o sesji
+   * Rejestruje nowego użytkownika bez pozostawiania aktywnej sesji.
+   * Użytkownik musi potwierdzić konto z linku aktywacyjnego.
    */
   const signUp = async (email: string, password: string) => {
     try {
@@ -46,7 +47,17 @@ export function useAuth() {
         throw error
       }
 
-      return { user: data.user, session: data.session }
+      // Jeśli Supabase utworzyło sesję, natychmiast ją unieważniamy.
+      if (data.session) {
+        const { error: signOutError } = await supabaseClient.auth.signOut()
+
+        if (signOutError) {
+          throw signOutError
+        }
+      }
+
+      // Zwracamy wynik bez sesji – wymagane jest potwierdzenie email.
+      return { user: data.user, session: null }
     } catch (error) {
       console.error('Error signing up:', error)
       throw error
