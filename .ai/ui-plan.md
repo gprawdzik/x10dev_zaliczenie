@@ -29,6 +29,12 @@ Aplikacja StravaGoals składa się z siedmiu głównych widoków i dwóch modaln
   • Kluczowe komponenty: `ProgressChart`, `GoalCard`, `BottomNavBar` / `TopNavBar`, `Toast`, `SkeletonRow`  
   • UX / dostępność / bezpieczeństwo: Lazy loading wykresu, paginacja kart, skeletony, dark-mode
 
+- **Dashboard / homepage (statystyki)** (`/`)
+  • Cel: Prezentuje skrót kluczowych metryk po zalogowaniu  
+  • Kluczowe informacje: liczba celów rocznych łącznie, liczba celów osiągniętych, liczba aktywności w bieżącym miesiącu (per sport), liczba aktywności w bieżącym roku (per sport)  
+  • Kluczowe komponenty: `StatCard`, `ActivitiesBreakdown`, `SkeletonRow`  
+  • UX / dostępność / bezpieczeństwo: układ siatki (1 kolumna mobile, 2–3 kolumny desktop), skeletony w trakcie ładowania, kontrast w dark-mode
+
 - **Historia** (`/history`)
   • Cel: Przegląd cel vs wykonanie dla poprzednich lat  
   • Kluczowe informacje: Wybór lat, zbiorczy wykres porównawczy, tabela roczna  
@@ -68,7 +74,7 @@ Aplikacja StravaGoals składa się z siedmiu głównych widoków i dwóch modaln
 ## 3. Mapa podróży użytkownika
 
 1. **Anonimowy użytkownik** otwiera `/login` → wprowadza dane → **Supabase Auth** → przekierowanie na `/`.
-2. Na **Dashboardzie** ładowane są równolegle: lista celów (`GET /goals`) i wykres postępu (`POST /functions/progress-annual`).  
+2. Na **Dashboardzie** ładowane są równolegle: sekcja statystyk (`POST /functions/dashboard-stats`), lista celów (`GET /goals`) i wykres postępu (`POST /functions/progress-annual`).  
    • Użytkownik przewija listę (paginacja „Załaduj więcej”).  
    • Kliknięcie karty celu otwiera modal „Historia celu” (`GET /goal_history`).  
    • Kliknięcie „Pokaż sugestie” wywołuje `POST /functions/ai-suggestions-generate`, po czym modal „Sugestie AI” (`GET /ai_suggestions`).  
