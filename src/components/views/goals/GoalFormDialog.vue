@@ -297,9 +297,15 @@ const handleSubmit = async () => {
 
 .goal-form {
   @apply space-y-4;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* fallback when global reset zeroes margins */
 }
 
 .form-section {
   @apply space-y-2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* fallback when global reset zeroes margins */
 }
 </style>
